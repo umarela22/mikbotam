@@ -1418,8 +1418,201 @@ function info() {
 	$getdata=file_get_contents('https://download.mikbotam.net/scari.php?Runing');
 echo  $getdata;
 }
-function  Version() {
+function Version() {
 
 	$getdata=file_get_contents('https://download.mikbotam.net/scari.php?Version');
 echo  $getdata;
 }
+
+//===================================================== START PPP BILLING DATABASE FUNCTIONS ====================//
+
+function init_ppp_billing_tables() {
+    global $mikbotamdata;
+    if (!$mikbotamdata) return;
+    try {
+        $pdo = $mikbotamdata->pdo;
+        $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_packages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            profile_name TEXT NOT NULL UNIQUE,
+            price INTEGER NOT NULL DEFAULT 0,
+            description TEXT
+        )");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username_ppp TEXT NOT NULL UNIQUE,
+            customer_name TEXT,
+            phone_number TEXT,
+            address TEXT,
+            due_date INTEGER DEFAULT 20,
+            telegram_id TEXT
+        )");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_invoices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            invoice_number TEXT NOT NULL UNIQUE,
+            username_ppp TEXT NOT NULL,
+            month_year TEXT NOT NULL,
+            amount INTEGER NOT NULL DEFAULT 0,
+            status TEXT NOT NULL DEFAULT 'UNPAID',
+            payment_date DATETIME,
+            payment_method TEXT,
+            notes TEXT
+        )");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_isolir_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            setting_key TEXT UNIQUE,
+            setting_value TEXT
+        )");
+    } catch (Exception $e) {
+        // Table creation fallback
+    }
+}
+
+// Auto-run table initialization
+init_ppp_billing_tables();
+
+function get_ppp_packages() {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $data = $mikbotamdata->select('ppp_packages', ['id', 'profile_name', 'price', 'description']);
+    return is_array($data) ? $data : [];
+}
+
+function save_ppp_package($profile_name, $price, $description = '') {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $check = $mikbotamdata->get('ppp_packages', 'id', ['profile_name' => $profile_name]);
+    if ($check) {
+        return $mikbotamdata->update('ppp_packages', [
+            'price' => intval($price),
+            'description' => $description
+        ], ['profile_name' => $profile_name]);
+    } else {
+        return $mikbotamdata->insert('ppp_packages', [
+            'profile_name' => $profile_name,
+            'price' => intval($price),
+            'description' => $description
+        ]);
+    }
+}
+
+function delete_ppp_package($id) {
+    global $mikbotamdata;
+    return $mikbotamdata->delete('ppp_packages', ['id' => intval($id)]);
+}
+
+function get_ppp_isolir_settings() {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $rows = $mikbotamdata->select('ppp_isolir_settings', ['setting_key', 'setting_value']);
+    $settings = [
+        'due_date' => 20,
+        'isolir_mode' => 'disable', // 'disable' or 'profile'
+        'isolir_profile' => 'ISOLIR_PPPOE',
+        'reminder_days' => 3
+    ];
+    if (is_array($rows)) {
+        foreach ($rows as $row) {
+            $settings[$row['setting_key']] = $row['setting_value'];
+        }
+    }
+    return $settings;
+}
+
+function save_ppp_isolir_settings($data) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    foreach ($data as $key => $val) {
+        $check = $mikbotamdata->get('ppp_isolir_settings', 'id', ['setting_key' => $key]);
+        if ($check) {
+            $mikbotamdata->update('ppp_isolir_settings', ['setting_value' => $val], ['setting_key' => $key]);
+        } else {
+            $mikbotamdata->insert('ppp_isolir_settings', ['setting_key' => $key, 'setting_value' => $val]);
+        }
+    }
+    return true;
+}
+
+function get_ppp_invoices($month_year = null, $status = null, $search = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $and = [];
+    if (!empty($month_year)) {
+        $and['month_year'] = $month_year;
+    }
+    if (!empty($status)) {
+        $and['status'] = $status;
+    }
+    if (!empty($search)) {
+        $and['username_ppp[~]'] = $search;
+    }
+    
+    $where = [];
+    if (!empty($and)) {
+        $where['AND'] = $and;
+    }
+    $where['ORDER'] = ['id' => 'DESC'];
+    $data = $mikbotamdata->select('ppp_invoices', [
+        'id', 'invoice_number', 'username_ppp', 'month_year', 'amount', 'status', 'payment_date', 'payment_method', 'notes'
+    ], $where);
+    return is_array($data) ? $data : [];
+}
+
+function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    date_default_timezone_set('Asia/Jakarta');
+    return $mikbotamdata->update('ppp_invoices', [
+        'status' => 'PAID',
+        'payment_date' => date('Y-m-d H:i:s'),
+        'payment_method' => $method,
+        'notes' => $notes
+    ], ['id' => intval($id)]);
+}
+
+function update_ppp_invoice_status($id, $status) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    return $mikbotamdata->update('ppp_invoices', [
+        'status' => $status
+    ], ['id' => intval($id)]);
+}
+
+function generate_monthly_invoices($month_year, $secrets_list) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $packages = get_ppp_packages();
+    $pkg_map = [];
+    foreach ($packages as $pkg) {
+        $pkg_map[$pkg['profile_name']] = intval($pkg['price']);
+    }
+
+    $count = 0;
+    foreach ($secrets_list as $secret) {
+        $user = isset($secret['name']) ? $secret['name'] : '';
+        $profile = isset($secret['profile']) ? $secret['profile'] : '';
+        if (empty($user)) continue;
+
+        $price = isset($pkg_map[$profile]) ? $pkg_map[$profile] : 0;
+        if ($price <= 0) continue;
+
+        $exists = $mikbotamdata->get('ppp_invoices', 'id', [
+            'AND' => [
+                'username_ppp' => $user,
+                'month_year' => $month_year
+            ]
+        ]);
+
+        if (!$exists) {
+            $inv_no = 'INV-' . str_replace('-', '', $month_year) . '-' . sprintf('%04d', rand(1, 9999));
+            $mikbotamdata->insert('ppp_invoices', [
+                'invoice_number' => $inv_no,
+                'username_ppp' => $user,
+                'month_year' => $month_year,
+                'amount' => $price,
+                'status' => 'UNPAID'
+            ]);
+            $count++;
+        }
+    }
+    return $count;
+}

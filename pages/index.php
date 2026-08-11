@@ -124,6 +124,18 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 		include "../ppp/ppp_profile.php";
 	} else
 
+	if ($_GET["Mikbotam"] == "pppbilling") {
+		include "../ppp/ppp_billing.php";
+	} else
+
+	if ($_GET["Mikbotam"] == "ppppackages") {
+		include "../ppp/ppp_packages.php";
+	} else
+
+	if ($_GET["Mikbotam"] == "pppisolir") {
+		include "../ppp/ppp_isolir_settings.php";
+	} else
+
 	if ($_GET["Mikbotam"] == "Settingstext") {
 		include "settingstext.php";
 	} else {

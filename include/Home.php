@@ -50,6 +50,15 @@
 	} elseif ($page == "pppprofile") {
 		$hSHOWPPP    = "show-sub";
 		$ppp_profile = "active";
+	} elseif ($page == "pppbilling") {
+		$hSHOWPPP    = "show-sub";
+		$ppp_billing = "active";
+	} elseif ($page == "ppppackages") {
+		$hSHOWPPP     = "show-sub";
+		$ppp_packages = "active";
+	} elseif ($page == "pppisolir") {
+		$hSHOWPPP   = "show-sub";
+		$ppp_isolir = "active";
 	} elseif ($page == "sendMessage") {
 		$Nshow     = "show-sub";
 		$Broadcast = "active";
@@ -166,7 +175,7 @@
         <li class="nav-item"><a class="nav-link <?=$addprofilec;?>" href="./?Mikbotam=addprofile"><i class="fa fa-user-plus"></i> Add Profile</a></li>
         </ul>
 
-        <a href="#" class="sl-menu-link <?=   $ppp_active." ".$hSHOWPPP ;?> " >
+        <a href="#" class="sl-menu-link <?=   $ppp . " " . $ppp_active . " " . $ppp_profile . " " . $ppp_billing . " " . $ppp_packages . " " . $ppp_isolir . " " . $hSHOWPPP ;?> " >
           <div class="sl-menu-item">
             <i class="menu-item-icon fa   fa-retweet tx-16"></i>
             <span class="menu-item-label"> PPP</span>
@@ -177,6 +186,9 @@
         <li class="nav-item"><a class="nav-link <?=$ppp;?>" href="./?Mikbotam=pppuser"><i class="fa  fa-users "></i> PPP User</a></li>
           <li class="nav-item"><a class="nav-link <?=$ppp_active;?>" href="./?Mikbotam=pppactive"><i class="fa   fa-check-circle-o "></i> PPP Active</a></li>
            <li class="nav-item"><a class="nav-link <?=$ppp_profile;?>" href="./?Mikbotam=pppprofile"><i class="fa    fa-th-large "></i> PPP Profile</a></li>
+           <li class="nav-item"><a class="nav-link <?=$ppp_billing;?>" href="./?Mikbotam=pppbilling"><i class="fa fa-money"></i> Tagihan PPPoE</a></li>
+           <li class="nav-item"><a class="nav-link <?=$ppp_packages;?>" href="./?Mikbotam=ppppackages"><i class="fa fa-tags"></i> Paket & Tarif</a></li>
+           <li class="nav-item"><a class="nav-link <?=$ppp_isolir;?>" href="./?Mikbotam=pppisolir"><i class="fa fa-ban"></i> Pengaturan Isolir</a></li>
         </ul>
         
 
