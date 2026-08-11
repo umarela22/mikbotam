@@ -52,18 +52,18 @@
        
         
         if (strpos($urlpath ,'index.php?Mikbotam=setwebhook')){
-        	
-         $linktobot=str_replace('/pages/index.php?Mikbotam=setwebhook', '/Saldo/Core.php',$urlpath);
-        	
-        }else{
-        	
-        $linktobot=str_replace('/pages/?Mikbotam=setwebhook', '/Saldo/Core.php',$urlpath);
-       
+          $linktobot=str_replace('/pages/index.php?Mikbotam=setwebhook', '/Saldo/Core.php',$urlpath);
+        } else {
+          $linktobot=str_replace('/pages/?Mikbotam=setwebhook', '/Saldo/Core.php',$urlpath);
         }
-        
-        
-       $actual_link = $cekhttps . $_SERVER['HTTP_HOST']. $linktobot;
-		 $getwebhhok=getWebhookInfo($token);
+
+        $active_uid = isset($_SESSION['impersonate_user_id']) ? intval($_SESSION['impersonate_user_id']) : (isset($_SESSION['app_user_id']) ? intval($_SESSION['app_user_id']) : 0);
+        if ($active_uid > 0 && strpos($linktobot, 'uid=') === false) {
+          $linktobot .= (strpos($linktobot, '?') !== false ? '&' : '?') . 'uid=' . $active_uid;
+        }
+
+        $actual_link = $cekhttps . $_SERVER['HTTP_HOST']. $linktobot;
+        $getwebhhok=getWebhookInfo($token);
 		 $jsonget=json_decode($getwebhhok,true);
 		 $result=$jsonget['result'];
     }

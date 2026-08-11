@@ -23,10 +23,17 @@
 	require_once ('system.database.php');
 
 	$active_user_id = null;
-	if (isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0) {
+	if (isset($_GET['uid']) && intval($_GET['uid']) > 0) {
+		$active_user_id = intval($_GET['uid']);
+	} elseif (isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0) {
 		$active_user_id = intval($_SESSION['impersonate_user_id']);
 	} elseif (isset($_SESSION['app_user_id']) && intval($_SESSION['app_user_id']) > 0) {
 		$active_user_id = intval($_SESSION['app_user_id']);
+	} elseif (isset($_GET['token']) && !empty($_GET['token'])) {
+		$u_by_token = $mikbotamdata->get('app_users', ['id'], ['bot_token' => trim($_GET['token'])]);
+		if ($u_by_token && isset($u_by_token['id'])) {
+			$active_user_id = intval($u_by_token['id']);
+		}
 	}
 
 	$active_app_user = null;
