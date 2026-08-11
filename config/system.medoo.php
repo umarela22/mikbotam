@@ -697,7 +697,7 @@ class medoo
         $column = null;
         $query = $this->query('SELECT EXISTS('.$this->select_context($table, $join, $column, $where, 1).')');
         if ($query) {
-            return $query->fetchColumn() === '1';
+            return (bool) $query->fetchColumn();
         } else {
             return false;
         }
