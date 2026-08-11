@@ -1194,7 +1194,43 @@ function getid($id) {
 function getsettings() {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+
+	if ($tenant_id) {
+		$u = get_app_user_by_id($tenant_id);
+		if ($u) {
+			$st = $mikbotamdata->get('st_mikbotam', '*', ['app_user_id' => $tenant_id]);
+			if (!$st) {
+				$st = [
+					"_id" => 1,
+					"Token_bot" => isset($u['bot_token']) ? $u['bot_token'] : '',
+					"Username_bot" => '',
+					"Nama_router" => !empty($u['full_name']) ? $u['full_name'] : $u['username'],
+					"IP_router" => isset($u['mikrotik_ip']) ? $u['mikrotik_ip'] : '',
+					"Username_router" => isset($u['mikrotik_username']) ? $u['mikrotik_username'] : '',
+					"Pass_router" => isset($u['mikrotik_password']) ? encrypturl($u['mikrotik_password']) : '',
+					"Port" => isset($u['mikrotik_port']) ? $u['mikrotik_port'] : 8728,
+					"Owner" => $u['full_name'],
+					"Id_owner" => isset($u['owner_telegram_id']) ? $u['owner_telegram_id'] : '',
+					"dnsname" => '',
+					"Voucher_1" => '',
+					"Voucher_nonsaldo" => '',
+					"Tanggal_diubah" => date('Y-m-d')
+				];
+			} else {
+				$st['IP_router'] = isset($u['mikrotik_ip']) ? $u['mikrotik_ip'] : (isset($st['IP_router']) ? $st['IP_router'] : '');
+				$st['Username_router'] = isset($u['mikrotik_username']) ? $u['mikrotik_username'] : (isset($st['Username_router']) ? $st['Username_router'] : '');
+				$st['Pass_router'] = isset($u['mikrotik_password']) ? encrypturl($u['mikrotik_password']) : (isset($st['Pass_router']) ? $st['Pass_router'] : '');
+				$st['Port'] = isset($u['mikrotik_port']) ? $u['mikrotik_port'] : (isset($st['Port']) ? $st['Port'] : 8728);
+				$st['Token_bot'] = isset($u['bot_token']) ? $u['bot_token'] : (isset($st['Token_bot']) ? $st['Token_bot'] : '');
+				$st['Id_owner'] = isset($u['owner_telegram_id']) ? $u['owner_telegram_id'] : (isset($st['Id_owner']) ? $st['Id_owner'] : '');
+			}
+			return $st;
+		}
+	}
+
 	$settings = $mikbotamdata->get('st_mikbotam', [
+		"_id",
 		"Token_bot",
 		"Username_bot",
 		"Nama_router",
@@ -1211,41 +1247,58 @@ function getsettings() {
 
 	]);
 
-	return $settings;
+	return is_array($settings) ? $settings : [];
 }
 function upvoc($sendfungsi, $id) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ["_id" => $id];
+	if ($tenant_id) {
+		$check = $mikbotamdata->get('st_mikbotam', '_id', ['app_user_id' => $tenant_id]);
+		if ($check) {
+			$where = ["_id" => $check];
+		}
+	}
 	$settings = $mikbotamdata->update('st_mikbotam', [
 
 		"Voucher_1" => $sendfungsi,
 		"Tanggal_diubah" => date('Y-m-d'),
 
-	],
-		[
-			"_id" => $id,
-		]);
+	], $where);
 
 	return $settings;
 }
 function upvocnon($sendfungsi, $id) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ["_id" => $id];
+	if ($tenant_id) {
+		$check = $mikbotamdata->get('st_mikbotam', '_id', ['app_user_id' => $tenant_id]);
+		if ($check) {
+			$where = ["_id" => $check];
+		}
+	}
 	$settings = $mikbotamdata->update('st_mikbotam', [
 
 		"Voucher_nonsaldo" => $sendfungsi,
 		"Tanggal_diubah" => date('Y-m-d'),
 
-	],
-		[
-			"_id" => $id,
-		]);
+	], $where);
 
 	return $settings;
 }
 function getvocnon($id) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	if ($tenant_id) {
+		$check = $mikbotamdata->get('st_mikbotam', 'Voucher_nonsaldo', ['app_user_id' => $tenant_id]);
+		if ($check !== null && $check !== false) {
+			return $check;
+		}
+	}
 	$settings = $mikbotamdata->get('st_mikbotam', [
 
 		"Voucher_nonsaldo"
@@ -1253,13 +1306,20 @@ function getvocnon($id) {
 		[
 			"_id" => $id,
 		]);
-	$hasil = $settings["Voucher_nonsaldo"];
+	$hasil = isset($settings["Voucher_nonsaldo"]) ? $settings["Voucher_nonsaldo"] : '';
 	return $hasil;
 }
 
 function getvoc($id) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	if ($tenant_id) {
+		$check = $mikbotamdata->get('st_mikbotam', 'Voucher_1', ['app_user_id' => $tenant_id]);
+		if ($check !== null && $check !== false) {
+			return $check;
+		}
+	}
 	$settings = $mikbotamdata->get('st_mikbotam', [
 
 		"Voucher_1"
@@ -1267,11 +1327,59 @@ function getvoc($id) {
 		[
 			"_id" => $id,
 		]);
-	$hasil = $settings["Voucher_1"];
+	$hasil = isset($settings["Voucher_1"]) ? $settings["Voucher_1"] : '';
 	return $hasil;
 }
 function upbot($id, $token, $usernamebot, $namarouter, $ipmik, $usernamemik, $passmik, $port, $dns, $owner, $idowner) {
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+
+	if ($tenant_id) {
+		save_app_user([
+			'id' => $tenant_id,
+			'mikrotik_ip' => $ipmik,
+			'mikrotik_username' => $usernamemik,
+			'mikrotik_password' => decrypturl($passmik),
+			'mikrotik_port' => intval($port),
+			'bot_token' => $token,
+			'owner_telegram_id' => $idowner,
+			'full_name' => $owner
+		]);
+
+		$check = $mikbotamdata->get('st_mikbotam', '_id', ['app_user_id' => $tenant_id]);
+		if ($check) {
+			return $mikbotamdata->update('st_mikbotam', [
+				"Token_bot" => $token,
+				"Username_bot" => $usernamebot,
+				"Nama_router" => $namarouter,
+				"IP_router" => $ipmik,
+				"Username_router" => $usernamemik,
+				"Pass_router" => $passmik,
+				"Port" => $port,
+				"dnsname" => $dns,
+				"Owner" => $owner,
+				"Id_owner" => $idowner,
+				"Tanggal_diubah" => date('Y-m-d'),
+			], ["_id" => $check]);
+		} else {
+			return $mikbotamdata->insert('st_mikbotam', [
+				"_id" => $tenant_id,
+				"Token_bot" => $token,
+				"Username_bot" => $usernamebot,
+				"Nama_router" => $namarouter,
+				"IP_router" => $ipmik,
+				"Username_router" => $usernamemik,
+				"Pass_router" => $passmik,
+				"Port" => $port,
+				"dnsname" => $dns,
+				"Owner" => $owner,
+				"Id_owner" => $idowner,
+				"app_user_id" => $tenant_id,
+				"Tanggal_diubah" => date('Y-m-d'),
+			]);
+		}
+	}
+
 	$settings = $mikbotamdata->update('st_mikbotam', [
 		"Token_bot" => $token,
 		"Username_bot" => $usernamebot,
@@ -1566,6 +1674,7 @@ function init_ppp_billing_tables() {
         try { $pdo->exec("ALTER TABLE ppp_customers ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE ppp_invoices ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE ppp_isolir_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE st_mikbotam ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try {
             $pdo->exec("UPDATE re_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE re_operating SET app_user_id = 1 WHERE app_user_id IS NULL");
@@ -1574,6 +1683,7 @@ function init_ppp_billing_tables() {
             $pdo->exec("UPDATE ppp_customers SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE ppp_invoices SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE ppp_isolir_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE st_mikbotam SET app_user_id = 1 WHERE app_user_id IS NULL");
         } catch (Exception $ex) {}
 
         // Auto-migrate existing admin as Superadmin if app_users is empty
