@@ -56,17 +56,17 @@
 	}
 	global $settings;
 
-	if ($active_app_user && !empty($active_app_user['mikrotik_ip'])) {
+	if ($active_app_user) {
 		$identitiy 			= !empty($active_app_user['full_name']) ? $active_app_user['full_name'] : 'Router_' . $active_app_user['username'];
-		$mikrotik_ip 		= $active_app_user['mikrotik_ip'];
-		$mikrotik_username  = $active_app_user['mikrotik_username'];
-		$mikrotik_password  = $active_app_user['mikrotik_password'];
-		$mikrotik_port 	    = $active_app_user['mikrotik_port'];
+		$mikrotik_ip 		= isset($active_app_user['mikrotik_ip']) ? $active_app_user['mikrotik_ip'] : '';
+		$mikrotik_username  = isset($active_app_user['mikrotik_username']) ? $active_app_user['mikrotik_username'] : '';
+		$mikrotik_password  = isset($active_app_user['mikrotik_password']) ? $active_app_user['mikrotik_password'] : '';
+		$mikrotik_port 	    = (isset($active_app_user['mikrotik_port']) && intval($active_app_user['mikrotik_port']) > 0) ? intval($active_app_user['mikrotik_port']) : 8728;
 		$dnsname			= isset($settings["dnsname"]) ? $settings["dnsname"] : '';	
 		$Name_router 		= $identitiy;
 		$owner 				= $active_app_user['full_name'];
-		$id_own 			= $active_app_user['owner_telegram_id'];
-		$token 				= !empty($active_app_user['bot_token']) ? $active_app_user['bot_token'] : (isset($settings["Token_bot"]) ? $settings["Token_bot"] : '');
+		$id_own 			= isset($active_app_user['owner_telegram_id']) ? $active_app_user['owner_telegram_id'] : '';
+		$token 				= isset($active_app_user['bot_token']) ? $active_app_user['bot_token'] : '';
 		$usernamebot 		= isset($settings["Username_bot"]) ? $settings["Username_bot"] : '';
 		$voucher_1			= isset($settings["Voucher_1"]) ? $settings["Voucher_1"] : '';
 		$Voucher_nonsaldo	= isset($settings["Voucher_nonsaldo"]) ? $settings["Voucher_nonsaldo"] : '';
