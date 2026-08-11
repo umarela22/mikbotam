@@ -223,6 +223,7 @@ foreach ($invoices as $inv) {
 							<th>No. Invoice</th>
 							<th>Username PPPoE</th>
 							<th>Periode</th>
+							<th>Jatuh Tempo / Expired</th>
 							<th>Jumlah Tagihan</th>
 							<th>Status</th>
 							<th>Tgl & Metode Bayar</th>
@@ -232,7 +233,7 @@ foreach ($invoices as $inv) {
 					<tbody>
 						<?php
 						if (empty($invoices)) {
-							echo '<tr><td colspan="8" class="text-center pd-20">Belum ada data tagihan untuk periode ini. Klik <strong>Generate Tagihan Periode Ini</strong> untuk membuat otomatis dari daftar MikroTik Secret.</td></tr>';
+							echo '<tr><td colspan="9" class="text-center pd-20">Belum ada data tagihan untuk periode ini. Klik <strong>Generate Tagihan Periode Ini</strong> untuk membuat otomatis dari daftar MikroTik Secret.</td></tr>';
 						} else {
 							$no = 1;
 							foreach ($invoices as $inv) {
@@ -244,12 +245,16 @@ foreach ($invoices as $inv) {
 								} else {
 									$badge = '<span class="badge badge-warning tx-12 pd-5-10">BELUM BAYAR</span>';
 								}
+
+								$cust_info = $mikbotamdata->get('ppp_customers', ['exp_date', 'due_date'], ['username_ppp' => $inv['username_ppp']]);
+								$exp_disp = ($cust_info && !empty($cust_info['exp_date'])) ? $cust_info['exp_date'] : $inv['month_year'] . '-' . sprintf('%02d', ($cust_info && !empty($cust_info['due_date']) ? $cust_info['due_date'] : 20));
 								?>
 								<tr>
 									<td><?=$no++;?></td>
 									<td><strong class="tx-inverse"><?=htmlspecialchars($inv['invoice_number']);?></strong></td>
 									<td><strong class="tx-primary"><?=htmlspecialchars($inv['username_ppp']);?></strong></td>
 									<td><?=htmlspecialchars($inv['month_year']);?></td>
+									<td><span class="badge badge-outline-info font-weight-bold"><i class="fa fa-calendar"></i> <?=$exp_disp;?></span></td>
 									<td><strong>Rp <?=number_format($inv['amount'], 0, ',', '.');?></strong></td>
 									<td><?=$badge;?></td>
 									<td>

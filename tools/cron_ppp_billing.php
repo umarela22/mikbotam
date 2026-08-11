@@ -31,13 +31,17 @@ if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mik
 		$generated = generate_monthly_invoices($current_month, $secrets);
 		echo "[CRON PPP BILLING] Generated $generated new invoices for month $current_month\n";
 
-		// 2. Auto Isolir if today > due date
-		if ($today_day > $due_date_day) {
-			echo "[CRON PPP BILLING] Today ($today_day) is past due date ($due_date_day). Checking unpaid invoices for auto-isolir...\n";
-			$unpaid_invoices = get_ppp_invoices($current_month, 'UNPAID');
+		// 2. Auto Isolir if today >= customer's exp_date
+		$today_date = date('Y-m-d');
+		echo "[CRON PPP BILLING] Checking unpaid invoices for auto-isolir (Today: $today_date)...\n";
+		$unpaid_invoices = get_ppp_invoices($current_month, 'UNPAID');
 
-			foreach ($unpaid_invoices as $inv) {
-				$user_ppp = $inv['username_ppp'];
+		foreach ($unpaid_invoices as $inv) {
+			$user_ppp = $inv['username_ppp'];
+			$cust_data = $mikbotamdata->get('ppp_customers', ['exp_date', 'due_date'], ['username_ppp' => $user_ppp]);
+			$cust_exp  = ($cust_data && !empty($cust_data['exp_date'])) ? $cust_data['exp_date'] : $current_month . '-' . sprintf('%02d', ($cust_data && !empty($cust_data['due_date']) ? $cust_data['due_date'] : $due_date_day));
+
+			if ($today_date >= $cust_exp) {
 				$find_sec = $API->comm("/ppp/secret/print", ["?name" => $user_ppp]);
 
 				if (isset($find_sec[0]['.id'])) {
@@ -56,7 +60,7 @@ if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mik
 					}
 
 					update_ppp_invoice_status($inv['id'], 'ISOLIR');
-					echo "[CRON PPP BILLING] Isolated user: $user_ppp\n";
+					echo "[CRON PPP BILLING] Isolated user: $user_ppp (Expired: $cust_exp)\n";
 				}
 			}
 		}

@@ -1444,8 +1444,14 @@ function init_ppp_billing_tables() {
             phone_number TEXT,
             address TEXT,
             due_date INTEGER DEFAULT 20,
+            exp_date TEXT,
             telegram_id TEXT
         )");
+        try {
+            $pdo->exec("ALTER TABLE ppp_customers ADD COLUMN exp_date TEXT");
+        } catch (Exception $e) {
+            // Column already exists
+        }
         $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_invoices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             invoice_number TEXT NOT NULL UNIQUE,
@@ -1561,6 +1567,35 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
     global $mikbotamdata;
     init_ppp_billing_tables();
     date_default_timezone_set('Asia/Jakarta');
+
+    $inv = $mikbotamdata->get('ppp_invoices', ['username_ppp', 'month_year'], ['id' => intval($id)]);
+    if ($inv) {
+        $user_ppp = $inv['username_ppp'];
+        $settings = get_ppp_isolir_settings();
+        $default_day = intval($settings['due_date']);
+
+        $cust = $mikbotamdata->get('ppp_customers', ['id', 'exp_date', 'due_date'], ['username_ppp' => $user_ppp]);
+        $day = ($cust && !empty($cust['due_date'])) ? intval($cust['due_date']) : $default_day;
+
+        if ($cust && !empty($cust['exp_date'])) {
+            $cur_exp = $cust['exp_date'];
+            $next_exp = date('Y-m-d', strtotime('+1 month', strtotime($cur_exp)));
+        } else {
+            $next_month = date('Y-m', strtotime('+1 month'));
+            $next_exp = $next_month . '-' . sprintf('%02d', $day);
+        }
+
+        if ($cust) {
+            $mikbotamdata->update('ppp_customers', ['exp_date' => $next_exp], ['id' => $cust['id']]);
+        } else {
+            $mikbotamdata->insert('ppp_customers', [
+                'username_ppp' => $user_ppp,
+                'due_date' => $day,
+                'exp_date' => $next_exp
+            ]);
+        }
+    }
+
     return $mikbotamdata->update('ppp_invoices', [
         'status' => 'PAID',
         'payment_date' => date('Y-m-d H:i:s'),
