@@ -83,12 +83,13 @@ error_reporting(0);
                     </i>Motive
                 </div>
                 <div class="card-body fadesa">
-                    <?php $getjson = sikider();
-
-                        for ($i = 0; $i < count($getjson); $i++) {
-                            echo $getjson[$i];
+                    <?php 
+                        $getjson = sikider();
+                        if (is_array($getjson)) {
+                            for ($i = 0; $i < count($getjson); $i++) {
+                                echo $getjson[$i];
+                            }
                         }
-
                     ?>
                 </div>
             </div>

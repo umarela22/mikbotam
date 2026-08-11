@@ -27,40 +27,62 @@
 		include '../config/system.conn.php';
 		include '../config/system.byte.php';
 		include '../Api/routeros_api.class.php';
+		$id = isset($id) ? $id : null;
 		$datavoucher = sethistory($id);
+		if (!is_array($datavoucher)) {
+			$datavoucher = [];
+		}
 		date_default_timezone_set('Asia/Jakarta');
 		$API = new routeros_api();
+		$API->timeout = 3;
 
-		if ($API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
+		if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
 			$IDENTITY      = $API->comm('/system/identity/getall');
-			$routername    = $IDENTITY['0']['name'];
+			$routername    = isset($IDENTITY['0']['name']) ? $IDENTITY['0']['name'] : 'Unknown';
 			$health        = $API->comm("/system/health/print");
-			$dhealth       = $health['0'];
+			$dhealth       = isset($health['0']) ? $health['0'] : [];
 			$ARRAY         = $API->comm("/system/resource/print");
-			$first         = $ARRAY['0'];
-			$memperc       = ($first['free-memory'] / $first['total-memory']);
-			$hddperc       = ($first['free-hdd-space'] / $first['total-hdd-space']);
+			$first         = isset($ARRAY['0']) ? $ARRAY['0'] : [];
+
+			$total_mem     = isset($first['total-memory']) && $first['total-memory'] > 0 ? $first['total-memory'] : 1;
+			$free_mem      = isset($first['free-memory']) ? $first['free-memory'] : 0;
+			$total_hdd     = isset($first['total-hdd-space']) && $first['total-hdd-space'] > 0 ? $first['total-hdd-space'] : 1;
+			$free_hdd      = isset($first['free-hdd-space']) ? $first['free-hdd-space'] : 0;
+
+			$memperc       = ($free_mem / $total_mem);
+			$hddperc       = ($free_hdd / $total_hdd);
 			$mem           = ($memperc * 100);
-			$hdd           = ($hddperc * 100);
-			$sehat         = $dhealth['temperature'];
-			$platform      = $first['platform'];
-			$board         = $first['board-name'];
-			$version       = $first['version'];
-			$architecture  = $first['architecture-name'];
-			$cpu           = $first['cpu'];
-			$cpuload       = $first['cpu-load'];
-			$uptime        = $first['uptime'];
-			$cpufreq       = $first['cpu-frequency'];
-			$cpucount      = $first['cpu-count'];
-			$memory        = formatBytes($first['total-memory']);
-			$fremem        = formatBytes($first['free-memory']);
-			$mempersen     = number_format($mem, 3);
-			$hdd           = formatBytes($first['total-hdd-space']);
-			$frehdd        = formatBytes($first['free-hdd-space']);
-			$hddpersen     = number_format($hdd, 3);
-			$sector        = $first['write-sect-total'];
-			$setelahreboot = $first['write-sect-since-reboot'];
-			$kerusakan     = $first['bad-blocks'];
+			$hdd_calc      = ($hddperc * 100);
+			$sehat         = isset($dhealth['temperature']) ? $dhealth['temperature'] : '-';
+			$platform      = isset($first['platform']) ? $first['platform'] : '-';
+			$board         = isset($first['board-name']) ? $first['board-name'] : '-';
+			$version       = isset($first['version']) ? $first['version'] : '-';
+			$architecture  = isset($first['architecture-name']) ? $first['architecture-name'] : '-';
+			$cpu           = isset($first['cpu']) ? $first['cpu'] : '-';
+			$cpuload       = isset($first['cpu-load']) ? $first['cpu-load'] : '-';
+			$uptime        = isset($first['uptime']) ? $first['uptime'] : '-';
+			$cpufreq       = isset($first['cpu-frequency']) ? $first['cpu-frequency'] : '-';
+			$cpucount      = isset($first['cpu-count']) ? $first['cpu-count'] : '-';
+			$memory        = formatBytes($total_mem);
+			$fremem        = formatBytes($free_mem);
+			$mempersen     = number_format($mem, 2);
+			$hdd           = formatBytes($total_hdd);
+			$frehdd        = formatBytes($free_hdd);
+			$hddpersen     = number_format($hdd_calc, 2);
+			$sector        = isset($first['write-sect-total']) ? $first['write-sect-total'] : '-';
+			$setelahreboot = isset($first['write-sect-since-reboot']) ? $first['write-sect-since-reboot'] : '-';
+			$kerusakan     = isset($first['bad-blocks']) ? $first['bad-blocks'] : '0';
+			$API->disconnect();
+		} else {
+			$routername    = 'Disconnected';
+			$board         = 'N/A';
+			$version       = 'N/A';
+			$cpu           = 'N/A';
+			$cpufreq       = 'N/A';
+			$cpucount      = 'N/A';
+			$fremem        = '0 MB';
+			$frehdd        = '0 MB';
+			$kerusakan     = '0';
 		}
 	}
 

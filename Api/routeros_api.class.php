@@ -583,7 +583,7 @@ function Crpas($length) {
 };
 //Update by BangAchil 2 april 2019
 
-function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true){
+function msubstr($str, $start = 0, $length = null, $charset = "utf-8", $suffix = true){
 	if (function_exists("mb_substr")) {
 		$i_str_len = mb_strlen($str);
 		$s_sub_str = mb_substr($str, $start, $length, $charset);
