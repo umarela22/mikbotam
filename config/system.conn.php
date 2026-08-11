@@ -20,6 +20,15 @@
 	if (session_status() === PHP_SESSION_NONE) {
 		@session_start();
 	}
+
+	// Enable automatic PHP app error logging
+	$app_log_dir = __DIR__ . '/../logs';
+	if (!is_dir($app_log_dir)) {
+		@mkdir($app_log_dir, 0755, true);
+	}
+	ini_set('log_errors', 1);
+	ini_set('error_log', $app_log_dir . '/app_error.log');
+
 	require_once ('system.database.php');
 
 	$active_user_id = null;
