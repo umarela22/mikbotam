@@ -138,13 +138,7 @@
         <?php if ($is_superadmin_clean): ?>
         <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers' || empty($page)) ? 'active' : '';?>">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-home tx-22"></i>
-            <span class="menu-item-label font-weight-bold"> Dashboard SuperAdmin</span>
-          </div>
-        </a>
-        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-users tx-18 text-warning"></i>
+            <i class="menu-item-icon fa fa-users tx-20 text-warning"></i>
             <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>
             <span class="badge badge-warning tx-10 pd-3-8 mg-l-auto">SUPERADMIN</span>
           </div>
@@ -160,16 +154,12 @@
           <li class="nav-item"><a class="nav-link <?=$setwebhookmenu;?>" href="./?Mikbotam=setwebhook"><i class="fa fa-cog "></i> Set Webhook</a></li>
           <li class="nav-item"><a class="nav-link <?=$boteditor;?> " href="./?Mikbotam=boteditor&bottype=Core"><i class="fa fa-pencil "></i> Edit Bot Core</a></li>
         </ul>
-        <a href="#" class="sl-menu-link <?=$Nshowabaoute;?>">
+        <a href="./?Mikbotam=about" class="sl-menu-link <?=$about;?>">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-info-circle tx-22"></i>
-            <span class="menu-item-label">About</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
+            <i class="menu-item-icon fa fa-info-circle tx-20"></i>
+            <span class="menu-item-label"> About</span>
           </div>
         </a>
-        <ul class="sl-menu-sub nav flex-column">
-          <li class="nav-item"><a class="nav-link <?=$about;?>" href="./?Mikbotam=about"><i class="fa fa-cog "></i> About</a></li>
-        </ul>
 
         <?php else: ?>
         <a href="index.php" class="sl-menu-link <?=empty($page) ? 'active' : '';?>">
@@ -186,119 +176,83 @@
           </div><!-- menu-item -->
         </a>
         <ul class="sl-menu-sub nav flex-column">
-         <li class="nav-item"><a class="nav-link <?=$NewUser;?>" href="./?Mikbotam=NewUser"><i class="fa fa-user-plus "></i> Add User </a></li>
-                <li class="nav-item"><a class="nav-link <?=$topupsaldo;?>" href="./?Mikbotam=topupsaldo"><i class="fa fa-level-up"></i> Top Up Saldo </a></li>
-        <li class="nav-item"><a class="nav-link <?=$topdownsaldo;?>" href="./?Mikbotam=topdownsaldo"><i class="fa fa-level-down"></i></i> Top Down Saldo </a></li>
-                <li class="nav-item"><a class="nav-link <?=$UserList;?>" href="./?Mikbotam=userlist"><i class="fa fa-users "></i> User List </a></li>
-                <li class="nav-item"><a class="nav-link <?=$sendVoc;?>" href="./?Mikbotam=sendVoc"><i class="fa  fa-paper-plane-o "></i> Send Voucher</a></li>
-                <li class="nav-item"><a class="nav-link <?=$Broadcast;?>" href="./?Mikbotam=sendMessage"><i class="fa  fa-paper-plane "></i> Send Message</a></li>
-                <li class="nav-item"><a class="nav-link <?=$Record;?>" href="./?Mikbotam=Record"><i class="fa fa-history"></i></i> History User</a></li>
+          <li class="nav-item"><a class="nav-link <?=$NewUser;?>" href="./?Mikbotam=NewUser"><i class="fa fa-user-plus "></i> Add User </a></li>
+          <li class="nav-item"><a class="nav-link <?=$topupsaldo;?>" href="./?Mikbotam=topupsaldo"><i class="fa fa-level-up"></i> Top Up Saldo </a></li>
+          <li class="nav-item"><a class="nav-link <?=$topdownsaldo;?>" href="./?Mikbotam=topdownsaldo"><i class="fa fa-level-down"></i> Top Down Saldo </a></li>
+          <li class="nav-item"><a class="nav-link <?=$UserList;?>" href="./?Mikbotam=userlist"><i class="fa fa-users "></i> User List </a></li>
+          <li class="nav-item"><a class="nav-link <?=$sendVoc;?>" href="./?Mikbotam=sendVoc"><i class="fa fa-paper-plane-o "></i> Send Voucher</a></li>
+          <li class="nav-item"><a class="nav-link <?=$Broadcast;?>" href="./?Mikbotam=sendMessage"><i class="fa fa-paper-plane "></i> Send Message</a></li>
+          <li class="nav-item"><a class="nav-link <?=$Record;?>" href="./?Mikbotam=Record"><i class="fa fa-history"></i> History User</a></li>
         </ul>
-        <a href="./?Mikbotam=comingsoon" class="sl-menu-link "  >
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-id-badge tx-16"></i>
-            <span class="menu-item-label"> GoCustomer</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
-          </div><!-- menu-item -->
-        </a>
-                         <a href="./?Mikbotam=comingsoon" class="sl-menu-link "  >
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-envelope tx-16"></i>
-            <span class="menu-item-label"> SMS Gateway</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
-          </div><!-- menu-item -->
-        </a>
 
-         <a href="#" class="sl-menu-link <?=$hSHOWHotspot;?>">
+        <a href="#" class="sl-menu-link <?=$hSHOWHotspot;?>">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa   fa-wifi tx-16"></i>
+            <i class="menu-item-icon fa fa-wifi tx-16"></i>
             <span class="menu-item-label"> Hotspot</span>
             <i class="menu-item-arrow fa fa-angle-down"></i>
           </div><!-- menu-item -->
         </a>
-            <ul class="sl-menu-sub nav flex-column">
-         <li class="nav-item"><a class="nav-link <?=$Hotspot;?>" href="./?Mikbotam=Hotspotuserlist"><i class="fa    fa-users"></i> User List</a></li>
-
-            <li class="nav-item"><a class="nav-link <?=$useractive;
-?>" href="./?Mikbotam=useractive"><i class="fa   fa-check-circle-o "></i> User Active</a></li>
-        <li class="nav-item"><a class="nav-link <?=$addprofilec;?>" href="./?Mikbotam=addprofile"><i class="fa fa-user-plus"></i> Add Profile</a></li>
+        <ul class="sl-menu-sub nav flex-column">
+          <li class="nav-item"><a class="nav-link <?=$Hotspot;?>" href="./?Mikbotam=Hotspotuserlist"><i class="fa fa-users"></i> User List</a></li>
+          <li class="nav-item"><a class="nav-link <?=$useractive;?>" href="./?Mikbotam=useractive"><i class="fa fa-check-circle-o "></i> User Active</a></li>
+          <li class="nav-item"><a class="nav-link <?=$addprofilec;?>" href="./?Mikbotam=addprofile"><i class="fa fa-user-plus"></i> Add Profile</a></li>
         </ul>
 
-        <a href="#" class="sl-menu-link <?=   $ppp . " " . $ppp_active . " " . $ppp_profile . " " . $ppp_billing . " " . $ppp_packages . " " . $ppp_isolir . " " . $hSHOWPPP ;?> " >
+        <a href="#" class="sl-menu-link <?= $ppp . " " . $ppp_active . " " . $ppp_profile . " " . $ppp_billing . " " . $ppp_packages . " " . $ppp_isolir . " " . $hSHOWPPP ;?> ">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa   fa-retweet tx-16"></i>
+            <i class="menu-item-icon fa fa-retweet tx-16"></i>
             <span class="menu-item-label"> PPP</span>
             <i class="menu-item-arrow fa fa-angle-down"></i>
           </div><!-- menu-item -->
         </a>
-          <ul class="sl-menu-sub nav flex-column">
-        <li class="nav-item"><a class="nav-link <?=$ppp;?>" href="./?Mikbotam=pppuser"><i class="fa  fa-users "></i> PPP User</a></li>
-          <li class="nav-item"><a class="nav-link <?=$ppp_active;?>" href="./?Mikbotam=pppactive"><i class="fa   fa-check-circle-o "></i> PPP Active</a></li>
-           <li class="nav-item"><a class="nav-link <?=$ppp_profile;?>" href="./?Mikbotam=pppprofile"><i class="fa    fa-th-large "></i> PPP Profile</a></li>
-           <li class="nav-item"><a class="nav-link <?=$ppp_billing;?>" href="./?Mikbotam=pppbilling"><i class="fa fa-money"></i> Tagihan PPPoE</a></li>
-           <li class="nav-item"><a class="nav-link <?=$ppp_packages;?>" href="./?Mikbotam=ppppackages"><i class="fa fa-tags"></i> Paket & Tarif</a></li>
-           <li class="nav-item"><a class="nav-link <?=$ppp_isolir;?>" href="./?Mikbotam=pppisolir"><i class="fa fa-ban"></i> Pengaturan Isolir</a></li>
-        </ul>
-        
-
-
-         <a href="#" class="sl-menu-link  <?=$Mmonitortraffic . $vouchergraph;?>" >
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-desktop tx-16"></i>
-            <span class="menu-item-label"> Report Graffic</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
-          </div><!-- menu-item -->
-        </a>
         <ul class="sl-menu-sub nav flex-column">
-        <li class="nav-item"><a class="nav-link <?=$monitortraffic;?>" href="./?Mikbotam=monitortraffic"><i class="fa fa-cog "></i> Traffic</a></li>
-          <li class="nav-item"><a class="nav-link <?=$vouchergraph;?>" href="./?Mikbotam=comingsoon"><i class="fa fa-file "></i> Voucher</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp;?>" href="./?Mikbotam=pppuser"><i class="fa fa-users "></i> PPP User</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp_active;?>" href="./?Mikbotam=pppactive"><i class="fa fa-check-circle-o "></i> PPP Active</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp_profile;?>" href="./?Mikbotam=pppprofile"><i class="fa fa-th-large "></i> PPP Profile</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp_billing;?>" href="./?Mikbotam=pppbilling"><i class="fa fa-money"></i> Tagihan PPPoE</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp_packages;?>" href="./?Mikbotam=ppppackages"><i class="fa fa-tags"></i> Paket & Tarif</a></li>
+          <li class="nav-item"><a class="nav-link <?=$ppp_isolir;?>" href="./?Mikbotam=pppisolir"><i class="fa fa-ban"></i> Pengaturan Isolir</a></li>
         </ul>
 
-
-        <a href="#" class="sl-menu-link <?=$Settings .$Settingstext. $SettingsVoc . " " . $sshow;?>" >
+        <a href="./?Mikbotam=monitortraffic" class="sl-menu-link <?=$monitortraffic;?>">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-cogs tx-16"></i>
+            <i class="menu-item-icon fa fa-desktop tx-16"></i>
+            <span class="menu-item-label"> Report Traffic</span>
+          </div>
+        </a>
+
+        <a href="#" class="sl-menu-link <?=$Settings .$Settingstext. $SettingsVoc . " " . $sshow;?> ">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-cogs tx-16"></i>
             <span class="menu-item-label"> Settings</span>
             <i class="menu-item-arrow fa fa-angle-down"></i>
           </div><!-- menu-item -->
         </a>
         <ul class="sl-menu-sub nav flex-column">
-        <li class="nav-item"><a class="nav-link <?=$Settings;?>" href="./?Mikbotam=Settings"><i class="fa fa-cog "></i> Settings</a></li>
+          <li class="nav-item"><a class="nav-link <?=$Settings;?>" href="./?Mikbotam=Settings"><i class="fa fa-cog "></i> Settings</a></li>
           <li class="nav-item"><a class="nav-link <?=$SettingsVoc;?>" href="./?Mikbotam=SettingsVoc"><i class="fa fa-ticket "></i> Settings Voucher</a></li>
-           <li class="nav-item"><a class="nav-link <?=$SettingsVocnonsaldos;?>" href="./?Mikbotam=SettingsVocnonsaldo"><i class="fa fa-ticket "></i> Settings Voucher Non saldo</a></li>
-          <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa  fa-pencil-square-o "></i> Text Settings</a></li>
-
+          <li class="nav-item"><a class="nav-link <?=$SettingsVocnonsaldos;?>" href="./?Mikbotam=SettingsVocnonsaldo"><i class="fa fa-ticket "></i> Settings Voucher Non saldo</a></li>
+          <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa fa-pencil-square-o "></i> Text Settings</a></li>
         </ul>
-        
-        <a href="#" class="sl-menu-link  <?=$toolsshow;?> ">
+
+        <a href="#" class="sl-menu-link <?=$toolsshow;?> ">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-wrench tx-20"></i>
+            <i class="menu-item-icon fa fa-wrench tx-20"></i>
             <span class="menu-item-label"> Tools</span>
             <i class="menu-item-arrow fa fa-angle-down"></i>
           </div>
         </a>
         <ul class="sl-menu-sub nav flex-column">
-        <li class="nav-item"><a class="nav-link <?=$setwebhookmenu;?>" href="./?Mikbotam=setwebhook"><i class="fa fa-cog "></i> Set Webhook</a></li>
-         <li class="nav-item"><a class="nav-link <?=$boteditor;?> " href="./?Mikbotam=boteditor&bottype=Core"><i class="fa fa-pencil "></i> Edit Bot Core</a></li>
+          <li class="nav-item"><a class="nav-link <?=$setwebhookmenu;?>" href="./?Mikbotam=setwebhook"><i class="fa fa-cog "></i> Set Webhook</a></li>
+          <li class="nav-item"><a class="nav-link <?=$boteditor;?> " href="./?Mikbotam=boteditor&bottype=Core"><i class="fa fa-pencil "></i> Edit Bot Core</a></li>
         </ul>
 
-        <a href="./?Mikbotam=comingsoon" class="sl-menu-link">
+        <a href="./?Mikbotam=about" class="sl-menu-link <?=$about;?>">
           <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-paper-plane tx-16"></i>
-            <span class="menu-item-label">Chat admin</span>
+            <i class="menu-item-icon fa fa-info-circle tx-22"></i>
+            <span class="menu-item-label"> About</span>
           </div>
         </a>
-        <a href="#" class="sl-menu-link <?=$Nshowabaoute;?>">
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa  fa-info-circle tx-22"></i>
-            <span class="menu-item-label">About</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
-          </div>
-        </a>
-        <ul class="sl-menu-sub nav flex-column">
-        <li class="nav-item"><a class="nav-link <?=$about;?>" href="./?Mikbotam=about"><i class="fa fa-cog "></i> About</a></li>
-          <li class="nav-item"><a class="nav-link " href="./?Mikbotam=comingsoon"><i class="fa  fa-exclamation-circle "></i> Change logs</a></li>
-        </ul>
         <?php endif; ?>
       </div>
 
