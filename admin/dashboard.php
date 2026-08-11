@@ -62,12 +62,13 @@ error_reporting(0);
                     <div class="row mg-t-0">
                         <div class="col-sm-20 mg-l-auto">
                             <div class="form-layout-footer">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="" class="btn bg-primary pd-x-25  tx-white "><i class="fa fa-exclamation"></i> Connect</a>
-                                    <a href='../pages' class='btn bg-primary pd-x-25  tx-white'><i class='fa fa-home'></i> Dashboard</a>
-                                    <a href="index.php?admin=myserver" class="btn bg-primary pd-x-25  tx-white "><i class="fa fa-pencil-square-o"></i> Edit</a>
-                                    <a href="" class="btn bg-primary pd-x-25  tx-white "><i class="fa fa-trash"></i> Delete</a>
-                                </div>
+                                 <div class="btn-group" role="group" aria-label="Basic example">
+                                     <a href='../pages' class='btn bg-primary pd-x-25  tx-white'><i class='fa fa-home'></i> Dashboard</a>
+                                     <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+                                     <a href="../pages/index.php?Mikbotam=manageusers" class="btn btn-warning pd-x-25 tx-inverse font-weight-bold"><i class="fa fa-users"></i> Kelola User Admin</a>
+                                     <?php endif; ?>
+                                     <a href="index.php?admin=myserver" class="btn bg-primary pd-x-25  tx-white "><i class="fa fa-pencil-square-o"></i> Edit</a>
+                                 </div>
                             </div>
                             <!-- form-layout-footer -->
                         </div>

@@ -46,6 +46,13 @@ $page = $_GET["admin"];
 
             </div>
         </a>
+        <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+        <a href="../pages/index.php?Mikbotam=manageusers" class="sl-menu-link">
+            <div class="sl-menu-item"> <i class="menu-item-icon fa fa-users tx-16 text-warning"></i>
+ <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>
+            </div>
+        </a>
+        <?php endif; ?>
         <a href="index.php?admin=logout" class="sl-menu-link<?php if ($page == "logout") {echo 'active'; }?>">
             <div class="sl-menu-item"> <i class="menu-item-icon fa   fa-sign-out tx-16"></i>
  <span class="menu-item-label"> Sign Out</span>
@@ -71,6 +78,9 @@ $page = $_GET["admin"];
                 </a>
                 <div class="dropdown-menu dropdown-menu-header wd-200">
                     <ul class="list-unstyled user-profile-nav">
+                        <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+                        <li><a href="../pages/index.php?Mikbotam=manageusers"><i class="menu-item-icon fa fa-users text-primary"></i> <span class="menu-item-label font-weight-bold"> Kelola User Admin</span></a></li>
+                        <?php endif; ?>
                         <li><a href="./index.php?admin=sessionedit"><i class="menu-item-icon fa  fa-user"></i> <span class="menu-item-label"> Edit Profile</span></a>
                         </li>
                         <li><a href="./index.php?admin=myserver"><i class="menu-item-icon fa fa-file"></i><span class="menu-item-label">  Settings</span></a>
