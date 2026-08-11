@@ -43,10 +43,24 @@
 			if (empty($viewid)) {
 				$make = inbot($id, $token, $usernamebot, $namarouter, $ipmik, $usernamemik, $passmik, $port, $dns, $owner, $idowner);
 			} else {
-
 				$dump = upbot($id, $token, $usernamebot, $namarouter, $ipmik, $usernamemik, $passmik, $port, $dns, $owner, $idowner);
-				
 			}
+
+			// Sync tenant's router and bot credentials to app_users table
+			$active_uid = isset($_SESSION['impersonate_user_id']) ? intval($_SESSION['impersonate_user_id']) : (isset($_SESSION['app_user_id']) ? intval($_SESSION['app_user_id']) : 0);
+			if ($active_uid > 0) {
+				save_app_user([
+					'id' => $active_uid,
+					'full_name' => !empty($owner) ? $owner : $namarouter,
+					'mikrotik_ip' => $ipmik,
+					'mikrotik_username' => $usernamemik,
+					'mikrotik_password' => $_POST['passmikrotik'],
+					'mikrotik_port' => intval($port) > 0 ? intval($port) : 8728,
+					'bot_token' => $token,
+					'owner_telegram_id' => $idowner
+				]);
+			}
+
 			unset($settings);
 		}
 
