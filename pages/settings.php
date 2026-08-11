@@ -16,14 +16,16 @@
  *
  */
 
-//=====================================================START SCRIPT====================//
-	session_start();
- error_reporting(0);
-	if (!isset($_SESSION["Mikbotamuser"])) {
-		header("Location:../admin/login.php");
-	} else {
-
-		include '../config/system.conn.php';
+if (session_status() === PHP_SESSION_NONE) {
+	@session_start();
+}
+error_reporting(0);
+if (!isset($_SESSION["Mikbotamuser"])) {
+	header("Location:../admin/login.php");
+	exit();
+} else {
+	include_once __DIR__ . '/../config/system.conn.php';
+	include_once __DIR__ . '/../config/system.database.php';
 
 		if (isset($_POST['save'])) {
 			$id          = $_SESSION['Mikbotamid'];

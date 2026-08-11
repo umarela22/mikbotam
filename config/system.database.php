@@ -1221,10 +1221,8 @@ function getvoc($id) {
 	return $hasil;
 }
 function upbot($id, $token, $usernamebot, $namarouter, $ipmik, $usernamemik, $passmik, $port, $dns, $owner, $idowner) {
-
 	global $mikbotamdata;
 	$settings = $mikbotamdata->update('st_mikbotam', [
-		"_id" => $id,
 		"Token_bot" => $token,
 		"Username_bot" => $usernamebot,
 		"Nama_router" => $namarouter,
@@ -1236,8 +1234,7 @@ function upbot($id, $token, $usernamebot, $namarouter, $ipmik, $usernamemik, $pa
 		"Owner" => $owner,
 		"Id_owner" => $idowner,
 		"Tanggal_diubah" => date('Y-m-d'),
-
-	]);
+	], ["_id" => $id]);
 
 	return $settings;
 }

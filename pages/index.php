@@ -17,7 +17,9 @@
  */
 
 //=====================================================START SCRIPT====================//
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+	@session_start();
+}
 
 ob_start();
 error_reporting(0);
