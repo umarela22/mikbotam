@@ -136,6 +136,10 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 		include "../ppp/ppp_isolir_settings.php";
 	} else
 
+	if ($_GET["Mikbotam"] == "manageusers") {
+		include "manage_users.php";
+	} else
+
 	if ($_GET["Mikbotam"] == "Settingstext") {
 		include "settingstext.php";
 	} else {

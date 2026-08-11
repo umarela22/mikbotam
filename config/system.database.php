@@ -984,6 +984,30 @@ function login() {
 }
 function ceklogin($user, $pass) {
 	global $mikbotamdata;
+	init_ppp_billing_tables();
+
+	$app_user = $mikbotamdata->get('app_users', '*', ['username' => $user, 'status' => 'active']);
+	if ($app_user) {
+		$valid = false;
+		if (password_verify($pass, $app_user['password'])) {
+			$valid = true;
+		} elseif ($app_user['password'] === $pass) {
+			$valid = true;
+			$newHash = password_hash($pass, PASSWORD_BCRYPT);
+			$mikbotamdata->update('app_users', ['password' => $newHash], ['id' => $app_user['id']]);
+		}
+
+		if ($valid) {
+			if (session_status() === PHP_SESSION_NONE) {
+				@session_start();
+			}
+			$_SESSION['app_user_id']   = $app_user['id'];
+			$_SESSION['app_user_role'] = $app_user['role'];
+			$_SESSION['app_full_name'] = $app_user['full_name'];
+			return true;
+		}
+	}
+
 	$account = $mikbotamdata->get('mikhbotam_id', [
 		'u_id',
 		'u_user',
@@ -1468,9 +1492,100 @@ function init_ppp_billing_tables() {
             setting_key TEXT UNIQUE,
             setting_value TEXT
         )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS app_users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            full_name TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'user',
+            status TEXT NOT NULL DEFAULT 'active',
+            mikrotik_ip TEXT,
+            mikrotik_username TEXT,
+            mikrotik_password TEXT,
+            mikrotik_port INTEGER DEFAULT 8728,
+            bot_token TEXT,
+            owner_telegram_id TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )");
+
+        // Auto-migrate existing admin as Superadmin if app_users is empty
+        $count = $mikbotamdata->count('app_users');
+        if ($count == 0) {
+            $mikh = $mikbotamdata->get('mikhbotam_id', ['u_user', 'u_pass']);
+            $st   = $mikbotamdata->get('st_mikbotam', '*');
+
+            $admin_user = ($mikh && !empty($mikh['u_user'])) ? $mikh['u_user'] : 'admin';
+            $admin_pass = ($mikh && !empty($mikh['u_pass'])) ? $mikh['u_pass'] : password_hash('admin', PASSWORD_BCRYPT);
+            $mk_ip   = ($st && !empty($st['IP_router'])) ? $st['IP_router'] : '';
+            $mk_user = ($st && !empty($st['Username_router'])) ? $st['Username_router'] : '';
+            $mk_pass = ($st && !empty($st['Pass_router'])) ? decrypturl($st['Pass_router']) : '';
+            $mk_port = ($st && !empty($st['Port'])) ? intval($st['Port']) : 8728;
+            $bot_tok = ($st && !empty($st['Token_bot'])) ? $st['Token_bot'] : '';
+            $own_id  = ($st && !empty($st['Id_owner'])) ? $st['Id_owner'] : '';
+
+            $mikbotamdata->insert('app_users', [
+                'username' => $admin_user,
+                'password' => $admin_pass,
+                'full_name' => 'Super Admin',
+                'role' => 'superadmin',
+                'status' => 'active',
+                'mikrotik_ip' => $mk_ip,
+                'mikrotik_username' => $mk_user,
+                'mikrotik_password' => $mk_pass,
+                'mikrotik_port' => $mk_port,
+                'bot_token' => $bot_tok,
+                'owner_telegram_id' => $own_id
+            ]);
+        }
     } catch (Exception $e) {
         // Table creation fallback
     }
+}
+
+function get_all_app_users() {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    return $mikbotamdata->select('app_users', '*');
+}
+
+function get_app_user_by_id($id) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    return $mikbotamdata->get('app_users', '*', ['id' => intval($id)]);
+}
+
+function get_app_user_by_username($username) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    return $mikbotamdata->get('app_users', '*', ['username' => $username]);
+}
+
+function save_app_user($data) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    
+    if (isset($data['id']) && intval($data['id']) > 0) {
+        $id = intval($data['id']);
+        unset($data['id']);
+        if (isset($data['password']) && empty($data['password'])) {
+            unset($data['password']);
+        } elseif (isset($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        }
+        return $mikbotamdata->update('app_users', $data, ['id' => $id]);
+    } else {
+        if (isset($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        }
+        return $mikbotamdata->insert('app_users', $data);
+    }
+}
+
+function delete_app_user($id) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    return $mikbotamdata->delete('app_users', ['id' => intval($id)]);
 }
 
 // Auto-run table initialization

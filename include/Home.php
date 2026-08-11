@@ -220,6 +220,16 @@
           <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa  fa-pencil-square-o "></i> Text Settings</a></li>
 
         </ul>
+        <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-users tx-18 text-warning"></i>
+            <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>
+            <span class="badge badge-warning tx-10 pd-3-8 mg-l-auto">SUPERADMIN</span>
+          </div>
+        </a>
+        <?php endif; ?>
+
         <a href="#" class="sl-menu-link  <?=$toolsshow;?> ">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa  fa-wrench tx-20"></i>
@@ -260,15 +270,25 @@
       </div>
       <div class="sl-header-right bg-primary">
         <nav class="nav">
-          <div class="dropdown">
+            <?php
+            $display_user_name = isset($_SESSION['app_full_name']) ? $_SESSION['app_full_name'] : (isset($_SESSION['Mikbotamuser']) ? $_SESSION['Mikbotamuser'] : 'Admin');
+            $display_role = isset($_SESSION['app_user_role']) ? ucfirst($_SESSION['app_user_role']) : 'User';
+            $is_impersonating = isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0;
+            ?>
             <a href="" class="nav-link nav-link-profile" data-toggle="dropdown">
-              <span class="logged-name">Admin<span class="hidden-md-down">Stator</span></span>
+              <span class="logged-name"><?=htmlspecialchars($display_user_name);?> <span class="hidden-md-down">(<?=$display_role;?>)</span></span>
               <img src="../img/logoMwhite.svg" class="wd-32 rounded-circle" alt="">
             </a>
-            <div class="dropdown-menu dropdown-menu-header wd-200">
+            <div class="dropdown-menu dropdown-menu-header wd-220">
               <ul class="list-unstyled user-profile-nav">
-                <li><a href="../admin/index.php?admin=sessionedit"><i class="menu-item-icon fa  fa-user"></i> <span class=""> Edit Profile</span></a></li>
-                <li><a href="./?Mikbotam=Settings"><i class="menu-item-icon fa fa-file"></i><span class="">  Settings</span></a></li>
+                <?php if ($is_impersonating): ?>
+                <li class="bg-warning-light"><a href="./?Mikbotam=manageusers&stop_impersonate=1" class="text-danger font-weight-bold"><i class="menu-item-icon fa fa-sign-out"></i> <span> Exit Impersonate</span></a></li>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+                <li><a href="./?Mikbotam=manageusers"><i class="menu-item-icon fa fa-users text-primary"></i> <span class="font-weight-bold"> Kelola User</span></a></li>
+                <?php endif; ?>
+                <li><a href="../admin/index.php?admin=sessionedit"><i class="menu-item-icon fa fa-user"></i> <span class=""> Edit Profile</span></a></li>
+                <li><a href="./?Mikbotam=Settings"><i class="menu-item-icon fa fa-file"></i><span class=""> Settings</span></a></li>
                 <li><a href="./?Mikbotam=logout"><i class="menu-item-icon fa fa-sign-out"></i><span class=""> Sign Out</span></a></li>
               </ul>
             </div>

@@ -17,25 +17,59 @@
  */
 
 //=====================================================START SCRIPT====================//
+	if (session_status() === PHP_SESSION_NONE) {
+		@session_start();
+	}
 	require_once ('system.database.php');
-	$settings=getsettings();
+
+	$active_user_id = null;
+	if (isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0) {
+		$active_user_id = intval($_SESSION['impersonate_user_id']);
+	} elseif (isset($_SESSION['app_user_id']) && intval($_SESSION['app_user_id']) > 0) {
+		$active_user_id = intval($_SESSION['app_user_id']);
+	}
+
+	$active_app_user = null;
+	if ($active_user_id) {
+		$active_app_user = get_app_user_by_id($active_user_id);
+	}
+
+	$settings = getsettings();
 	if (!is_array($settings)) {
 		$settings = [];
 	}
 	global $settings;
-	$identitiy 			= isset($settings["Nama_router"]) ? $settings["Nama_router"] : '';
-	$mikrotik_ip 		= isset($settings["IP_router"]) ? $settings["IP_router"] : '';
-	$mikrotik_username  = isset($settings["Username_router"]) ? $settings["Username_router"] : '';
-	$mikrotik_password  = isset($settings["Pass_router"]) ? decrypturl($settings["Pass_router"]) : '';
-	$mikrotik_port 	    = isset($settings["Port"]) ? $settings["Port"] : '';
-	$dnsname			= isset($settings["dnsname"]) ? $settings["dnsname"] : '';	
-	$Name_router 		= isset($settings["Nama_router"]) ? $settings["Nama_router"] : '';
-	$owner 				= isset($settings["Owner"]) ? $settings["Owner"] : '';
-	$id_own 			= isset($settings["Id_owner"]) ? $settings["Id_owner"] : '';
-	$token 				= isset($settings["Token_bot"]) ? $settings["Token_bot"] : '';
-	$usernamebot 		= isset($settings["Username_bot"]) ? $settings["Username_bot"] : '';
-	$voucher_1			= isset($settings["Voucher_1"]) ? $settings["Voucher_1"] : '';
-	$Voucher_nonsaldo	= isset($settings["Voucher_nonsaldo"]) ? $settings["Voucher_nonsaldo"] : '';
-	$lastupdate         = isset($settings["Tanggal_diubah"]) ? $settings["Tanggal_diubah"] : '';
+
+	if ($active_app_user && !empty($active_app_user['mikrotik_ip'])) {
+		$identitiy 			= !empty($active_app_user['full_name']) ? $active_app_user['full_name'] : 'Router_' . $active_app_user['username'];
+		$mikrotik_ip 		= $active_app_user['mikrotik_ip'];
+		$mikrotik_username  = $active_app_user['mikrotik_username'];
+		$mikrotik_password  = $active_app_user['mikrotik_password'];
+		$mikrotik_port 	    = $active_app_user['mikrotik_port'];
+		$dnsname			= isset($settings["dnsname"]) ? $settings["dnsname"] : '';	
+		$Name_router 		= $identitiy;
+		$owner 				= $active_app_user['full_name'];
+		$id_own 			= $active_app_user['owner_telegram_id'];
+		$token 				= !empty($active_app_user['bot_token']) ? $active_app_user['bot_token'] : (isset($settings["Token_bot"]) ? $settings["Token_bot"] : '');
+		$usernamebot 		= isset($settings["Username_bot"]) ? $settings["Username_bot"] : '';
+		$voucher_1			= isset($settings["Voucher_1"]) ? $settings["Voucher_1"] : '';
+		$Voucher_nonsaldo	= isset($settings["Voucher_nonsaldo"]) ? $settings["Voucher_nonsaldo"] : '';
+		$lastupdate         = isset($settings["Tanggal_diubah"]) ? $settings["Tanggal_diubah"] : '';
+	} else {
+		$identitiy 			= isset($settings["Nama_router"]) ? $settings["Nama_router"] : '';
+		$mikrotik_ip 		= isset($settings["IP_router"]) ? $settings["IP_router"] : '';
+		$mikrotik_username  = isset($settings["Username_router"]) ? $settings["Username_router"] : '';
+		$mikrotik_password  = isset($settings["Pass_router"]) ? decrypturl($settings["Pass_router"]) : '';
+		$mikrotik_port 	    = isset($settings["Port"]) ? $settings["Port"] : '';
+		$dnsname			= isset($settings["dnsname"]) ? $settings["dnsname"] : '';	
+		$Name_router 		= isset($settings["Nama_router"]) ? $settings["Nama_router"] : '';
+		$owner 				= isset($settings["Owner"]) ? $settings["Owner"] : '';
+		$id_own 			= isset($settings["Id_owner"]) ? $settings["Id_owner"] : '';
+		$token 				= isset($settings["Token_bot"]) ? $settings["Token_bot"] : '';
+		$usernamebot 		= isset($settings["Username_bot"]) ? $settings["Username_bot"] : '';
+		$voucher_1			= isset($settings["Voucher_1"]) ? $settings["Voucher_1"] : '';
+		$Voucher_nonsaldo	= isset($settings["Voucher_nonsaldo"]) ? $settings["Voucher_nonsaldo"] : '';
+		$lastupdate         = isset($settings["Tanggal_diubah"]) ? $settings["Tanggal_diubah"] : '';
+	}
 	
 	
