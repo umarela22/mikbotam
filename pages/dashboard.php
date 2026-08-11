@@ -23,10 +23,11 @@
 
 	if (!isset($_SESSION["Mikbotamuser"])) {
 		header("Location:../admin/login.php");
+		exit();
 	} else {
-		include '../config/system.conn.php';
-		include '../config/system.byte.php';
-		include '../Api/routeros_api.class.php';
+		include_once __DIR__ . '/../config/system.conn.php';
+		include_once __DIR__ . '/../config/system.byte.php';
+		include_once __DIR__ . '/../Api/routeros_api.class.php';
 		$id = isset($id) ? $id : null;
 		$datavoucher = sethistory($id);
 		if (!is_array($datavoucher)) {

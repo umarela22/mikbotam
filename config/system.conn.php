@@ -29,7 +29,7 @@
 	ini_set('log_errors', 1);
 	ini_set('error_log', $app_log_dir . '/app_error.log');
 
-	require_once ('system.database.php');
+	require_once __DIR__ . '/system.database.php';
 
 	$active_user_id = null;
 	if (isset($_GET['uid']) && intval($_GET['uid']) > 0) {
