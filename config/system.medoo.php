@@ -14,6 +14,7 @@
  * + fix bugs AND auto ASC
  * Di modif ulang  @bangachil : Desember 2018
  */
+#[\AllowDynamicProperties]
 class medoo
 {
     // General
@@ -185,7 +186,7 @@ class medoo
             }
         }
 
-        return implode($stack, ',');
+        return implode(',', $stack);
     }
 
     protected function array_quote($array)
@@ -195,7 +196,7 @@ class medoo
             $temp[] = is_int($value) ? $value : $this->pdo->quote($value);
         }
 
-        return implode($temp, ',');
+        return implode(',', $temp);
     }
 
     protected function inner_conjunct($data, $conjunctor, $outer_conjunctor)
@@ -341,7 +342,7 @@ class medoo
             if (isset($where['MATCH'])) {
                 $MATCH = $where['MATCH'];
                 if (is_array($MATCH) && isset($MATCH['columns'], $MATCH['keyword'])) {
-                    $where_clause .= ($where_clause != '' ? ' AND ' : ' WHERE ').' MATCH ("'.str_replace('.', '"."', implode($MATCH['columns'], '", "')).'") AGAINST ('.$this->quote($MATCH['keyword']).')';
+                    $where_clause .= ($where_clause != '' ? ' AND ' : ' WHERE ').' MATCH ("'.str_replace('.', '"."', implode('", "', $MATCH['columns'])).'") AGAINST ('.$this->quote($MATCH['keyword']).')';
                 }
             }
             if (isset($where['GROUP'])) {
@@ -363,7 +364,7 @@ class medoo
                             $stack[] = $this->column_quote($value);
                         }
                     }
-                    $where_clause .= ' ORDER BY '.implode($stack, ',');
+                    $where_clause .= ' ORDER BY '.implode(',', $stack);
                 } else {
                     $where_clause .= ' ORDER BY '.$this->column_quote($ORDER);
                 }
@@ -425,7 +426,7 @@ class medoo
                     if (is_array($relation)) {
                         // For ['column1', 'column2']
                         if (isset($relation[0])) {
-                            $relation = 'USING ("'.implode($relation, '", "').'")';
+                            $relation = 'USING ("'.implode('", "', $relation).'")';
                         } else {
                             $joins = [];
                             foreach ($relation as $key => $value) {
@@ -439,7 +440,7 @@ class medoo
                                 ' = '.
                                 $this->table_quote(isset($match[5]) ? $match[5] : $match[3]).'."'.$value.'"';
                             }
-                            $relation = 'ON '.implode($joins, ' AND ');
+                            $relation = 'ON '.implode(' AND ', $joins);
                         }
                     }
                     $table_name = $this->table_quote($match[3]).' ';
@@ -449,7 +450,7 @@ class medoo
                     $table_join[] = $join_array[$match[2]].' JOIN '.$table_name.$relation;
                 }
             }
-            $table_query .= ' '.implode($table_join, ' ');
+            $table_query .= ' '.implode(' ', $table_join);
         } else {
             if (is_null($columns)) {
                 if (is_null($where)) {
@@ -578,7 +579,7 @@ class medoo
                         break;
                 }
             }
-            $this->exec('INSERT INTO '.$this->table_quote($table).' ('.implode(', ', $columns).') VALUES ('.implode($values, ', ').')');
+            $this->exec('INSERT INTO '.$this->table_quote($table).' ('.implode(', ', $columns).') VALUES ('.implode(', ', $values).')');
             $lastId[] = $this->pdo->lastInsertId();
         }
 

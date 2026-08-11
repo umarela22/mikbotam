@@ -1,8 +1,15 @@
 # Block direct access to database, config, and text files
 <FilesMatch "\.(db|sqlite|sqlite3|config\.php|txt)$">
-    Order allow,deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
-# Block directory browsing
-Options -Indexes
+# Disable directory listing if supported
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>

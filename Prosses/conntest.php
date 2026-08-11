@@ -1,4 +1,4 @@
- <?php
+<?php
 //=====================================================START====================//
 
 /*
@@ -17,48 +17,48 @@
  */
 
 //=====================================================START SCRIPT====================//
- error_reporting(0); 
- 	if($_GET[cmd]=="testcon"){
- 	
-	$ip = $_POST[ip];
-	$user = $_POST[user];
-	$pass = $_POST[pass];
-	$ports = $_POST[portapi];
-    include '../Api/routeros_api.class.php';
-$wait = 1; // wait Timeout In Seconds
-$host = $ip;
-$API = new routeros_api();
+session_start();
+error_reporting(0); 
 
-    $fp = @fsockopen($host, $ports, $errCode, $errStr, $wait);
-    if ($fp) {
-    	
-    	 if ($API->connect($ip, $user, $pass,$ports)) {
-    	 echo '        <div class="card pd-20 pd-sm-20 bg-primary "><div class="signin-logo tx-center tx-40 tx-bold tx-white">CONECTED </div>
-        <div class="tx-center  tx-white">Mikbotam Conect Your Router</div>
+$cmd = isset($_GET['cmd']) ? $_GET['cmd'] : '';
+if ($cmd === "testcon") {
+	$ip = isset($_POST['ip']) ? trim($_POST['ip']) : '';
+	$user = isset($_POST['user']) ? trim($_POST['user']) : '';
+	$pass = isset($_POST['pass']) ? trim($_POST['pass']) : '';
+	$ports = isset($_POST['portapi']) && !empty($_POST['portapi']) ? intval($_POST['portapi']) : 8728;
+
+	if (empty($ip) || empty($user)) {
+		echo '        <div class="card pd-20 pd-sm-20 bg-danger "><div class="signin-logo tx-center tx-40 tx-bold tx-white">DISCONNECT </div>
+        <div class="tx-center  tx-white">Silahkan isi IP Router dan Username MikroTik terlebih dahulu.</div>
         </div>';
-    	 }else{
-    	 echo '        <div class="card pd-20 pd-sm-20 bg-danger "><div class="signin-logo tx-center tx-40 tx-bold tx-white">DISCONECT </div>
-        <div class="tx-center  tx-white">Please check again to make sure it is filled in correctly</div>
-        <div class="tx-center  tx-white">ERROR :  Incorrect  Username Or Password </div>
+		exit();
+	}
+
+	include_once '../Api/routeros_api.class.php';
+	$wait = 3; // wait Timeout In Seconds
+	$host = $ip;
+	$API = new routeros_api();
+	$API->timeout = 3;
+
+	$fp = @fsockopen($host, $ports, $errCode, $errStr, $wait);
+	if ($fp) {
+		if ($API->connect($ip, $user, $pass, $ports)) {
+			echo '        <div class="card pd-20 pd-sm-20 bg-primary "><div class="signin-logo tx-center tx-40 tx-bold tx-white">CONNECTED </div>
+        <div class="tx-center  tx-white">Mikbotam Connected To Your Router Successfully</div>
         </div>';
-    	 }
-    	 	
-    	 
-	
-       
-        fclose($fp);
-    } else {
-       
-       	
-    
-    	 		echo '        <div class="card pd-20 pd-sm-20 bg-danger "><div class="signin-logo tx-center tx-40 tx-bold tx-white">DISCONECT </div>
-        <div class="tx-center  tx-white">Please check again to make sure it is filled in correctly</div>
-        <div class="tx-center  tx-white">ERROR : '.$errCode.' '.$errStr.' </div>
-         <div class="tx-center  tx-white">ERROR : Incorrect port Mikrotik </div>
+			$API->disconnect();
+		} else {
+			echo '        <div class="card pd-20 pd-sm-20 bg-danger "><div class="signin-logo tx-center tx-40 tx-bold tx-white">DISCONNECT </div>
+        <div class="tx-center  tx-white">Please check again to make sure credentials are correct</div>
+        <div class="tx-center  tx-white">ERROR : Incorrect Username Or Password</div>
         </div>';
-
-    }
-
-
+		}
+		@fclose($fp);
+	} else {
+		echo '        <div class="card pd-20 pd-sm-20 bg-danger "><div class="signin-logo tx-center tx-40 tx-bold tx-white">DISCONNECT </div>
+        <div class="tx-center  tx-white">Gagal terhubung ke Router IP: ' . htmlspecialchars($ip) . ' Port: ' . htmlspecialchars($ports) . '</div>
+        <div class="tx-center  tx-white">ERROR : ' . htmlspecialchars($errCode) . ' ' . htmlspecialchars($errStr) . '</div>
+        </div>';
+	}
 }
- ?>
+?>

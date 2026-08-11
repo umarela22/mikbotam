@@ -1111,7 +1111,7 @@ function getid($id) {
 		"_id",
 
 	]);
-	$hasil = $settings[_id];
+	$hasil = isset($settings['_id']) ? $settings['_id'] : null;
 	return $hasil;
 }
 

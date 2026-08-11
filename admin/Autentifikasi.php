@@ -45,41 +45,46 @@ function IP() {
 }
 
 $ip = IP();
-if (isset($_POST)) {
-	$user = $_POST['username'];
-	$pass = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && empty($_POST)) {
+	header("Location: login.php");
+	exit();
+}
 
-	if (empty($user) or empty($pass)) {
-		create_validasi(
-			"Autentifikasi Valid",
-			"<img style='width:30%;' class='responsive-image center'; src='../img/loading.svg'/><br><center>Incorrect username or password.</center>",
-			"index.php");
-	} else {
-		if (ceklogin($user, $pass)) {
-			$_SESSION['Mikbotamuser'] = $user;
-			$_SESSION['Mikbotamid']   = makesession($user);
+$user = isset($_POST['username']) ? trim($_POST['username']) : '';
+$pass = isset($_POST['password']) ? trim($_POST['password']) : '';
 
-			if (!empty(getid($_SESSION['Mikbotamid']))) {
-				if (!empty($_SESSION['MikbotamUrl'])) {
-					header("Location: " . $_SESSION['MikbotamUrl']);
-				} else {
+if (empty($user) || empty($pass)) {
+	create_validasi(
+		"Autentifikasi Valid",
+		"<img style='width:30%;' class='responsive-image center'; src='../img/loading.svg'/><br><center>Incorrect username or password.</center>",
+		"login.php");
+} else {
+	if (ceklogin($user, $pass)) {
+		$_SESSION['Mikbotamuser'] = $user;
+		$_SESSION['Mikbotamid']   = makesession($user);
+		$status   = 'Success';
+		$sendlast = lastlogin($ip, $user, $status);
 
-					echo "<meta http-equiv='refresh' content='0;url=../admin/index.php' />";
-				}
+		$checkId = getid($_SESSION['Mikbotamid']);
+		if (!empty($checkId)) {
+			if (!empty($_SESSION['MikbotamUrl'])) {
+				header("Location: " . $_SESSION['MikbotamUrl']);
+				exit();
 			} else {
-				echo "<meta http-equiv='refresh' content='0;url=myservernew.php' />";
+				header("Location: ../admin/index.php");
+				exit();
 			}
-			$status   = 'Success';
-			$sendlast = lastlogin($ip, $user, $status);
-			exit(0);
 		} else {
-			$status   = 'Valid';
-			$sendlast = lastlogin($ip, $user, $status);
-			create_validasi(
-				"Autentifikasi Valid!",
-				"<img style='width:30%;' class='responsive-image center'; src='../img/loading.svg'/><br><center>Incorrect username or password.</center>",
-				"index.php"
-			);
+			header("Location: myservernew.php");
+			exit();
 		}
+	} else {
+		$status   = 'Valid';
+		$sendlast = lastlogin($ip, $user, $status);
+		create_validasi(
+			"Autentifikasi Valid!",
+			"<img style='width:30%;' class='responsive-image center'; src='../img/loading.svg'/><br><center>Incorrect username or password.</center>",
+			"login.php"
+		);
 	}
 }

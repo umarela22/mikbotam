@@ -26,7 +26,7 @@ require_once 'system.medoo.php';
         
 $mikbotamdata = new medoo([
     'database_type' => 'sqlite',
-    'database_file' => '../config/mibotam.db',
+    'database_file' => __DIR__ . '/mibotam.db',
 ]);
 
 
