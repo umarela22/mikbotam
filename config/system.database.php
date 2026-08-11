@@ -990,6 +990,16 @@ function historydata($id) {
 function gethistory($id) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = [
+		"ORDER" => [
+			"Tanggal" => "DESC",
+			"Waktu" => "DESC"
+		]
+	];
+	if ($tenant_id) {
+		$where["AND"] = ["app_user_id" => $tenant_id];
+	}
 	$gethistory = $mikbotamdata->select('re_operating', [
 		"No",
 		"id_user",
@@ -1006,14 +1016,9 @@ function gethistory($id) {
 		"Waktu",
 		"Tanggal"
 
-	], [
-		"ORDER" => [
-			"Tanggal" => "DESC"
-		]
+	], $where);
 
-	]);
-
-	return $gethistory;
+	return is_array($gethistory) ? $gethistory : [];
 }
 function login() {
 
@@ -1533,8 +1538,9 @@ function init_ppp_billing_tables() {
         )");
         $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_isolir_settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            setting_key TEXT UNIQUE,
-            setting_value TEXT
+            setting_key TEXT,
+            setting_value TEXT,
+            app_user_id INTEGER
         )");
 
         $pdo->exec("CREATE TABLE IF NOT EXISTS app_users (
@@ -1556,10 +1562,18 @@ function init_ppp_billing_tables() {
         try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE ppp_packages ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE ppp_customers ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE ppp_invoices ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE ppp_isolir_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try {
             $pdo->exec("UPDATE re_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE re_operating SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE st_reportdata SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE ppp_packages SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE ppp_customers SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE ppp_invoices SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE ppp_isolir_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
         } catch (Exception $ex) {}
 
         // Auto-migrate existing admin as Superadmin if app_users is empty
@@ -1606,14 +1620,14 @@ function get_app_user_by_id($id) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     $rows = $mikbotamdata->select('app_users', '*', ['id' => intval($id)]);
-    return isset($rows[0]) ? $rows[0] : false;
+    return (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
 }
 
 function get_app_user_by_username($username) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     $rows = $mikbotamdata->select('app_users', '*', ['username' => $username]);
-    return isset($rows[0]) ? $rows[0] : false;
+    return (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
 }
 
 function save_app_user($data) {
@@ -1649,37 +1663,58 @@ init_ppp_billing_tables();
 function get_ppp_packages() {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    $data = $mikbotamdata->select('ppp_packages', ['id', 'profile_name', 'price', 'description']);
+    $tenant_id = get_current_tenant_id();
+    $where = [];
+    if ($tenant_id) {
+        $where['app_user_id'] = $tenant_id;
+    }
+    $data = $mikbotamdata->select('ppp_packages', ['id', 'profile_name', 'price', 'description'], $where);
     return is_array($data) ? $data : [];
 }
 
 function save_ppp_package($profile_name, $price, $description = '') {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    $check = $mikbotamdata->get('ppp_packages', 'id', ['profile_name' => $profile_name]);
+    $tenant_id = get_current_tenant_id();
+    $where_check = ['profile_name' => $profile_name];
+    if ($tenant_id) {
+        $where_check = ['AND' => ['profile_name' => $profile_name, 'app_user_id' => $tenant_id]];
+    }
+    $check = $mikbotamdata->get('ppp_packages', 'id', $where_check);
     if ($check) {
         return $mikbotamdata->update('ppp_packages', [
             'price' => intval($price),
             'description' => $description
-        ], ['profile_name' => $profile_name]);
+        ], ['id' => $check]);
     } else {
         return $mikbotamdata->insert('ppp_packages', [
             'profile_name' => $profile_name,
             'price' => intval($price),
-            'description' => $description
+            'description' => $description,
+            'app_user_id' => $tenant_id
         ]);
     }
 }
 
 function delete_ppp_package($id) {
     global $mikbotamdata;
-    return $mikbotamdata->delete('ppp_packages', ['id' => intval($id)]);
+    $tenant_id = get_current_tenant_id();
+    $where = ['id' => intval($id)];
+    if ($tenant_id) {
+        $where = ['AND' => ['id' => intval($id), 'app_user_id' => $tenant_id]];
+    }
+    return $mikbotamdata->delete('ppp_packages', $where);
 }
 
 function get_ppp_isolir_settings() {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    $rows = $mikbotamdata->select('ppp_isolir_settings', ['setting_key', 'setting_value']);
+    $tenant_id = get_current_tenant_id();
+    $where = [];
+    if ($tenant_id) {
+        $where['app_user_id'] = $tenant_id;
+    }
+    $rows = $mikbotamdata->select('ppp_isolir_settings', ['setting_key', 'setting_value'], $where);
     $settings = [
         'due_date' => 20,
         'isolir_mode' => 'disable', // 'disable' or 'profile'
@@ -1697,12 +1732,17 @@ function get_ppp_isolir_settings() {
 function save_ppp_isolir_settings($data) {
     global $mikbotamdata;
     init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
     foreach ($data as $key => $val) {
-        $check = $mikbotamdata->get('ppp_isolir_settings', 'id', ['setting_key' => $key]);
+        $where_check = ['setting_key' => $key];
+        if ($tenant_id) {
+            $where_check = ['AND' => ['setting_key' => $key, 'app_user_id' => $tenant_id]];
+        }
+        $check = $mikbotamdata->get('ppp_isolir_settings', 'id', $where_check);
         if ($check) {
-            $mikbotamdata->update('ppp_isolir_settings', ['setting_value' => $val], ['setting_key' => $key]);
+            $mikbotamdata->update('ppp_isolir_settings', ['setting_value' => $val], ['id' => $check]);
         } else {
-            $mikbotamdata->insert('ppp_isolir_settings', ['setting_key' => $key, 'setting_value' => $val]);
+            $mikbotamdata->insert('ppp_isolir_settings', ['setting_key' => $key, 'setting_value' => $val, 'app_user_id' => $tenant_id]);
         }
     }
     return true;
@@ -1711,7 +1751,11 @@ function save_ppp_isolir_settings($data) {
 function get_ppp_invoices($month_year = null, $status = null, $search = null) {
     global $mikbotamdata;
     init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
     $and = [];
+    if ($tenant_id) {
+        $and['app_user_id'] = $tenant_id;
+    }
     if (!empty($month_year)) {
         $and['month_year'] = $month_year;
     }
@@ -1737,14 +1781,24 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
     global $mikbotamdata;
     init_ppp_billing_tables();
     date_default_timezone_set('Asia/Jakarta');
+    $tenant_id = get_current_tenant_id();
 
-    $inv = $mikbotamdata->get('ppp_invoices', ['username_ppp', 'month_year'], ['id' => intval($id)]);
+    $where_inv = ['id' => intval($id)];
+    if ($tenant_id) {
+        $where_inv = ['AND' => ['id' => intval($id), 'app_user_id' => $tenant_id]];
+    }
+
+    $inv = $mikbotamdata->get('ppp_invoices', ['username_ppp', 'month_year'], $where_inv);
     if ($inv) {
         $user_ppp = $inv['username_ppp'];
         $settings = get_ppp_isolir_settings();
         $default_day = intval($settings['due_date']);
 
-        $cust = $mikbotamdata->get('ppp_customers', ['id', 'exp_date', 'due_date'], ['username_ppp' => $user_ppp]);
+        $where_cust = ['username_ppp' => $user_ppp];
+        if ($tenant_id) {
+            $where_cust = ['AND' => ['username_ppp' => $user_ppp, 'app_user_id' => $tenant_id]];
+        }
+        $cust = $mikbotamdata->get('ppp_customers', ['id', 'exp_date', 'due_date'], $where_cust);
         $day = ($cust && !empty($cust['due_date'])) ? intval($cust['due_date']) : $default_day;
 
         if ($cust && !empty($cust['exp_date'])) {
@@ -1761,30 +1815,37 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
             $mikbotamdata->insert('ppp_customers', [
                 'username_ppp' => $user_ppp,
                 'due_date' => $day,
-                'exp_date' => $next_exp
+                'exp_date' => $next_exp,
+                'app_user_id' => $tenant_id
             ]);
         }
-    }
 
-    return $mikbotamdata->update('ppp_invoices', [
-        'status' => 'PAID',
-        'payment_date' => date('Y-m-d H:i:s'),
-        'payment_method' => $method,
-        'notes' => $notes
-    ], ['id' => intval($id)]);
+        $mikbotamdata->update('ppp_invoices', [
+            'status' => 'PAID',
+            'payment_date' => date('Y-m-d H:i:s'),
+            'payment_method' => $method,
+            'notes' => $notes
+        ], $where_inv);
+    }
 }
 
 function update_ppp_invoice_status($id, $status) {
     global $mikbotamdata;
     init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
+    $where = ['id' => intval($id)];
+    if ($tenant_id) {
+        $where = ['AND' => ['id' => intval($id), 'app_user_id' => $tenant_id]];
+    }
     return $mikbotamdata->update('ppp_invoices', [
         'status' => $status
-    ], ['id' => intval($id)]);
+    ], $where);
 }
 
 function generate_monthly_invoices($month_year, $secrets_list) {
     global $mikbotamdata;
     init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
     $packages = get_ppp_packages();
     $pkg_map = [];
     foreach ($packages as $pkg) {
@@ -1800,11 +1861,16 @@ function generate_monthly_invoices($month_year, $secrets_list) {
         $price = isset($pkg_map[$profile]) ? $pkg_map[$profile] : 0;
         if ($price <= 0) continue;
 
+        $where_and = [
+            'username_ppp' => $user,
+            'month_year' => $month_year
+        ];
+        if ($tenant_id) {
+            $where_and['app_user_id'] = $tenant_id;
+        }
+
         $exists = $mikbotamdata->get('ppp_invoices', 'id', [
-            'AND' => [
-                'username_ppp' => $user,
-                'month_year' => $month_year
-            ]
+            'AND' => $where_and
         ]);
 
         if (!$exists) {
@@ -1814,10 +1880,11 @@ function generate_monthly_invoices($month_year, $secrets_list) {
                 'username_ppp' => $user,
                 'month_year' => $month_year,
                 'amount' => $price,
-                'status' => 'UNPAID'
+                'status' => 'UNPAID',
+                'app_user_id' => $tenant_id
             ]);
             $count++;
         }
     }
     return $count;
-}
+}
