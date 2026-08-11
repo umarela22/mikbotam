@@ -285,8 +285,8 @@
          $text .= "/deposit - Permintaan Deposit\n\n";
          $text .= "Admin commands==============\n";
          $text .= "/tagihan_ppp - Ringkasan Tagihan PPPoE\n";
-         $text .= "/bayar_ppp <user> - Tandai Lunas PPPoE\n";
-         $text .= "/isolir_ppp <user> - Isolir User PPPoE\n";
+         $text .= "/bayar_ppp &lt;user&gt; - Tandai Lunas PPPoE\n";
+         $text .= "/isolir_ppp &lt;user&gt; - Isolir User PPPoE\n";
          $text .= "/daftarid - Daftar User Manual\n";
          $text .= "/topdown - Mengurangi Saldo User\n";
          $text .= "/topup - Top-up Saldo User\n";
