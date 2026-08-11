@@ -195,7 +195,7 @@ var _0x4214=["\x66\x61\x73\x74","\x66\x61\x64\x65\x49\x6E","\x2E\x2E\x2F\x47\x72
 								</thead>
 								<tbody>
 									<?php
-									$TotalReg = count($datavoucher);
+									$TotalReg = is_array($datavoucher) ? count($datavoucher) : 0;
 									for ($i = 0; $i < $TotalReg; $i++) {
 										$datas = $datavoucher[$i];
 										$no = $i + 1;

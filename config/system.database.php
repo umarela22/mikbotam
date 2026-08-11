@@ -639,7 +639,7 @@ function countuser() {
 			'Tanggal[<>]' => $startTime,
 		]]);
 
-	$ech = count($data);
+	$ech = is_array($data) ? count($data) : 0;
 	return $ech;
 }
 function counterror() {
@@ -680,7 +680,7 @@ function counterror() {
 
 	]
 	);
-	$ech = count($gethistory);
+	$ech = is_array($gethistory) ? count($gethistory) : 0;
 	return $ech;
 }
 function sethistoryidbymonth($id,$month) {
@@ -906,7 +906,7 @@ function countvoucher() {
 
 	]
 	);
-	$ech = count($gethistory);
+	$ech = is_array($gethistory) ? count($gethistory) : 0;
 	return $ech;
 }
 function historydata($id) {
@@ -939,7 +939,7 @@ function historydata($id) {
 
 	]
 	);
-	$ech = count($gethistory);
+	$ech = is_array($gethistory) ? count($gethistory) : 0;
 	return $ech;
 }
 function gethistory($id) {
