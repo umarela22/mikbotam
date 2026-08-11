@@ -204,42 +204,60 @@
    //daftar commands
    $mkbot->cmd('/daftar', function () {
       include ('../config/system.conn.php');
-      $info         = bot::message();
-      $msgid        = $info['message_id'];
-      $nametelegram = $info['from']['username'];
-      $idtelegram   = $info['from']['id'];
+      $info       = bot::message();
+      $msgid      = $info['message_id'];
+      $idtelegram = $info['from']['id'];
+
+      // Fallback name if Telegram username is empty
+      if (!empty($info['from']['username'])) {
+         $nametelegram = $info['from']['username'];
+         $display_name = "@" . $nametelegram;
+      } else {
+         $first = isset($info['from']['first_name']) ? $info['from']['first_name'] : '';
+         $last  = isset($info['from']['last_name']) ? $info['from']['last_name'] : '';
+         $nametelegram = trim($first . ' ' . $last);
+         if (empty($nametelegram)) {
+            $nametelegram = "User_" . $idtelegram;
+         }
+         $display_name = htmlspecialchars($nametelegram);
+      }
 
       Bot::sendChatAction('typing');
-      $ids = $info['chat']['id'];
+      $ids  = $info['chat']['id'];
+      $text = "";
 
-      if (empty($nametelegram)) {
-         $text = 'Maaf Akun Telegram anda belum terpasang username silahkan pasang terlebih dahulu username anda';
-      } else {
+      if (has($idtelegram) == false) {
+         $cek = daftar($idtelegram, $nametelegram);
 
-         if (has($idtelegram) == false) {
-            $cek = daftar($idtelegram, $nametelegram);
-
-            if (empty($cek)) {
-               $text .= "Mohon Maaf system kami mengalami gangguan silahkan hubungi Adminstator untuk reservasi layanan ini\n";
-            } else {
-               $text .= "<code>   Customer ID $idtelegram   </code>\n";
-               $text .= "<code>========================</code>\n";
-               $text .= "<code>  ID User  :</code> <code>$idtelegram</code>\n";
-               $text .= "<code>  Username :</code> @$nametelegram\n";
-               $text .= "<code>  Status   : Terdaftar </code>\n";
-               $text .= "<code>========================</code>\n";
-               $text .= "Silahkan Isi saldo anda Di outlet kami 😊 \n\n";
-               $text .= "Terima kasih atas kepercayaan anda mengunakan layanan kami\n";
-            }
+         if (empty($cek)) {
+            $text .= "Mohon Maaf system kami mengalami gangguan silahkan hubungi Administrator untuk reservasi layanan ini\n";
          } else {
-            $text .= "Maaf Anda sudah terdaftar dalam layanan ini\n\n";
-            $text .= "<code>    Informasi ID Anda</code>\n";
+            $text .= "<code>   Customer ID $idtelegram   </code>\n";
             $text .= "<code>========================</code>\n";
-            $text .= "<code>  ID User  : </code> <code>$idtelegram</code>\n";
-            $text .= "<code>  Username : </code> @$nametelegram\n";
+            $text .= "<code>  ID User  :</code> <code>$idtelegram</code>\n";
+            $text .= "<code>  Nama/User:</code> $display_name\n";
             $text .= "<code>  Status   : Terdaftar </code>\n";
             $text .= "<code>========================</code>\n";
+            $text .= "Silahkan Isi saldo anda Di outlet kami 😊 \n\n";
+            $text .= "Terima kasih atas kepercayaan anda menggunakan layanan kami\n";
+
+            // Send alert notification to Admin / Owner
+            if (!empty($id_own)) {
+               $admin_msg = "🔔 <b>Pendaftaran Reseller Baru!</b>\n"
+                          . "ID Telegram : <code>$idtelegram</code>\n"
+                          . "Nama/User   : $display_name\n"
+                          . "Waktu       : " . date('d-m-Y H:i:s') . " WIB";
+               Bot::sendMessage($admin_msg, ['parse_mode' => 'html', 'chat_id' => $id_own]);
+            }
          }
+      } else {
+         $text .= "Maaf Anda sudah terdaftar dalam layanan ini\n\n";
+         $text .= "<code>    Informasi ID Anda</code>\n";
+         $text .= "<code>========================</code>\n";
+         $text .= "<code>  ID User  : </code> <code>$idtelegram</code>\n";
+         $text .= "<code>  Nama/User: </code> $display_name\n";
+         $text .= "<code>  Status   : Terdaftar </code>\n";
+         $text .= "<code>========================</code>\n";
       }
 
       $options = [
