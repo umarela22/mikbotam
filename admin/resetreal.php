@@ -64,7 +64,6 @@ error_reporting(0);
         <title>MIKBOTAM</title>
         <link rel="stylesheet" href="../css/Mikbotam.min.css">
          <link href="../lib/font-awesome/css/font-awesome.css" rel="stylesheet">
-            <link rel="stylesheet" href="../lib/alert/alertify.min.css">
             <script src="../lib/alert/alertify.min.js"></script>
      <script src="../lib/jquery/jquery.js"></script>
 <script>

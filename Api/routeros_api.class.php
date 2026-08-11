@@ -563,8 +563,9 @@ function Crusername($length) {
     $chars = "1234567890abcdefghijkmnopqrstuvwxyz";
     $i     = 1;
     $user  = "";
+    $maxLen = strlen($chars) - 1;
     while ($i <= $length) {
-        $user .= $chars{mt_rand(0, strlen($chars))};
+        $user .= $chars[mt_rand(0, $maxLen)];
         $i++;
     }
     return $user;
@@ -573,13 +574,12 @@ function Crpas($length) {
     $chars = "1234567890abcdefghijkmnopqrstuvwxyz";
     $i     = 1;
     $pass  = "";
+    $maxLen = strlen($chars) - 1;
     while ($i <= $length) {
-        $pass .= $chars{mt_rand(0, strlen($chars))};
+        $pass .= $chars[mt_rand(0, $maxLen)];
         $i++;
     }
     return $pass;
-    
-    
 };
 //Update by BangAchil 2 april 2019
 

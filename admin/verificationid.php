@@ -70,7 +70,6 @@
     <link href="../lib/font-awesome/css/font-awesome.css" rel="stylesheet">
     <!-- Starlight CSS -->
     <link rel="stylesheet" href="../css/Mikbotam.min.css">
-            <link rel="stylesheet" href="../lib/alert/alertify.min.css">
   </head>
  <body>
 

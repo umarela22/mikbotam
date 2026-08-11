@@ -20,6 +20,7 @@
  error_reporting(0);
     if (!isset($_SESSION["Mikbotamuser"])) {
         header("Location:../admin/login.php");
+        exit();
     } else {
     	
         include '../config/system.conn.php';

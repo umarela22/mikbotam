@@ -25,6 +25,7 @@ $_SESSION['MikbotamUrl'] = $_SERVER['REQUEST_URI'];
 
 if (!isset($_SESSION["Mikbotamuser"])) {
 	header("Location:../admin/login.php");
+	exit();
 } else {
 
 	include '../include/header.php';

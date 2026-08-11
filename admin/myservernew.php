@@ -21,6 +21,7 @@
 error_reporting(0);
     if (!isset($_SESSION["Mikbotamuser"])) {
         header("Location:../admin/login.php");
+        exit();
     } else {
         include '../include/header.php';
         include '../config/system.conn.php';

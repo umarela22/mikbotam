@@ -76,6 +76,14 @@ function daftarid($id, $name, $notlp, $saldo) {
 	return $text;
 }
 function encrypturl($pamerbojo) {
+	if (empty($pamerbojo)) return '';
+	$key = hash('sha256', '4ku4ll_mikbotam_secret_key', true);
+	$iv = openssl_random_pseudo_bytes(16);
+	$encrypted = openssl_encrypt($pamerbojo, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+	if ($encrypted !== false) {
+		return 'enc:v2:' . base64_encode($iv . $encrypted);
+	}
+	$serondenggosong = '';
 	$kunciobeng = '4ku4ll';
 	for ($i = 0; $i < strlen($pamerbojo); $i++) {
 		$buahnanas = substr($pamerbojo, $i, 1);
@@ -87,6 +95,19 @@ function encrypturl($pamerbojo) {
 }
 
 function decrypturl($pamerbojo) {
+	if (empty($pamerbojo)) return '';
+	if (strpos($pamerbojo, 'enc:v2:') === 0) {
+		$raw = base64_decode(substr($pamerbojo, 7));
+		if (strlen($raw) > 16) {
+			$iv = substr($raw, 0, 16);
+			$encrypted = substr($raw, 16);
+			$key = hash('sha256', '4ku4ll_mikbotam_secret_key', true);
+			$decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+			if ($decrypted !== false) {
+				return $decrypted;
+			}
+		}
+	}
 	$pamerbojo = base64_decode($pamerbojo);
 	$serondenggosong = '';
 	$kunciobeng = '4ku4ll';
@@ -962,16 +983,31 @@ function login() {
 	return $hasil;
 }
 function ceklogin($user, $pass) {
-
 	global $mikbotamdata;
-	$settings = $mikbotamdata->has('mikhbotam_id', [
-		'AND' => [
-			'u_user' => $user,
-			'u_pass' => $pass
-		]
+	$account = $mikbotamdata->get('mikhbotam_id', [
+		'u_id',
+		'u_user',
+		'u_pass'
+	], [
+		'u_user' => $user
 	]);
 
-	return $settings;
+	if ($account && !empty($account['u_pass'])) {
+		$storedPass = $account['u_pass'];
+		if (password_verify($pass, $storedPass)) {
+			return true;
+		}
+		if ($storedPass === $pass) {
+			$newHash = password_hash($pass, PASSWORD_BCRYPT);
+			$mikbotamdata->update('mikhbotam_id', [
+				'u_pass' => $newHash
+			], [
+				'u_id' => $account['u_id']
+			]);
+			return true;
+		}
+	}
+	return false;
 }
 function lastlogin($ip, $user, $status) {
 
@@ -1003,15 +1039,16 @@ function getlastlogin() {
 }
 function Mikbotamlogin($id, $user, $pass) {
 	global $mikbotamdata;
+	$hashedPass = password_hash($pass, PASSWORD_BCRYPT);
 	$data = $mikbotamdata->update('mikhbotam_id', [
 
 		'u_user' => $user,
-		'u_pass' => $pass,
+		'u_pass' => $hashedPass,
 	], [
 		'u_id' => $id
 	]);
 
-	return $hasil;
+	return $data;
 }
 function makesession($user) {
 	global $mikbotamdata;
@@ -1024,15 +1061,16 @@ function makesession($user) {
 
 	]);
 
-	$hasil = $data[u_id];
+	$hasil = isset($data['u_id']) ? $data['u_id'] : null;
 	return $hasil;
 }
 function updatesession($user, $pass,$id) {
 	global $mikbotamdata;
+	$hashedPass = password_hash($pass, PASSWORD_BCRYPT);
 	$data = $mikbotamdata->update('mikhbotam_id', [
 
 		'u_user' => $user,
-		'u_pass' => $pass
+		'u_pass' => $hashedPass
 	],[
 		'u_id' => $id,
 	]);
@@ -1237,9 +1275,9 @@ function tokenGenerate() {
 	$chars = "1234567890";
 	$i = 1;
 	$token = "";
+	$maxLen = strlen($chars) - 1;
 	while ($i <= 8) {
-		$token .= $chars {
-			mt_rand(0, strlen($chars))};
+		$token .= $chars[mt_rand(0, $maxLen)];
 		$i++;
 	}
 	return $token;
@@ -1256,7 +1294,7 @@ function sendreset($username) {
 	$tokenreal = $token['Token_bot'];
 	$getoken = tokenGenerate();
 
-	$text .= "<code>Mikbotam Password Reset</code>\n";
+	$text = "<code>Mikbotam Password Reset</code>\n";
 	$text .= "<code>========================</code>\n";
 	$text .= "<code>Username :</code> $username\n";
 	$text .= "<code>PIN      : $getoken </code>\n";
@@ -1282,13 +1320,14 @@ function resetdone($password) {
 		"Token_bot",
 	]);
 	$tokenreal = $token['Token_bot'];
+	$hashedPass = password_hash($password, PASSWORD_BCRYPT);
 	$update = $mikbotamdata->update('mikhbotam_id', [
 
-		'u_pass' => $password,
+		'u_pass' => $hashedPass,
 		'token' => null,
 	]);
 
-	$text .= "<code>Mikbotam Password Reset</code>\n";
+	$text = "<code>Mikbotam Password Reset</code>\n";
 	$text .= "<code>========================</code>\n";
 	$text .= "<code>Password berhasil diperbarui</code>\n";
 	$text .= "<code>     Terima kasih</code>\n";

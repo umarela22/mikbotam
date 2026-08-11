@@ -23,6 +23,7 @@
 
     if (!isset($_SESSION["Mikbotamuser"])) {
         header("Location:admin/login.php");
+        exit();
     } else {
       echo '<script>';
       echo 'window.location.replace("../pages/index.php");';

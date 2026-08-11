@@ -22,6 +22,7 @@ session_start();
 if (!isset($_SESSION["Mikbotamuser"])) {
     header("Location:../admin/login.php");
     echo 'Silahkan Login kembali';
+    exit();
 } else {
 
     include '../config/system.conn.php';
