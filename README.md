@@ -1,7 +1,40 @@
-# Mikbotamv1.8
-#Changelogs
+# Mikbotam v2.0
+# Changelogs
 
-#01/04/2019 Mikbotam V1.8 krakatau
+# 11/08/2026 Mikbotam V2.0 (PPPoE Billing & Modern Voucher Settings Update)
+
+## 🚀 Fitur Baru & Peningkatan Utama
+
+### 📋 1. Sistem Pengelolaan Tagihan PPPoE Bulanan (PPPoE Monthly Billing System)
+- **Menu Kelola Tagihan PPPoE (`ppp/ppp_billing.php`)**: Kelola invoice bulanan pelanggan PPPoE secara transparan dengan status (Lunas 🟢, Belum Bayar ⚠️, Terasolir 🔴).
+- **Pengaturan Auto-Isolir (`ppp/ppp_isolir.php`)**: Konfigurasi tanggal jatuh tempo, mode isolir (Disable Account vs Change Profile), dan nama profile isolir.
+- **Sistem Top-Up Rollover Jatuh Tempo (`exp_date`)**:
+  - Pelunasan tagihan otomatis memperpanjang masa aktif `exp_date` **+1 bulan** dengan tanggal hari tetap.
+  - Pembayaran otomatis membuka isolir di MikroTik (`/ppp/secret/enable`) & me-refresh sesi aktif.
+- **Otomatisasi Cron Job (`tools/cron_ppp_billing.php`)**: Menerbitkan tagihan dan meng-isolir pelanggan secara otomatis 100% tanpa perlu generate manual.
+
+### 🎨 2. Penyederhanaan Total Menu Settings Voucher (Saldo & Non-Saldo)
+- **Desain Modern Dinamis**: Menggantikan 12 formulir statis yang panjang (2.500+ baris duplikat) dengan **Tabel Ringkasan Dinamis** & **Single Modal Editor** (`pages/settingsvoc.php` & `pages/settingsvocnonsaldo.php`).
+- **Fleksibel & Bersih**: Bebas menambah/mengedit/menghapus paket voucher tanpa batasan slot, lengkap dengan kalkulasi otomatis harga pokok + markup.
+- **100% Backward Compatible**: Format JSON voucher tetap kompatibel dengan Bot Telegram Core.
+
+### 🤖 3. Peningkatan Bot Telegram Core
+- **Perintah Tagihan PPPoE Baru**:
+  - `/tagihan` : Cek rincian tagihan PPPoE bulanan & cara bayar (Pelanggan).
+  - `/kwitansi` : Cek bukti kwitansi lunas (Pelanggan).
+  - `/tagihan_ppp` : Ringkasan statistik tagihan PPPoE (Admin).
+  - `/bayar_ppp <user>` : Tandai lunas tagihan PPPoE & unisolir MikroTik (Admin).
+  - `/isolir_ppp <user>` : Isolir pelanggan PPPoE dari Telegram (Admin).
+- **Pendaftaran Mandiri `/daftar`**:
+  - Memiliki fallback Nama (`first_name`) untuk akun Telegram tanpa `@username`.
+  - Notifikasi *Alert* ke Telegram Owner/Admin setiap ada reseller baru mendaftar.
+- **Fix Query Database Medoo (`has()`)**:
+  - Memperbaiki bug casting boolean Medoo SQLite PDO yang menyebabkan pengecekan status terdaftar di Telegram gagal.
+- **Pembaruan Menu `/help`**: Menu `/help` yang bersih dan bebas dari error parsing HTML Telegram.
+
+---
+
+# 01/04/2019 Mikbotam V1.8 krakatau
 
 Fixed  * :
 
