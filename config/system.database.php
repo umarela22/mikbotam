@@ -986,7 +986,9 @@ function ceklogin($user, $pass) {
 	global $mikbotamdata;
 	init_ppp_billing_tables();
 
-	$app_user = $mikbotamdata->get('app_users', '*', ['username' => $user, 'status' => 'active']);
+	$cols = ['id', 'username', 'password', 'full_name', 'role', 'status', 'mikrotik_ip', 'mikrotik_username', 'mikrotik_password', 'mikrotik_port', 'bot_token', 'owner_telegram_id'];
+	$rows = $mikbotamdata->select('app_users', $cols, ['AND' => ['username' => $user, 'status' => 'active']]);
+	$app_user = (is_array($rows) && isset($rows[0])) ? $rows[0] : false;
 	if ($app_user) {
 		$valid = false;
 		if (password_verify($pass, $app_user['password'])) {
@@ -1552,13 +1554,15 @@ function get_all_app_users() {
 function get_app_user_by_id($id) {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    return $mikbotamdata->get('app_users', '*', ['id' => intval($id)]);
+    $rows = $mikbotamdata->select('app_users', '*', ['id' => intval($id)]);
+    return isset($rows[0]) ? $rows[0] : false;
 }
 
 function get_app_user_by_username($username) {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    return $mikbotamdata->get('app_users', '*', ['username' => $username]);
+    $rows = $mikbotamdata->select('app_users', '*', ['username' => $username]);
+    return isset($rows[0]) ? $rows[0] : false;
 }
 
 function save_app_user($data) {
