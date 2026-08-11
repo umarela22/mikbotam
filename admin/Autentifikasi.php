@@ -66,19 +66,9 @@ if (empty($user) || empty($pass)) {
 		$status   = 'Success';
 		$sendlast = lastlogin($ip, $user, $status);
 
-		$checkId = getid($_SESSION['Mikbotamid']);
-		if (!empty($checkId)) {
-			if (!empty($_SESSION['MikbotamUrl'])) {
-				header("Location: " . $_SESSION['MikbotamUrl']);
-				exit();
-			} else {
-				header("Location: ../admin/index.php");
-				exit();
-			}
-		} else {
-			header("Location: myservernew.php");
-			exit();
-		}
+		unset($_SESSION['MikbotamUrl']);
+		header("Location: ../pages/index.php");
+		exit();
 	} else {
 		$status   = 'Valid';
 		$sendlast = lastlogin($ip, $user, $status);
