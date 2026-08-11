@@ -22,12 +22,27 @@ date_default_timezone_set('Asia/Jakarta');
 
 include 'system.config.php';
 
+function get_current_tenant_id() {
+	if (isset($_GET['uid']) && intval($_GET['uid']) > 0) {
+		return intval($_GET['uid']);
+	}
+	if (isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0) {
+		return intval($_SESSION['impersonate_user_id']);
+	}
+	if (isset($_SESSION['app_user_id']) && intval($_SESSION['app_user_id']) > 0) {
+		return intval($_SESSION['app_user_id']);
+	}
+	return null;
+}
+
 function daftar($id, $name) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
 	$last_id = $mikbotamdata->insert('re_settings', [
 		'id_user' => $id,
 		'nama_seller' => $name,
+		'app_user_id' => $tenant_id,
 		'Waktu' => date('H:i:s'),
 		'Tanggal' => date('Y-m-d'),
 
@@ -39,13 +54,14 @@ function daftar($id, $name) {
 function daftarid($id, $name, $notlp, $saldo) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
 
 	$last_id = $mikbotamdata->insert('re_settings', [
 		'id_user' => $id,
 		'nama_seller' => $name,
 		'nomer_tlp' => $notlp,
-
 		'saldo' => $saldo,
+		'app_user_id' => $tenant_id,
 		'Waktu' => date('H:i:s'),
 		'Tanggal' => date('Y-m-d'),
 
@@ -202,6 +218,7 @@ function topupresseller($id, $name, $jumlah, $id_own) {
 		$nama = $datacek["nama_seller"];
 		$saldo = $datacek["saldo"];
 
+		$tenant_id = get_current_tenant_id();
 		$hasil = $mikbotamdata->insert('re_operating', [
 			'id_user' => $id,
 			'nama_seller' => $nama,
@@ -210,6 +227,7 @@ function topupresseller($id, $name, $jumlah, $id_own) {
 			'top_up' => $jumlah,
 			'keterangan' => 'topup',
 			'top_up_fromid' => $id_own,
+			'app_user_id' => $tenant_id,
 			'Waktu' => date('H:i:s'),
 			'Tanggal' => date('Y-m-d'),
 		]);
@@ -382,6 +400,7 @@ function topdown($id, $jumlah) {
 }
 function belivoucher($id, $usernamepelanggan, $princevoc,$markup, $username, $password, $uptime, $keterangan) {
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
 	$data = $mikbotamdata->get('re_settings', [
 		'saldo',
 		'id_user'
@@ -403,6 +422,7 @@ function belivoucher($id, $usernamepelanggan, $princevoc,$markup, $username, $pa
 			'password_voucher' => $password,
 			'exp_voucher' => $uptime,
 			'keterangan' => $keterangan,
+			'app_user_id' => $tenant_id,
 			'Waktu' => date('H:i:s'),
 			'Tanggal' => date('Y-m-d'),
 
@@ -425,6 +445,7 @@ function belivoucher($id, $usernamepelanggan, $princevoc,$markup, $username, $pa
 			'status' => $keterangan,
 			'transaksi' => 'halo',
 			'pendapatan' => $princevoc,
+			'app_user_id' => $tenant_id,
 			'Waktu' => date('H:i:s'),
 			'Tanggal' => date('Y-m-d'),
 
@@ -435,6 +456,11 @@ function belivoucher($id, $usernamepelanggan, $princevoc,$markup, $username, $pa
 }
 function lihatdata() {
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = [];
+	if ($tenant_id) {
+		$where['app_user_id'] = $tenant_id;
+	}
 	$data = $mikbotamdata->select('re_settings', [
 		'id_user',
 		'nama_seller',
@@ -448,9 +474,9 @@ function lihatdata() {
 		'Waktu',
 		'Tanggal',
 
-	]);
+	], $where);
 
-	return $data;
+	return is_array($data) ? $data : [];
 }
 
 function sendsms($phone, $message) {
@@ -478,6 +504,11 @@ function sendsms($phone, $message) {
 
 function lihatuser($id) {
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ['id_user' => $id];
+	if ($tenant_id) {
+		$where['app_user_id'] = $tenant_id;
+	}
 	$data = $mikbotamdata->get('re_settings', [
 		'id_user',
 		'nama_seller',
@@ -491,42 +522,33 @@ function lihatuser($id) {
 		'Waktu',
 		'Tanggal',
 
-	], [
-		'id_user' => $id
-
-	]);
+	], $where);
 
 	return $data;
 }
 function deleteuser($id) {
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ['id_user' => $id];
+	if ($tenant_id) {
+		$where = ['AND' => ['id_user' => $id, 'app_user_id' => $tenant_id]];
+	}
 
-	$datareseller = $mikbotamdata->delete('re_settings', [
-
-		'id_user' => $id
-
-	]);
-	$deletoperating = $mikbotamdata->delete('re_operating', [
-
-		'id_user' => $id
-
-	]);
-	$deletlaporan = $mikbotamdata->delete('st_reportdata', [
-
-		'id_user' => $id
-
-	]);
+	$datareseller = $mikbotamdata->delete('re_settings', $where);
+	$deletoperating = $mikbotamdata->delete('re_operating', $where);
+	$deletlaporan = $mikbotamdata->delete('st_reportdata', $where);
 
 	return $datareseller;
 }
 
 function has($id) {
 	global $mikbotamdata;
-	$data = $mikbotamdata->has('re_settings', [
-
-		'id_user' => $id
-
-	]);
+	$tenant_id = get_current_tenant_id();
+	$where = ['id_user' => $id];
+	if ($tenant_id) {
+		$where = ['AND' => ['id_user' => $id, 'app_user_id' => $tenant_id]];
+	}
+	$data = $mikbotamdata->has('re_settings', $where);
 
 	return $data;
 }
@@ -821,6 +843,11 @@ function sethistory($id) {
 	$makedate = date('Y-m-d', strtotime('-1 month'));
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where_and = ['Tanggal[<>]' => [$makedate,$date]];
+	if ($tenant_id) {
+		$where_and['app_user_id'] = $tenant_id;
+	}
 	$gethistory = $mikbotamdata->select('re_operating', [
 		"No",
 		"id_user",
@@ -838,18 +865,14 @@ function sethistory($id) {
 		"Tanggal"
 
 	], [
-		'AND' => [
-
-			'Tanggal[<>]' => [$makedate,$date]
-
-		],
+		'AND' => $where_and,
 		'ORDER' => [
 			'Tanggal' => 'DESC',
 			'Waktu' => 'DESC',
 		]]
 	);
 
-	return $gethistory;
+	return is_array($gethistory) ? $gethistory : [];
 }
 function estimasidata() {
 	date_default_timezone_set('Asia/Jakarta');
@@ -858,14 +881,18 @@ function estimasidata() {
 	$startTime = [date("Y-m-d", mktime(0, 0, 0, date("m"), 1, date("Y"))), date("Y-m-d", mktime(0, 0, 0, date("m"), $date, date("Y")))];
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where_and = ['Tanggal[<>]' => $startTime];
+	if ($tenant_id) {
+		$where_and['app_user_id'] = $tenant_id;
+	}
 	$reportekstimasi = $mikbotamdata->sum('st_reportdata', [
 		'pendapatan',
 	], [
-
-		'Tanggal[<>]' =>$startTime,
+		'AND' => $where_and
 	]);
 
-	return $reportekstimasi;
+	return $reportekstimasi ? $reportekstimasi : 0;
 }
 function getcounttopup() {
 	date_default_timezone_set('Asia/Jakarta');
@@ -874,17 +901,22 @@ function getcounttopup() {
 	$startTime = [date("Y-m-d", mktime(0, 0, 0, date("m"), 1, date("Y"))), date("Y-m-d", mktime(0, 0, 0, date("m"), $date, date("Y")))];
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where_and = [
+		'keterangan' => 'topup',
+		'Tanggal[<>]' => $startTime,
+	];
+	if ($tenant_id) {
+		$where_and['app_user_id'] = $tenant_id;
+	}
 	$reportekstimasi = $mikbotamdata->sum('re_operating', [
 		'top_up',
 	], [
-		'AND' => [
-			'keterangan' => 'topup',
-			'Tanggal[<>]' => $startTime,
-		]
+		'AND' => $where_and
 
 	]);
 
-	return $reportekstimasi;
+	return $reportekstimasi ? $reportekstimasi : 0;
 }
 function countvoucher() {
 	date_default_timezone_set('Asia/Jakarta');
@@ -893,16 +925,21 @@ function countvoucher() {
 	$date = date('t',strtotime($dateinput));
 	$startTime = [date("Y-m-d", mktime(0, 0, 0, date("m"), 1, date("Y"))), date("Y-m-d", mktime(0, 0, 0, date("m"), $date, date("Y")))];
 
+	$tenant_id = get_current_tenant_id();
+	$where_and = [
+		'keterangan' => 'Success',
+		'Tanggal[<>]' => $startTime,
+	];
+	if ($tenant_id) {
+		$where_and['app_user_id'] = $tenant_id;
+	}
 	$gethistory = $mikbotamdata->select('re_operating', [
 		"keterangan",
 		"Waktu",
 		"Tanggal"
 
 	], [
-		'AND' => [
-			'keterangan' => 'Success',
-			'Tanggal[<>]' => $startTime,
-		]
+		'AND' => $where_and
 
 	]
 	);
@@ -915,6 +952,14 @@ function historydata($id) {
 	$makedate = date('Y-m-d', strtotime('-1 month'));
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where_and = [
+		'keterangan' => 'Success',
+		'Tanggal[<>]' => [$makedate,$date],
+	];
+	if ($tenant_id) {
+		$where_and['app_user_id'] = $tenant_id;
+	}
 	$gethistory = $mikbotamdata->select('re_operating', [
 		"No",
 		"id_user",
@@ -1507,6 +1552,15 @@ function init_ppp_billing_tables() {
             owner_telegram_id TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )");
+
+        try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try {
+            $pdo->exec("UPDATE re_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE re_operating SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE st_reportdata SET app_user_id = 1 WHERE app_user_id IS NULL");
+        } catch (Exception $ex) {}
 
         // Auto-migrate existing admin as Superadmin if app_users is empty
         $count = $mikbotamdata->count('app_users');
