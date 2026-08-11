@@ -60,6 +60,7 @@ if (empty($user) || empty($pass)) {
 		"login.php");
 } else {
 	if (ceklogin($user, $pass)) {
+		session_regenerate_id(true);
 		$_SESSION['Mikbotamuser'] = $user;
 		$_SESSION['Mikbotamid']   = makesession($user);
 		$status   = 'Success';
