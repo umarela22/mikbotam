@@ -71,12 +71,15 @@ $page = $_GET["admin"];
     </div>
     <!-- sl-header-left -->
     <div class="sl-header-right">
-        <nav class="nav">
+            <?php
+            $adm_name = isset($_SESSION['app_full_name']) ? $_SESSION['app_full_name'] : (isset($_SESSION['Mikbotamuser']) ? $_SESSION['Mikbotamuser'] : 'Admin');
+            $adm_role = isset($_SESSION['app_user_role']) ? ucfirst($_SESSION['app_user_role']) : 'User';
+            ?>
             <div class="dropdown">
-                <a href="" class="nav-link nav-link-profile" data-toggle="dropdown"> <span class="logged-name">Admin<span class="hidden-md-down">Stator</span></span>
-                    <img src="../img/newuser.svg" class="wd-32 rounded-circle" alt="">
+                <a href="" class="nav-link nav-link-profile" data-toggle="dropdown"> <span class="logged-name"><?=htmlspecialchars($adm_name);?> <span class="hidden-md-down">(<?=$adm_role;?>)</span></span>
+                    <img src="../img/logoMwhite.svg" class="wd-32 rounded-circle" alt="">
                 </a>
-                <div class="dropdown-menu dropdown-menu-header wd-200">
+                <div class="dropdown-menu dropdown-menu-header wd-220">
                     <ul class="list-unstyled user-profile-nav">
                         <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
                         <li><a href="../pages/index.php?Mikbotam=manageusers"><i class="menu-item-icon fa fa-users text-primary"></i> <span class="menu-item-label font-weight-bold"> Kelola User Admin</span></a></li>

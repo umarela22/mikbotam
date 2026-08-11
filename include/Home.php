@@ -280,6 +280,7 @@
       </div>
       <div class="sl-header-right bg-primary">
         <nav class="nav">
+          <div class="dropdown">
             <?php
             $display_user_name = isset($_SESSION['app_full_name']) ? $_SESSION['app_full_name'] : (isset($_SESSION['Mikbotamuser']) ? $_SESSION['Mikbotamuser'] : 'Admin');
             $display_role = isset($_SESSION['app_user_role']) ? ucfirst($_SESSION['app_user_role']) : 'User';
@@ -301,8 +302,8 @@
                 <li><a href="./?Mikbotam=Settings"><i class="menu-item-icon fa fa-file"></i><span class=""> Settings</span></a></li>
                 <li><a href="./?Mikbotam=logout"><i class="menu-item-icon fa fa-sign-out"></i><span class=""> Sign Out</span></a></li>
               </ul>
-            </div>
-          </div>
+            </div><!-- dropdown-menu -->
+          </div><!-- dropdown -->
         </nav>
         <div class="navicon-right">
           <a id="btnRightMenu" href="" class="pos-relative">
