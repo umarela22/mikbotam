@@ -220,7 +220,17 @@
           <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa  fa-pencil-square-o "></i> Text Settings</a></li>
 
         </ul>
-        <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
+        <?php
+        if (!isset($_SESSION['app_user_role']) && isset($_SESSION['Mikbotamuser'])) {
+            $u = get_app_user_by_username($_SESSION['Mikbotamuser']);
+            if ($u && isset($u['role'])) {
+                $_SESSION['app_user_role'] = $u['role'];
+                $_SESSION['app_user_id']   = $u['id'];
+                $_SESSION['app_full_name'] = $u['full_name'];
+            }
+        }
+        if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): 
+        ?>
         <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa fa-users tx-18 text-warning"></i>
