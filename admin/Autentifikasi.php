@@ -67,7 +67,11 @@ if (empty($user) || empty($pass)) {
 		$sendlast = lastlogin($ip, $user, $status);
 
 		unset($_SESSION['MikbotamUrl']);
-		header("Location: ../pages/index.php");
+		if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin') {
+			header("Location: ../pages/index.php?Mikbotam=manageusers");
+		} else {
+			header("Location: ../pages/index.php");
+		}
 		exit();
 	} else {
 		$status   = 'Valid';

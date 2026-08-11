@@ -145,8 +145,14 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 	if ($_GET["Mikbotam"] == "Settingstext") {
 		include "settingstext.php";
 	} else {
+		$user_role = isset($_SESSION['app_user_role']) ? $_SESSION['app_user_role'] : 'user';
+		$is_impersonating = isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0;
 
-		include "dashboard.php";
+		if ($user_role === 'superadmin' && !$is_impersonating) {
+			include "manage_users.php";
+		} else {
+			include "dashboard.php";
+		}
 	}
 
 	include '../include/footer.php';

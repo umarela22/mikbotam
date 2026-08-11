@@ -122,8 +122,57 @@
       </div><!-- input-group -->
 
 
+      <?php
+      if (!isset($_SESSION['app_user_role']) && isset($_SESSION['Mikbotamuser'])) {
+          $u = get_app_user_by_username($_SESSION['Mikbotamuser']);
+          if ($u && isset($u['role'])) {
+              $_SESSION['app_user_role'] = $u['role'];
+              $_SESSION['app_user_id']   = $u['id'];
+              $_SESSION['app_full_name'] = $u['full_name'];
+          }
+      }
+      $is_superadmin_clean = (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin' && (!isset($_SESSION['impersonate_user_id']) || intval($_SESSION['impersonate_user_id']) === 0));
+      ?>
+
       <div class="sl-sideleft-menu">
-        <a href="index.php" class="sl-menu-link">
+        <?php if ($is_superadmin_clean): ?>
+        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers' || empty($page)) ? 'active' : '';?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-home tx-22"></i>
+            <span class="menu-item-label font-weight-bold"> Dashboard SuperAdmin</span>
+          </div>
+        </a>
+        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-users tx-18 text-warning"></i>
+            <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>
+            <span class="badge badge-warning tx-10 pd-3-8 mg-l-auto">SUPERADMIN</span>
+          </div>
+        </a>
+        <a href="#" class="sl-menu-link <?=$toolsshow;?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-wrench tx-20"></i>
+            <span class="menu-item-label"> Tools</span>
+            <i class="menu-item-arrow fa fa-angle-down"></i>
+          </div>
+        </a>
+        <ul class="sl-menu-sub nav flex-column">
+          <li class="nav-item"><a class="nav-link <?=$setwebhookmenu;?>" href="./?Mikbotam=setwebhook"><i class="fa fa-cog "></i> Set Webhook</a></li>
+          <li class="nav-item"><a class="nav-link <?=$boteditor;?> " href="./?Mikbotam=boteditor&bottype=Core"><i class="fa fa-pencil "></i> Edit Bot Core</a></li>
+        </ul>
+        <a href="#" class="sl-menu-link <?=$Nshowabaoute;?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-info-circle tx-22"></i>
+            <span class="menu-item-label">About</span>
+            <i class="menu-item-arrow fa fa-angle-down"></i>
+          </div>
+        </a>
+        <ul class="sl-menu-sub nav flex-column">
+          <li class="nav-item"><a class="nav-link <?=$about;?>" href="./?Mikbotam=about"><i class="fa fa-cog "></i> About</a></li>
+        </ul>
+
+        <?php else: ?>
+        <a href="index.php" class="sl-menu-link <?=empty($page) ? 'active' : '';?>">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa fa-home tx-22"></i>
             <span class="menu-item-label"> Dashboard</span>
@@ -220,26 +269,7 @@
           <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa  fa-pencil-square-o "></i> Text Settings</a></li>
 
         </ul>
-        <?php
-        if (!isset($_SESSION['app_user_role']) && isset($_SESSION['Mikbotamuser'])) {
-            $u = get_app_user_by_username($_SESSION['Mikbotamuser']);
-            if ($u && isset($u['role'])) {
-                $_SESSION['app_user_role'] = $u['role'];
-                $_SESSION['app_user_id']   = $u['id'];
-                $_SESSION['app_full_name'] = $u['full_name'];
-            }
-        }
-        if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): 
-        ?>
-        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-users tx-18 text-warning"></i>
-            <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>
-            <span class="badge badge-warning tx-10 pd-3-8 mg-l-auto">SUPERADMIN</span>
-          </div>
-        </a>
-        <?php endif; ?>
-
+        
         <a href="#" class="sl-menu-link  <?=$toolsshow;?> ">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa  fa-wrench tx-20"></i>
@@ -269,6 +299,7 @@
         <li class="nav-item"><a class="nav-link <?=$about;?>" href="./?Mikbotam=about"><i class="fa fa-cog "></i> About</a></li>
           <li class="nav-item"><a class="nav-link " href="./?Mikbotam=comingsoon"><i class="fa  fa-exclamation-circle "></i> Change logs</a></li>
         </ul>
+        <?php endif; ?>
       </div>
 
       <br>
