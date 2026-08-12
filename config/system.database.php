@@ -507,7 +507,7 @@ function lihatuser($id) {
 	$tenant_id = get_current_tenant_id();
 	$where = ['id_user' => $id];
 	if ($tenant_id) {
-		$where['app_user_id'] = $tenant_id;
+		$where = ['AND' => ['id_user' => $id, 'app_user_id' => $tenant_id]];
 	}
 	$data = $mikbotamdata->get('re_settings', [
 		'id_user',
@@ -524,7 +524,7 @@ function lihatuser($id) {
 
 	], $where);
 
-	return $data;
+	return is_array($data) ? $data : [];
 }
 function deleteuser($id) {
 	global $mikbotamdata;
