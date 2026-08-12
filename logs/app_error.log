@@ -243,3 +243,11 @@ Stack trace:
 [12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Undefined array key "message" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
 [12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
 [12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 22:27:27 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 22:27:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined method medoo::id() in C:\xampp\htdocs\mikbotam\config\system.database.php:2368
+Stack trace:
+#0 C:\xampp\htdocs\mikbotam\scratch\test_registration_flow.php(12): register_new_app_user('testadmin178654...', 'Test Admin User', 'password123')
+#1 {main}
+  thrown in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2368
+[12-Aug-2026 22:27:38 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 22:27:40 Asia/Jakarta] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in C:\xampp\htdocs\mikbotam\scratch\test_registration_flow.php on line 26
