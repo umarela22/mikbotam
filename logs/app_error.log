@@ -1,0 +1,105 @@
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Undefined array key "text" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 111
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 07:28:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 128
+[12-Aug-2026 12:44:57 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1209
+[12-Aug-2026 12:44:57 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1210
+[12-Aug-2026 12:44:57 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1216
+[12-Aug-2026 12:44:57 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1217
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:03 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:06 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:10 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:45:18 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
