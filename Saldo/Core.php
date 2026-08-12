@@ -468,23 +468,22 @@
          return Bot::sendMessage("Format salah. Gunakan: <code>/bayar_ppp &lt;username_pppoe&gt; [jumlah_bulan]</code>\nContoh bayar 3 bulan: <code>/bayar_ppp user_john 3</code>", ['parse_mode' => 'html']);
       }
 
-      $month_year = date('Y-m');
-      $invoices   = get_ppp_invoices($month_year, null, $user);
+      $inv = get_or_create_next_unpaid_invoice($user);
 
-      if (empty($invoices)) {
-         return Bot::sendMessage("Tagihan untuk username <b>$user</b> periode $month_year tidak ditemukan.", ['parse_mode' => 'html']);
+      if (!$inv) {
+         return Bot::sendMessage("Tagihan untuk username <b>$user</b> tidak ditemukan.", ['parse_mode' => 'html']);
       }
 
-      $inv = $invoices[0];
       $inv_id = $inv['id'];
       $inv_no = isset($inv['invoice_number']) ? $inv['invoice_number'] : "INV-$inv_id";
+      $month_year = isset($inv['month_year']) ? $inv['month_year'] : date('Y-m');
       $monthly_amount = isset($inv['amount']) ? intval($inv['amount']) : 0;
       $total_amount = $monthly_amount * $months;
       $amount_fmt = rupiah($total_amount);
       $status = isset($inv['status']) ? $inv['status'] : 'UNPAID';
 
       if ($status === 'PAID') {
-         return Bot::sendMessage("Tagihan untuk username <b>$user</b> periode $month_year sudah <b>LUNAS</b>.", ['parse_mode' => 'html']);
+         return Bot::sendMessage("Seluruh tagihan untuk username <b>$user</b> sudah <b>LUNAS</b>.", ['parse_mode' => 'html']);
       }
 
       global $mikbotamdata;

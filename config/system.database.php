@@ -2126,6 +2126,54 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '', $months = 1) {
     return null;
 }
 
+function get_or_create_next_unpaid_invoice($user) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
+
+    $unpaid_invoices = get_ppp_invoices(null, 'UNPAID', $user);
+    if (!empty($unpaid_invoices)) {
+        return $unpaid_invoices[0];
+    }
+
+    $last_invoices = get_ppp_invoices(null, null, $user);
+    $amount = (!empty($last_invoices) && isset($last_invoices[0]['amount']) && intval($last_invoices[0]['amount']) > 0) ? intval($last_invoices[0]['amount']) : 150000;
+
+    if (!empty($last_invoices) && isset($last_invoices[0]['month_year'])) {
+        $last_m = $last_invoices[0]['month_year'];
+        $next_m = date('Y-m', strtotime('+1 month', strtotime($last_m . '-01')));
+    } else {
+        $next_m = date('Y-m');
+    }
+
+    $existing = get_ppp_invoices($next_m, null, $user);
+    if (!empty($existing)) {
+        return $existing[0];
+    }
+
+    $inv_num = 'INV-' . str_replace('-', '', $next_m) . '-' . sprintf('%04d', rand(100, 9999));
+    $mikbotamdata->insert('ppp_invoices', [
+        'invoice_number' => $inv_num,
+        'username_ppp' => $user,
+        'month_year' => $next_m,
+        'amount' => $amount,
+        'status' => 'UNPAID',
+        'notes' => 'Tagihan lanjutan via bot',
+        'app_user_id' => $tenant_id
+    ]);
+
+    $new_id = $mikbotamdata->get('ppp_invoices', 'id', ['invoice_number' => $inv_num]);
+    return [
+        'id' => $new_id,
+        'invoice_number' => $inv_num,
+        'username_ppp' => $user,
+        'month_year' => $next_m,
+        'amount' => $amount,
+        'status' => 'UNPAID',
+        'notes' => 'Tagihan lanjutan via bot'
+    ];
+}
+
 function update_ppp_invoice_status($id, $status) {
     global $mikbotamdata;
     init_ppp_billing_tables();
