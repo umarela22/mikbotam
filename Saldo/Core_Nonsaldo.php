@@ -397,37 +397,22 @@ $mkbot->cmd('!Menu|/menu|/Menu', function () {
                 
                 $text .= "<code>$textlist  </code>\n";
     }
-    for ($i = 0; $i < count($data); $i++) {
-        ${
-            'database' . $i
-        } = ['text' => $data[$i]['Voucher'] . '', 'callback_data' => 'Vcrnos' . $data[$i]['id'] . ''];
-    }
-
-    $vouchernamea0 = array_filter(
-        [
-            $database0,
-            $database1
-
-        ]);
-
-    $vouchernameb1 = array_filter(
-        [
-            $database2,
-            $database3
-
-        ]);
-
-    $vouchernamec2 = array_filter(
-        [
-            $database4,
-            $database5
-
-        ]);
-
     $send = [];
-    array_push($send, $vouchernamea0);
-    array_push($send, $vouchernameb1);
-    array_push($send, $vouchernamec2);
+    $row = [];
+    if (is_array($data)) {
+        foreach ($data as $v_item) {
+            if (isset($v_item['Voucher']) && isset($v_item['id'])) {
+                $row[] = ['text' => $v_item['Voucher'], 'callback_data' => 'Vcrnos' . $v_item['id']];
+                if (count($row) == 2) {
+                    $send[] = $row;
+                    $row = [];
+                }
+            }
+        }
+        if (!empty($row)) {
+            $send[] = $row;
+        }
+    }
 
     $options = [
         'reply_markup' => json_encode(['inline_keyboard' => $send]),
@@ -707,37 +692,22 @@ $mkbot->on('callback', function ($command) {
                 
                 $text .= "<code>$textlist  </code>\n";
     }
-    for ($i = 0; $i < count($data); $i++) {
-        ${
-            'database' . $i
-        } = ['text' => $data[$i]['Voucher'] . '', 'callback_data' => 'Vcrnos' . $data[$i]['id'] . ''];
-    }
-
-    $vouchernamea0 = array_filter(
-        [
-            $database0,
-            $database1
-
-        ]);
-
-    $vouchernameb1 = array_filter(
-        [
-            $database2,
-            $database3
-
-        ]);
-
-    $vouchernamec2 = array_filter(
-        [
-            $database4,
-            $database5
-
-        ]);
-
     $send = [];
-    array_push($send, $vouchernamea0);
-    array_push($send, $vouchernameb1);
-    array_push($send, $vouchernamec2);
+    $row = [];
+    if (is_array($data)) {
+        foreach ($data as $v_item) {
+            if (isset($v_item['Voucher']) && isset($v_item['id'])) {
+                $row[] = ['text' => $v_item['Voucher'], 'callback_data' => 'Vcrnos' . $v_item['id']];
+                if (count($row) == 2) {
+                    $send[] = $row;
+                    $row = [];
+                }
+            }
+        }
+        if (!empty($row)) {
+            $send[] = $row;
+        }
+    }
 
             $options = [
                 'chat_id' => $chatidtele,

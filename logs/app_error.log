@@ -137,3 +137,50 @@ Stack trace:
 #4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
 #5 {main}
   thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Undefined array key 2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Undefined array key 3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Undefined array key 4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Undefined array key 5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1261
+[12-Aug-2026 12:47:11 Asia/Jakarta] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * int in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php:559
+Stack trace:
+#0 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1279): toBytes()
+#1 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(304): {closure}()
+#2 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(144): FrameBot->process()
+#3 /home/andronet/mikbotam.andronet.xyz/Saldo/src/FrameBot.php(126): FrameBot->webhook()
+#4 /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php(1873): FrameBot->run()
+#5 {main}
+  thrown in /home/andronet/mikbotam.andronet.xyz/Api/routeros_api.class.php on line 559
+[12-Aug-2026 12:51:40 Asia/Jakarta] PHP Warning:  Undefined variable $limitsaldo in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1293
+[12-Aug-2026 12:52:12 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1209
+[12-Aug-2026 12:52:12 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1210
+[12-Aug-2026 12:52:12 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1216
+[12-Aug-2026 12:52:12 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1217
+[12-Aug-2026 12:56:17 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1209
+[12-Aug-2026 12:56:17 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1210
+[12-Aug-2026 12:56:17 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1216
+[12-Aug-2026 12:56:17 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1217
+[12-Aug-2026 12:56:19 Asia/Jakarta] PHP Warning:  Undefined variable $limitsaldo in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1293
+[12-Aug-2026 12:56:22 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1557
+[12-Aug-2026 12:56:22 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1558
+[12-Aug-2026 12:56:22 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1564
+[12-Aug-2026 12:56:22 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1565
+[12-Aug-2026 13:02:06 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1557
+[12-Aug-2026 13:02:06 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1558
+[12-Aug-2026 13:02:06 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1564
+[12-Aug-2026 13:02:06 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1565
+[12-Aug-2026 13:02:12 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1557
+[12-Aug-2026 13:02:12 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1558
+[12-Aug-2026 13:02:12 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1564
+[12-Aug-2026 13:02:12 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1565
+[12-Aug-2026 13:02:29 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1209
+[12-Aug-2026 13:02:29 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1210
+[12-Aug-2026 13:02:29 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1216
+[12-Aug-2026 13:02:29 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1217
+[12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database2 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1557
+[12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1558
+[12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1564
+[12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1565

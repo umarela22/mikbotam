@@ -1193,42 +1193,26 @@
          $text .= "<code>$textlist  </code>\n";
       }
 
-      for ($i = 0; $i < count($data); $i++) {
-         ${'database' . $i}
-
-         = ['text' => $data[$i]['Voucher'] . '', 'callback_data' => 'Vcr' . $data[$i]['id'] . ''];
+      $send = [];
+      $row = [];
+      if (is_array($data)) {
+         foreach ($data as $v_item) {
+            if (isset($v_item['Voucher']) && isset($v_item['id'])) {
+               $row[] = ['text' => $v_item['Voucher'], 'callback_data' => 'Vcr' . $v_item['id']];
+               if (count($row) == 2) {
+                  $send[] = $row;
+                  $row = [];
+               }
+            }
+         }
+         if (!empty($row)) {
+            $send[] = $row;
+         }
       }
-
-      $vouchernamea0 = array_filter(
-         [
-            $database0,
-            $database1
-
-         ]);
-
-      $vouchernameb1 = array_filter(
-         [
-            $database2,
-            $database3
-
-         ]);
-
-      $vouchernamec2 = array_filter(
-         [
-            $database4,
-            $database5
-
-         ]);
-      $menu_idakhir = [
+      $send[] = [
          ['text' => '💰 Cek Saldo', 'callback_data' => 'ceksaldo'],
          ['text' => '🔖 iNFORMASI', 'callback_data' => 'informasi'],
       ];
-
-      $send = [];
-      array_push($send, $vouchernamea0);
-      array_push($send, $vouchernameb1);
-      array_push($send, $vouchernamec2);
-      array_push($send, $menu_idakhir);
 
       $options = [
          'reply_markup' => json_encode(['inline_keyboard' => $send]),
@@ -1291,7 +1275,7 @@
 
                   if ($command == 'Vcr' . $getid2) {
                      if (sisasaldo($id, $princevoc) == true) {
-                        $limitsaldo .= "Maaf saldo anda tidak mencukupi untuk melakukan pembelian voucher\n";
+                        $limitsaldo = "Maaf saldo anda tidak mencukupi untuk melakukan pembelian voucher\n";
 
                         $options = [
                            'chat_id' => $chatidtele,
@@ -1538,44 +1522,26 @@
             }
 
             $datavoc = json_decode($voucher_1, true);
-            for ($i = 0; $i < count($datavoc); $i++) {
-               ${
-                  'database' . $i
+            $send = [];
+            $row = [];
+            if (is_array($datavoc)) {
+               foreach ($datavoc as $v_item) {
+                  if (isset($v_item['Voucher']) && isset($v_item['id'])) {
+                     $row[] = ['text' => $v_item['Voucher'], 'callback_data' => 'Vcr' . $v_item['id']];
+                     if (count($row) == 2) {
+                        $send[] = $row;
+                        $row = [];
+                     }
+                  }
                }
-
-               = ['text' => $datavoc[$i]['Voucher'] . '', 'callback_data' => 'Vcr' . $datavoc[$i]['id'] . ''];
+               if (!empty($row)) {
+                  $send[] = $row;
+               }
             }
-
-            $vouchernamea0 = array_filter(
-               [
-                  $database0,
-                  $database1
-
-               ]);
-
-            $vouchernameb1 = array_filter(
-               [
-                  $database2,
-                  $database3
-
-               ]);
-
-            $vouchernamec2 = array_filter(
-               [
-                  $database4,
-                  $database5
-
-               ]);
-
-            $menu_idakhir = [
+            $send[] = [
                ['text' => '💰 Cek Saldo', 'callback_data' => 'ceksaldo'],
                ['text' => '🔖 iNFORMASI', 'callback_data' => 'informasi'],
             ];
-            $send = [];
-            array_push($send, $vouchernamea0);
-            array_push($send, $vouchernameb1);
-            array_push($send, $vouchernamec2);
-            array_push($send, $menu_idakhir);
 
             $options = [
                'chat_id' => $chatidtele,
