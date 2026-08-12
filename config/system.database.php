@@ -1791,46 +1791,94 @@ function init_ppp_billing_tables() {
                 'owner_telegram_id' => $own_id
             ]);
         }
+        // Encrypt existing plain text credentials in app_users
+        try {
+            $existing_users = $mikbotamdata->select('app_users', ['id', 'mikrotik_password', 'bot_token']);
+            if (is_array($existing_users)) {
+                foreach ($existing_users as $usr) {
+                    $upd = [];
+                    if (!empty($usr['mikrotik_password']) && strpos($usr['mikrotik_password'], 'enc:v2:') !== 0) {
+                        $upd['mikrotik_password'] = encrypturl($usr['mikrotik_password']);
+                    }
+                    if (!empty($usr['bot_token']) && strpos($usr['bot_token'], 'enc:v2:') !== 0) {
+                        $upd['bot_token'] = encrypturl($usr['bot_token']);
+                    }
+                    if (!empty($upd)) {
+                        $mikbotamdata->update('app_users', $upd, ['id' => $usr['id']]);
+                    }
+                }
+            }
+        } catch (Exception $ex) {}
     } catch (Exception $e) {
         // Table creation fallback
     }
 }
 
+function decrypt_app_user_fields($user) {
+    if (!is_array($user)) return $user;
+    if (isset($user['mikrotik_password']) && !empty($user['mikrotik_password'])) {
+        $user['mikrotik_password'] = decrypturl($user['mikrotik_password']);
+    }
+    if (isset($user['bot_token']) && !empty($user['bot_token'])) {
+        $user['bot_token'] = decrypturl($user['bot_token']);
+    }
+    return $user;
+}
+
 function get_all_app_users() {
     global $mikbotamdata;
     init_ppp_billing_tables();
-    return $mikbotamdata->select('app_users', '*');
+    $users = $mikbotamdata->select('app_users', '*');
+    if (is_array($users)) {
+        foreach ($users as &$u) {
+            $u = decrypt_app_user_fields($u);
+        }
+    }
+    return is_array($users) ? $users : [];
 }
 
 function get_app_user_by_id($id) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     $rows = $mikbotamdata->select('app_users', '*', ['id' => intval($id)]);
-    return (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
+    $user = (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
+    return decrypt_app_user_fields($user);
 }
 
 function get_app_user_by_username($username) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     $rows = $mikbotamdata->select('app_users', '*', ['username' => $username]);
-    return (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
+    $user = (is_array($rows) && isset($rows[0])) ? $rows[0] : null;
+    return decrypt_app_user_fields($user);
 }
 
 function save_app_user($data) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     
+    if (isset($data['mikrotik_password']) && !empty($data['mikrotik_password'])) {
+        if (strpos($data['mikrotik_password'], 'enc:v2:') !== 0) {
+            $data['mikrotik_password'] = encrypturl($data['mikrotik_password']);
+        }
+    }
+    if (isset($data['bot_token']) && !empty($data['bot_token'])) {
+        if (strpos($data['bot_token'], 'enc:v2:') !== 0) {
+            $data['bot_token'] = encrypturl($data['bot_token']);
+        }
+    }
+
     if (isset($data['id']) && intval($data['id']) > 0) {
         $id = intval($data['id']);
         unset($data['id']);
         if (isset($data['password']) && empty($data['password'])) {
             unset($data['password']);
-        } elseif (isset($data['password'])) {
+        } elseif (isset($data['password']) && strpos($data['password'], '$2y$') !== 0) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
         return $mikbotamdata->update('app_users', $data, ['id' => $id]);
     } else {
-        if (isset($data['password'])) {
+        if (isset($data['password']) && strpos($data['password'], '$2y$') !== 0) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
         return $mikbotamdata->insert('app_users', $data);
