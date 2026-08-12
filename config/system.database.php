@@ -2257,7 +2257,7 @@ function generate_monthly_invoices($month_year, $secrets_list) {
 
             if ($cust && !empty($cust['exp_date'])) {
                 $exp_month_year = date('Y-m', strtotime($cust['exp_date']));
-                if ($exp_month_year >= $month_year) {
+                if ($exp_month_year > $month_year) {
                     $status = 'PAID';
                     $notes  = 'Lunas (Bayar Dimuka)';
                 }
