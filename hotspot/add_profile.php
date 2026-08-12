@@ -50,10 +50,20 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 			$trasparant = "no";
 		}
 
+		$tele_notify = "";
+		if (!empty($token) && !empty($id_own)) {
+			$tele_msg = "🔔+<b>NOTIFIKASI+LOGIN+HOTSPOT</b>%0A"
+					  . "•+Voucher:+<b>$" . "user" . "</b>%0A"
+					  . "•+IP:+<code>$" . "address" . "</code>%0A"
+					  . "•+MAC:+<code>$" . "mac-address" . "</code>%0A"
+					  . "•+Waktu:+<code>[/system clock get time]</code>+<code>[/system clock get date]</code>";
+			$tele_notify = "[/tool fetch url=\"https://api.telegram.org/bot{$token}/sendMessage?chat_id={$id_own}&parse_mode=html&text={$tele_msg}\" keep-result=no];";
+		}
+
 		if ($lock_macs == 'enable') {
-			$on_login = ':put (",' . $lock_macs . ',' . $validdity . ',");{:local date [/system clock get date ];:local time [/system clock get time ];:local uptime (' . $validdity . ');:local macadd $"mac-address";:local ipaddresslocal $"address";[/ip hotspot user set mac-address=$"macadd" [find where name=$user]];[/system scheduler add disabled=no interval=$uptime name=$user on-event= "[/ip hotspot active remove [find where user=$user]];[/ip hotspot user remove [find where name=$user]];[/ip hotspot cookie remove [find user=$user]];[/sys sch re [find where name=$user]]" start-date=$date start-time=$time];}}';
+			$on_login = ':put (",' . $lock_macs . ',' . $validdity . ',");{:local date [/system clock get date ];:local time [/system clock get time ];:local uptime (' . $validdity . ');:local macadd $"mac-address";:local ipaddresslocal $"address";[/ip hotspot user set mac-address=$"macadd" [find where name=$user]];' . $tele_notify . '[/system scheduler add disabled=no interval=$uptime name=$user on-event= "[/ip hotspot active remove [find where user=$user]];[/ip hotspot user remove [find where name=$user]];[/ip hotspot cookie remove [find user=$user]];[/sys sch re [find where name=$user]]" start-date=$date start-time=$time];}}';
 		} else {
-			$on_login = ':put (",' . $lock_macs . ',' . $validdity . ',");{:local date [/system clock get date ];:local time [/system clock get time ];:local uptime (' . $validdity . ');:local macadd $"mac-address";:local ipaddresslocal $"address";[/system scheduler add disabled=no interval=$uptime name=$user on-event= "[/ip hotspot active remove [find where user=$user]];[/ip hotspot user remove [find where name=$user]];[/ip hotspot cookie remove [find user=$user]];[/sys sch re [find where name=$user]]" start-date=$date start-time=$time];}}';
+			$on_login = ':put (",' . $lock_macs . ',' . $validdity . ',");{:local date [/system clock get date ];:local time [/system clock get time ];:local uptime (' . $validdity . ');:local macadd $"mac-address";:local ipaddresslocal $"address";' . $tele_notify . '[/system scheduler add disabled=no interval=$uptime name=$user on-event= "[/ip hotspot active remove [find where user=$user]];[/ip hotspot user remove [find where name=$user]];[/ip hotspot cookie remove [find user=$user]];[/sys sch re [find where name=$user]]" start-date=$date start-time=$time];}}';
 		}
 
 		if ($validdity != 0) {
