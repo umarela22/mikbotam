@@ -46,7 +46,7 @@ $cron_url = $base_url . '/tools/cron_ppp_billing.php';
 	<?=$message;?>
 
 	<div class="row row-sm mg-t-10">
-		<div class="col-lg-<?= $is_superadmin ? '7' : '12'; ?>">
+		<div class="col-lg-7">
 			<div class="card bd-primary">
 				<div class="card-header bg-primary tx-white font-weight-bold">
 					<i class="fa fa-cogs mg-r-5"></i> Form Pengaturan Isolir & Tagihan
