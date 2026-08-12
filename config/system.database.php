@@ -1683,6 +1683,35 @@ function init_ppp_billing_tables() {
             app_user_id INTEGER
         )");
 
+        // Migrate legacy ppp_isolir_settings table to remove global UNIQUE constraint on setting_key
+        try {
+            $index_info = $pdo->query("PRAGMA index_list(ppp_isolir_settings)")->fetchAll(PDO::FETCH_ASSOC);
+            $has_unique = false;
+            foreach ($index_info as $idx) {
+                if (isset($idx['unique']) && $idx['unique'] == 1) {
+                    $has_unique = true;
+                    break;
+                }
+            }
+            if ($has_unique) {
+                $cols = $pdo->query("PRAGMA table_info(ppp_isolir_settings)")->fetchAll(PDO::FETCH_ASSOC);
+                $col_names = array_column($cols, 'name');
+                $pdo->exec("CREATE TABLE ppp_isolir_settings_temp (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    setting_key TEXT,
+                    setting_value TEXT,
+                    app_user_id INTEGER
+                )");
+                if (in_array('app_user_id', $col_names)) {
+                    $pdo->exec("INSERT INTO ppp_isolir_settings_temp (id, setting_key, setting_value, app_user_id) SELECT id, setting_key, setting_value, app_user_id FROM ppp_isolir_settings");
+                } else {
+                    $pdo->exec("INSERT INTO ppp_isolir_settings_temp (id, setting_key, setting_value, app_user_id) SELECT id, setting_key, setting_value, 1 FROM ppp_isolir_settings");
+                }
+                $pdo->exec("DROP TABLE ppp_isolir_settings");
+                $pdo->exec("ALTER TABLE ppp_isolir_settings_temp RENAME TO ppp_isolir_settings");
+            }
+        } catch (Exception $ex) {}
+
         $pdo->exec("CREATE TABLE IF NOT EXISTS app_users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
