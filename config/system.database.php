@@ -2613,3 +2613,87 @@ function resend_verification_email($email) {
         'message' => 'Email verifikasi baru telah dikirimkan ke <strong>' . htmlspecialchars($email) . '</strong>. Silakan cek Inbox atau folder Spam.'
     ];
 }
+
+function get_current_app_user_profile() {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $tenant_id = get_current_tenant_id();
+    if ($tenant_id) {
+        $usr = $mikbotamdata->get('app_users', '*', ['id' => $tenant_id]);
+        if ($usr) {
+            if (empty($usr['email'])) {
+                $usr['email'] = $usr['username'] . '@domain.com';
+            }
+            return $usr;
+        }
+    }
+    $leg = $mikbotamdata->get('mikhbotam_id', '*');
+    return [
+        'id' => 1,
+        'full_name' => 'Administrator',
+        'username' => isset($leg['u_user']) ? $leg['u_user'] : 'admin',
+        'email' => 'admin@domain.com',
+        'role' => 'superadmin'
+    ];
+}
+
+function update_app_user_profile($user_id, $full_name, $username, $email, $new_password = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+
+    $user_id = intval($user_id);
+    if ($user_id <= 0) return ['success' => false, 'message' => 'User ID tidak valid.'];
+
+    $full_name = trim($full_name);
+    $username  = trim($username);
+    $email     = trim(strtolower($email));
+
+    if (empty($full_name) || empty($username) || empty($email)) {
+        return ['success' => false, 'message' => 'Nama lengkap, username, dan email wajib diisi.'];
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'Format email tidak valid.'];
+    }
+
+    $upd = [
+        'full_name' => $full_name,
+        'username'  => $username,
+        'email'     => $email
+    ];
+
+    if (!empty($new_password)) {
+        if (strlen($new_password) < 6) {
+            return ['success' => false, 'message' => 'Password minimal harus 6 karakter.'];
+        }
+        $upd['password'] = password_hash($new_password, PASSWORD_BCRYPT);
+    }
+
+    $exists = $mikbotamdata->get('app_users', 'id', [
+        'AND' => [
+            'id[!]' => $user_id,
+            'OR' => [
+                'username' => $username,
+                'email'    => $email
+            ]
+        ]
+    ]);
+
+    if ($exists) {
+        return ['success' => false, 'message' => 'Username atau Email sudah digunakan oleh pengguna lain.'];
+    }
+
+    $mikbotamdata->update('app_users', $upd, ['id' => $user_id]);
+
+    if ($user_id === 1 && !empty($new_password)) {
+        $mikbotamdata->update('mikhbotam_id', [
+            'u_user' => $username,
+            'u_pass' => password_hash($new_password, PASSWORD_BCRYPT)
+        ], ['u_id' => 1]);
+    }
+
+    $_SESSION['app_full_name'] = $full_name;
+    $_SESSION['Mikbotamuser']  = $username;
+
+    return ['success' => true, 'message' => 'Profil akun berhasil diperbarui!'];
+}

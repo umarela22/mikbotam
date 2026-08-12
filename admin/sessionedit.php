@@ -1,146 +1,92 @@
 <?php
-
- //=====================================================START====================//
-
-/*
- *  Base Code   : BangAchil
- *  Email       : kesumaerlangga@gmail.com
- *  Telegram    : @bangachil
- *
- *  Name        : Mikrotik bot telegram - php
- *  Function    : Mikortik api
- *  Manufacture : November 2018
- *  Last Edited : 26 Desember 2018
- *
- *  Please do not change this code
- *  All damage caused by editing we will not be responsible please think carefully,
- *
- */
-
 //=====================================================START SCRIPT====================//
-    error_reporting(0);
+error_reporting(0);
 
-    if (!isset($_SESSION["Mikbotamuser"])) {
-        header("Location:../admin/login.php");
-        exit();
+if (!isset($_SESSION["Mikbotamuser"])) {
+    header("Location:../admin/login.php");
+    exit();
+}
+
+include_once '../config/system.conn.php';
+include_once '../config/system.database.php';
+
+$message = '';
+$profile = get_current_app_user_profile();
+
+if (isset($_POST['save_profile'])) {
+    $full_name    = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
+    $username     = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $email        = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $new_password = isset($_POST['password']) ? $_POST['password'] : '';
+
+    $res = update_app_user_profile($profile['id'], $full_name, $username, $email, $new_password);
+    if ($res['success']) {
+        $message = '<div class="alert alert-success mg-b-15"><i class="fa fa-check-circle mg-r-5"></i> ' . htmlspecialchars($res['message']) . '</div>';
+        $profile = get_current_app_user_profile();
     } else {
-  		$id=$_SESSION['Mikbotamid'];
-      include '../config/system.conn.php';
-
-    	if (isset($_POST['save'])){
-    		 $user=$_POST['user'];
-    		 $pass=$_POST['pass'];
-    		
-    		 	
-    		 	if (!empty($pass)&&!empty($pass)){
-    		 		
-    		 		$update=updatesession($user, $pass,$id);
-    		 		if (empty($update)){
-    		 		 echo '<script language="javascript">';
-                echo 'document.addEventListener("DOMContentLoaded", function() {';
-                echo 'alertify.alert("Oh no", "<img style=\'width:30%\' class=\'responsive-image center\' src=\'../img/loading.svg\' alt=\'error\'><br><center>The user and password cannot be the same as the old one</center>").set(\'onok\', function(closeEvent){ window.location.href = "?admin=sessionedit";} );';
-                echo '});';
-                echo '</script>';
-    		 		}else{
-					 echo '<script language="javascript">';
-                echo 'document.addEventListener("DOMContentLoaded", function() {';
-                echo 'alertify.alert("Done", "<img style=\'width:30%\' class=\'responsive-image center\' src=\'../img/loading.svg\' alt=\'error\'><br><center>Done ! Your session has been updated </center>").set(\'onok\', function(closeEvent){ window.location.href = "?admin=sessionedit";} );';
-                echo '});';
-                echo '</script>';
-    		 		} 
-                
-    		 	}else{
-    		 	
-    		 	    echo '<script language="javascript">';
-                echo 'document.addEventListener("DOMContentLoaded", function() {';
-                echo 'alertify.alert("Error", "<img style=\'width:30%\' class=\'responsive-image center\' src=\'../img/loading.svg\' alt=\'error\'><br><center>Username and password cannot be empty</center>").set(\'onok\', function(closeEvent){ window.location.href = "?admin=sessionedit";} );';
-                echo '});';
-                echo '</script>';	
-    		 	}
-	
-    	}
-    	
+        $message = '<div class="alert alert-danger mg-b-15"><i class="fa fa-exclamation-circle mg-r-5"></i> ' . htmlspecialchars($res['message']) . '</div>';
     }
+}
+?>
 
+<div class="sl-pagebody">
+    <div class="sl-page-title d-flex justify-content-between align-items-center">
+        <div>
+            <h5>Pengaturan Profil Akun Admin</h5>
+            <p>Kelola data nama, email, username, dan password akun admin Anda.</p>
+        </div>
+    </div>
 
+    <?= $message; ?>
 
-
-  ?>
-       
-     <script>
-    function Passmikbot() {
-        var x = document.getElementById('password');
-        if (x.type === 'password') {
-            x.type = 'text';
-        } else {
-            x.type = 'password';
-        }
-    };
-
-
-
-    </script>
-  
-      <div class="sl-pagebody">
-      	<div class="row row-sm">
-        <div class="col-lg-4 mg-t-8">
-            <div class="card bd bd-primary">
-                <div class="card-body ">
-                    <div class="card pd-20 pd-sm-20  bg-primary ">
-                        <div class="signin-logo tx-center text-capitalize tx-20 tx-bold tx-white">
-                            <img src="../img/logoMwhite.svg" alt="Mikbotam.id" style="
-                                width: 48%;
-                                ">
-                            <br>
-                                  </div>
-
-                    </div>
-
+    <div class="row row-sm">
+        <div class="col-lg-4 mg-b-20">
+            <div class="card bd-primary text-center pd-20">
+                <div class="signin-logo mg-b-15">
+                    <img src="../img/logoM.svg" alt="Mikbotam" style="width: 100px;">
                 </div>
-
+                <h5 class="font-weight-bold text-dark mg-b-2"><?= htmlspecialchars($profile['full_name']); ?></h5>
+                <p class="text-muted tx-13 mg-b-10"><?= htmlspecialchars($profile['email']); ?></p>
+                <span class="badge badge-primary tx-12 pd-5-10 font-weight-bold text-uppercase">Role: <?= htmlspecialchars($profile['role']); ?></span>
             </div>
         </div>
 
-      	<div class="col-xl-6 mg-t-8">
-                <div class="card bd-primary">
-                    <div class="card-header bg-primary tx-white">
-                        <i class="fa  fa-pencil-square-o"></i> Login Settings </div>
-                    <div class="card-body pd-sm-15">
-                        <form method="post" action="">
-                            <div class="row mg-t-8">
-                                <label class="col-sm-4 form-control-label">Username  </label>
-                                <div class="col-lg">
-                                    <input type="text" name="user" class="form-control" placeholder="Username" value="<?=seeusersession($id);?>">
-                                </div>
-                            </div>
-                            <div class="row mg-t-8">
-                                <label class="col-sm-4 form-control-label">Password  </label>
-                                <div class="col-lg">
-                                                                                    <div class="input-group">
-                                                    <span class="input-group-addon bg-transparent">
-                  <label class="ckbox wd-16">
-                    <input type="checkbox" name="checkbox" value="0" onclick="Passmikbot()" ><span></span>
-                                                    </label>
-                                                    </span>
-                                                    <input  id="password" type="password" class="form-control" name="pass" placeholder="Password" value="<?=seepasssession($id);?>">
-                                                </div>
-                                </div>
-                            </div>
- 
-                            <div class="row row-xs mg-t-8">
-                                <div class="col-sm-15 mg-l-auto">
-                                    <div class="form-layout-footer">
-                                    	<button class="btn btn-success lh-0 tx-xthin mg-r-0 mg-t-8" name="save" type="submit"><i class="fa fa-send mg-r-2"></i> Update Session</button>
-                                    </div>
-                                    <!-- form-layout-footer -->
-                                </div>
-                                <!-- col-8 -->
-                            </div>
-                            <!-- card-body -->
-                        </form>
-                        <!-- card-body -->
-                    </div>
-                    <!-- card -->
+        <div class="col-lg-8">
+            <div class="card bd-primary">
+                <div class="card-header bg-primary tx-white font-weight-bold d-flex align-items-center">
+                    <i class="fa fa-user-circle mg-r-10"></i> Form Edit Profil Akun
+                </div>
+                <div class="card-body pd-20">
+                    <form method="POST" action="./?Mikbotam=sessionedit">
+                        <div class="form-group mg-b-15">
+                            <label class="font-weight-bold">Nama Lengkap:</label>
+                            <input type="text" name="full_name" class="form-control" value="<?= htmlspecialchars($profile['full_name']); ?>" required>
+                        </div>
+
+                        <div class="form-group mg-b-15">
+                            <label class="font-weight-bold">Username Login:</label>
+                            <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($profile['username']); ?>" required>
+                        </div>
+
+                        <div class="form-group mg-b-15">
+                            <label class="font-weight-bold">Alamat Email:</label>
+                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($profile['email']); ?>" required>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group mg-b-20">
+                            <label class="font-weight-bold">Password Baru (Opsional):</label>
+                            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <small class="text-muted">Biarkan kosong jika hanya ingin mengubah nama, email, atau username.</small>
+                        </div>
+
+                        <button type="submit" name="save_profile" class="btn btn-success font-weight-bold pd-x-20">
+                            <i class="fa fa-save mg-r-5"></i> Simpan Perubahan Profil
+                        </button>
+                    </form>
                 </div>
             </div>
-    </div></dvi>
+        </div>
+    </div>
+</div>

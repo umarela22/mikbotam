@@ -251,3 +251,5 @@ Stack trace:
   thrown in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2368
 [12-Aug-2026 22:27:38 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
 [12-Aug-2026 22:27:40 Asia/Jakarta] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in C:\xampp\htdocs\mikbotam\scratch\test_registration_flow.php on line 26
+[12-Aug-2026 22:47:32 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 22:47:49 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
