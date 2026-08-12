@@ -182,119 +182,204 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	</div>
 </div>
 
-<!-- Modal Add/Edit Voucher -->
-<div class="modal fade" id="voucherModal" tabindex="-1" role="dialog" aria-hidden="true">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<form method="POST" action="?Mikbotam=SettingsVoc">
-				<input type="hidden" name="voucher_index" id="form_voucher_index" value="-1">
-				<div class="modal-header bg-primary tx-white">
-					<h5 class="modal-title" id="modalTitle">Tambah Paket Voucher Baru</h5>
-					<button type="button" class="close tx-white" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body pd-20">
-					<div class="row row-sm">
-						<!-- Nama Paket & Keterangan -->
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Nama Paket Voucher:</label>
-							<input type="text" name="Voucher" id="field_Voucher" class="form-control" placeholder="Contoh: 1 Jam 2rb" required>
-						</div>
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Teks Tombol / Deskripsi Bot:</label>
-							<input type="text" name="Text_List" id="field_Text_List" class="form-control" placeholder="Contoh: 1 Jam - Rp 2.000" required>
-						</div>
-
-						<!-- Profil MikroTik & Server -->
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Profil Hotspot MikroTik:</label>
-							<select name="profile" id="field_profile" class="form-control" required>
-								<?php if (empty($ARRAY)): ?>
-									<option value="">-- Gagal mengambil profil / Router terputus --</option>
-								<?php else: ?>
-									<?php foreach ($ARRAY as $prof): ?>
-										<option value="<?=$prof['name'];?>"><?=$prof['name'];?></option>
-									<?php endforeach; ?>
-								<?php endif; ?>
-							</select>
-						</div>
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Server Hotspot:</label>
-							<select name="server" id="field_server" class="form-control">
-								<option value="all">all (Semua Server)</option>
-								<?php foreach ($serverhot as $serv): ?>
-									<option value="<?=$serv['name'];?>"><?=$serv['name'];?></option>
-								<?php endforeach; ?>
-							</select>
-						</div>
-
-						<!-- Harga Beli & Harga Jual -->
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Harga Modal / Potong Saldo (Rp):</label>
-							<input type="number" name="price" id="field_price" class="form-control" placeholder="2000" required>
-						</div>
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Harga Jual / Markup Reseller (Rp):</label>
-							<input type="number" name="markup" id="field_markup" class="form-control" placeholder="3000" required>
-						</div>
-
-						<!-- Limit Waktu & Kuota -->
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Limit Waktu (Uptime):</label>
-							<input type="text" name="Limit" id="field_Limit" class="form-control" placeholder="Contoh: 1h, 1d, 30m">
-						</div>
-						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Limit Kuota (Bytes):</label>
-							<input type="text" name="limit_total" id="field_limit_total" class="form-control" placeholder="Contoh: 500M, 1G (Kosongkan jika Unlimited)">
-						</div>
-
-						<!-- Format Kode -->
-						<div class="col-md-3 form-group">
-							<label class="font-weight-bold">Prefix Kode (Awalan):</label>
-							<input type="text" name="prefix" id="field_prefix" class="form-control" placeholder="Contoh: VC-, NET-">
-						</div>
-						<div class="col-md-3 form-group">
-							<label class="font-weight-bold">Tipe Login Voucher:</label>
-							<select name="type" id="field_type" class="form-control">
-								<option value="vc">Voucher Only (User = Pass)</option>
-								<option value="up">Username & Password Beda</option>
-							</select>
-						</div>
-						<div class="col-md-3 form-group">
-							<label class="font-weight-bold">Karakter Kode:</label>
-							<select name="typechar" id="field_typechar" class="form-control">
-								<option value="lower">Huruf Kecil (abc)</option>
-								<option value="upper">Huruf Besar (ABC)</option>
-								<option value="num">Angka (123)</option>
-								<option value="mix">Campuran (aB1)</option>
-							</select>
-						</div>
-						<div class="col-md-3 form-group">
-							<label class="font-weight-bold">Panjang Kode (Karakter):</label>
-							<input type="number" name="length" id="field_length" class="form-control" value="4" min="3" max="12" required>
-						</div>
-
-						<!-- Warna Card -->
-						<div class="col-md-12 form-group">
-							<label class="font-weight-bold">Warna Card Tampilan:</label>
-							<select name="Color" id="field_Color" class="form-control">
-								<option value="bg-primary">Biru (Primary)</option>
-								<option value="bg-teal">Teal / Hijau Muda</option>
-								<option value="bg-pink">Pink</option>
-								<option value="bg-warning">Kuning (Warning)</option>
-								<option value="bg-danger">Merah (Danger)</option>
-								<option value="bg-info">Cyan (Info)</option>
-								<option value="bg-dark">Hitam (Dark)</option>
-							</select>
-						</div>
+	<!-- Modal Add/Edit Voucher -->
+	<div class="modal fade" id="voucherModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content border-0 shadow-lg">
+				<form method="POST" action="?Mikbotam=SettingsVoc">
+					<input type="hidden" name="voucher_index" id="form_voucher_index" value="-1">
+					<div class="modal-header bg-primary tx-white pd-y-15 pd-x-20">
+						<h5 class="modal-title font-weight-bold d-flex align-items-center mg-b-0" id="modalTitle">
+							<i class="fa fa-ticket mg-r-10"></i> Tambah Paket Voucher Baru
+						</h5>
+						<button type="button" class="close tx-white op-8 hover-op-10" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-					<button type="submit" name="action_save_voucher" class="btn btn-primary"><i class="fa fa-save"></i> Simpan Paket Voucher</button>
-				</div>
-			</form>
+					<div class="modal-body pd-25">
+						
+						<!-- Section 1: Informasi Paket -->
+						<div class="card bd pd-15 mg-b-20 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-info-circle mg-r-5"></i> 1. Informasi Paket & Tampilan Bot
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Nama Paket Voucher <span class="tx-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-ticket tx-primary"></i></span>
+										<input type="text" name="Voucher" id="field_Voucher" class="form-control" placeholder="Contoh: 1 Jam 2k" required>
+									</div>
+									<small class="form-text text-muted">Nama singkat paket yang akan ditampilkan.</small>
+								</div>
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Teks Tombol / Deskripsi Bot <span class="tx-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-list-alt tx-primary"></i></span>
+										<input type="text" name="Text_List" id="field_Text_List" class="form-control" placeholder="Contoh: 1 Jam - Rp 2.000" required>
+									</div>
+									<small class="form-text text-muted">Teks tombol yang muncul di menu Telegram Bot.</small>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 2: Profil RouterOS -->
+						<div class="card bd pd-15 mg-b-20 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-server mg-r-5"></i> 2. Profil & Server Hotspot MikroTik
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Profil Hotspot MikroTik <span class="tx-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-cogs tx-primary"></i></span>
+										<select name="profile" id="field_profile" class="form-control" required>
+											<?php if (empty($ARRAY)): ?>
+												<option value="">-- Gagal mengambil profil / Router terputus --</option>
+											<?php else: ?>
+												<?php foreach ($ARRAY as $prof): ?>
+													<option value="<?=$prof['name'];?>"><?=$prof['name'];?></option>
+												<?php endforeach; ?>
+											<?php endif; ?>
+										</select>
+									</div>
+									<small class="form-text text-muted">Pilih profil User Profile dari router MikroTik Anda.</small>
+								</div>
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Server Hotspot Target</label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-wifi tx-primary"></i></span>
+										<select name="server" id="field_server" class="form-control">
+											<option value="all">all (Semua Server Hotspot)</option>
+											<?php foreach ($serverhot as $serv): ?>
+												<option value="<?=$serv['name'];?>"><?=$serv['name'];?></option>
+											<?php endforeach; ?>
+										</select>
+									</div>
+									<small class="form-text text-muted">Pilih server hotspot spesifik atau 'all' untuk semua.</small>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 3: Harga & Saldo -->
+						<div class="card bd pd-15 mg-b-20 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-money mg-r-5"></i> 3. Harga Modal & Harga Jual Reseller
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Harga Modal / Potong Saldo (Rp) <span class="tx-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-minus-circle tx-danger"></i></span>
+										<input type="number" name="price" id="field_price" class="form-control" placeholder="2000" required>
+									</div>
+									<small class="form-text text-muted">Jumlah saldo reseller yang dipotong saat cetak voucher.</small>
+								</div>
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Harga Jual / Target Reseller (Rp) <span class="tx-danger">*</span></label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-plus-circle tx-success"></i></span>
+										<input type="number" name="markup" id="field_markup" class="form-control" placeholder="3000" required>
+									</div>
+									<small class="form-text text-muted">Harga pasaran / patokan jual voucher ke pelanggan.</small>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 4: Limit Waktu & Kuota -->
+						<div class="card bd pd-15 mg-b-20 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-clock-o mg-r-5"></i> 4. Batasan Waktu & Kuota
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Limit Waktu (Uptime)</label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-hourglass-half tx-primary"></i></span>
+										<input type="text" name="Limit" id="field_Limit" class="form-control" placeholder="Contoh: 1h, 1d, 30m">
+									</div>
+									<small class="form-text text-muted">Gunakan: <code>m</code> (Menit), <code>h</code> (Jam), <code>d</code> (Hari). Contoh: <code>1h</code> atau <code>1d</code>.</small>
+								</div>
+								<div class="col-md-6 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Limit Kuota Data (Bytes)</label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-database tx-primary"></i></span>
+										<input type="text" name="limit_total" id="field_limit_total" class="form-control" placeholder="Contoh: 500M, 1G">
+									</div>
+									<small class="form-text text-muted">Gunakan: <code>M</code> (MB) atau <code>G</code> (GB). Kosongkan jika Unlimited.</small>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 5: Format Kode -->
+						<div class="card bd pd-15 mg-b-20 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-key mg-r-5"></i> 5. Format Kode & Prefix Voucher
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-3 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Prefix (Awalan)</label>
+									<input type="text" name="prefix" id="field_prefix" class="form-control" placeholder="Contoh: VC-, NET-">
+									<small class="form-text text-muted">Awalan kode voucher.</small>
+								</div>
+								<div class="col-md-3 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Tipe Login</label>
+									<select name="type" id="field_type" class="form-control">
+										<option value="vc">Voucher Only (User=Pass)</option>
+										<option value="up">Username & Password Beda</option>
+									</select>
+									<small class="form-text text-muted">Model login voucher.</small>
+								</div>
+								<div class="col-md-3 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Karakter Kode</label>
+									<select name="typechar" id="field_typechar" class="form-control">
+										<option value="lower">Huruf Kecil (abc)</option>
+										<option value="upper">Huruf Besar (ABC)</option>
+										<option value="num">Angka (123)</option>
+										<option value="mix">Campuran (aB1)</option>
+									</select>
+									<small class="form-text text-muted">Jenis karakter acak.</small>
+								</div>
+								<div class="col-md-3 form-group mg-b-10">
+									<label class="font-weight-bold tx-12 tx-gray-700">Panjang Acak</label>
+									<input type="number" name="length" id="field_length" class="form-control" value="4" min="3" max="12" required>
+									<small class="form-text text-muted">Jumlah karakter acak.</small>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 6: Warna Tampilan Card -->
+						<div class="card bd pd-15 bg-gray-100">
+							<h6 class="tx-13 tx-bold tx-uppercase tx-primary mg-b-15">
+								<i class="fa fa-paint-brush mg-r-5"></i> 6. Tampilan Visual Card
+							</h6>
+							<div class="row row-sm">
+								<div class="col-md-12 form-group mg-b-0">
+									<label class="font-weight-bold tx-12 tx-gray-700">Warna Tema Card Voucher</label>
+									<div class="input-group">
+										<span class="input-group-addon bg-white"><i class="fa fa-tint tx-primary"></i></span>
+										<select name="Color" id="field_Color" class="form-control">
+											<option value="bg-primary">Biru (Primary)</option>
+											<option value="bg-teal">Teal / Hijau Muda</option>
+											<option value="bg-pink">Pink</option>
+											<option value="bg-warning">Kuning (Warning)</option>
+											<option value="bg-danger">Merah (Danger)</option>
+											<option value="bg-info">Cyan (Info)</option>
+											<option value="bg-dark">Hitam (Dark)</option>
+										</select>
+									</div>
+									<small class="form-text text-muted">Warna latar belakang kartu voucher pada tampilan daftar.</small>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer pd-y-15 pd-x-20 bg-gray-200">
+						<button type="button" class="btn btn-secondary pd-x-20" data-dismiss="modal"><i class="fa fa-times mg-r-5"></i> Batal</button>
+						<button type="submit" name="action_save_voucher" class="btn btn-primary pd-x-25"><i class="fa fa-save mg-r-5"></i> Simpan Paket Voucher</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
