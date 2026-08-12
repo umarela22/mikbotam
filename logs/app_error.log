@@ -235,27 +235,11 @@ Stack trace:
 [12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
 [12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 128
 [12-Aug-2026 16:47:24 Asia/Jakarta] PHP Warning:  Undefined variable $gagalprint in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1454
-[12-Aug-2026 18:27:44 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:27:57 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:28:11 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:28:22 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:35:09 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:35:09 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined method medoo::id() in C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php:20
-Stack trace:
-#0 {main}
-  thrown in C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php on line 20
-[12-Aug-2026 18:35:17 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:35:17 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: ppp_invoices.invoice_number in C:\xampp\htdocs\mikbotam\config\system.medoo.php:143
-Stack trace:
-#0 C:\xampp\htdocs\mikbotam\config\system.medoo.php(143): PDO->exec('INSERT INTO "pp...')
-#1 C:\xampp\htdocs\mikbotam\config\system.medoo.php(582): medoo->exec('INSERT INTO "pp...')
-#2 C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php(12): medoo->insert('ppp_invoices', Array)
-#3 {main}
-  thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 143
-[12-Aug-2026 18:35:25 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:39:54 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined variable $inv_id in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2114
-[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined variable $inv_id in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2114
-[12-Aug-2026 18:43:18 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
-[12-Aug-2026 18:46:51 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 16:54:56 Asia/Jakarta] PHP Warning:  Undefined variable $echoexperid in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1344
+[12-Aug-2026 17:05:07 Asia/Jakarta] PHP Warning:  Undefined variable $echoexperid in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1344
+[12-Aug-2026 18:49:27 Asia/Jakarta] PHP Warning:  Undefined array key "message" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 18:49:27 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 18:49:27 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Undefined array key "message" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70
+[12-Aug-2026 18:49:36 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 70

@@ -64,13 +64,21 @@ class Bot {
 
         if (in_array($action, $needChatId) && !isset($data['chat_id'])) {
             $getUpdates = FrameBot::$getUpdates;
-            if (isset($getUpdates['callback_query'])) {
-                $getUpdates['callback_query'];
+            if (isset($getUpdates['callback_query']['message']['chat']['id'])) {
+                $data['chat_id'] = $getUpdates['callback_query']['message']['chat']['id'];
+            } elseif (isset($getUpdates['callback_query']['from']['id'])) {
+                $data['chat_id'] = $getUpdates['callback_query']['from']['id'];
+            } elseif (isset($getUpdates['message']['chat']['id'])) {
+                $data['chat_id'] = $getUpdates['message']['chat']['id'];
             }
-            $data['chat_id'] = $getUpdates['message']['chat']['id'];
+
             // Reply message
             if (!isset($data['reply_to_message_id']) && isset($data['reply']) && $data['reply'] === true) {
-                $data['reply_to_message_id'] = $getUpdates['message']['message_id'];
+                if (isset($getUpdates['message']['message_id'])) {
+                    $data['reply_to_message_id'] = $getUpdates['message']['message_id'];
+                } elseif (isset($getUpdates['callback_query']['message']['message_id'])) {
+                    $data['reply_to_message_id'] = $getUpdates['callback_query']['message']['message_id'];
+                }
                 unset($data['reply']);
             }
         }
