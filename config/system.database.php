@@ -1614,20 +1614,52 @@ function init_ppp_billing_tables() {
         $pdo = $mikbotamdata->pdo;
         $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_packages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            profile_name TEXT NOT NULL UNIQUE,
+            profile_name TEXT NOT NULL,
             price INTEGER NOT NULL DEFAULT 0,
-            description TEXT
+            description TEXT,
+            app_user_id INTEGER
         )");
         $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username_ppp TEXT NOT NULL UNIQUE,
+            username_ppp TEXT NOT NULL,
             customer_name TEXT,
             phone_number TEXT,
             address TEXT,
             due_date INTEGER DEFAULT 20,
             exp_date TEXT,
-            telegram_id TEXT
+            telegram_id TEXT,
+            app_user_id INTEGER
         )");
+
+        // Migrate legacy ppp_packages table to remove global UNIQUE constraint
+        try {
+            $index_info = $pdo->query("PRAGMA index_list(ppp_packages)")->fetchAll(PDO::FETCH_ASSOC);
+            $has_unique = false;
+            foreach ($index_info as $idx) {
+                if (isset($idx['unique']) && $idx['unique'] == 1) {
+                    $has_unique = true;
+                    break;
+                }
+            }
+            if ($has_unique) {
+                $cols = $pdo->query("PRAGMA table_info(ppp_packages)")->fetchAll(PDO::FETCH_ASSOC);
+                $col_names = array_column($cols, 'name');
+                $pdo->exec("CREATE TABLE ppp_packages_temp (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    profile_name TEXT NOT NULL,
+                    price INTEGER NOT NULL DEFAULT 0,
+                    description TEXT,
+                    app_user_id INTEGER
+                )");
+                if (in_array('app_user_id', $col_names)) {
+                    $pdo->exec("INSERT INTO ppp_packages_temp (id, profile_name, price, description, app_user_id) SELECT id, profile_name, price, description, app_user_id FROM ppp_packages");
+                } else {
+                    $pdo->exec("INSERT INTO ppp_packages_temp (id, profile_name, price, description, app_user_id) SELECT id, profile_name, price, description, 1 FROM ppp_packages");
+                }
+                $pdo->exec("DROP TABLE ppp_packages");
+                $pdo->exec("ALTER TABLE ppp_packages_temp RENAME TO ppp_packages");
+            }
+        } catch (Exception $ex) {}
         try {
             $pdo->exec("ALTER TABLE ppp_customers ADD COLUMN exp_date TEXT");
         } catch (Exception $e) {
