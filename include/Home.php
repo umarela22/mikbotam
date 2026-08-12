@@ -151,6 +151,13 @@
             <span class="badge badge-warning tx-10 pd-3-8 mg-l-auto">SUPERADMIN</span>
           </div>
         </a>
+        <a href="./?Mikbotam=smtpsettings" class="sl-menu-link <?=($page == 'smtpsettings') ? 'active' : '';?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-envelope tx-20 text-info"></i>
+            <span class="menu-item-label font-weight-bold"> Pengaturan SMTP Email</span>
+            <span class="badge badge-info tx-10 pd-3-8 mg-l-auto">SMTP</span>
+          </div>
+        </a>
         <a href="#" class="sl-menu-link <?=$toolsshow;?>">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa fa-wrench tx-20"></i>

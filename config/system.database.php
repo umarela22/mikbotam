@@ -1796,6 +1796,18 @@ function init_ppp_billing_tables() {
         try { $pdo->exec("ALTER TABLE app_users ADD COLUMN email TEXT"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE app_users ADD COLUMN verification_token TEXT"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE app_users ADD COLUMN token_expires_at DATETIME"); } catch (Exception $ex) {}
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS app_smtp_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            smtp_host TEXT,
+            smtp_port INTEGER DEFAULT 587,
+            smtp_user TEXT,
+            smtp_pass TEXT,
+            smtp_crypto TEXT DEFAULT 'tls',
+            from_email TEXT,
+            from_name TEXT DEFAULT 'Mikbotam Admin',
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )");
         try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
@@ -2268,6 +2280,170 @@ function generate_monthly_invoices($month_year, $secrets_list) {
     return $count;
 }
 
+function get_smtp_settings() {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $row = $mikbotamdata->get('app_smtp_settings', '*', ['id' => 1]);
+    if ($row) {
+        if (!empty($row['smtp_pass'])) {
+            $row['smtp_pass'] = decrypturl($row['smtp_pass']);
+        }
+        return $row;
+    }
+    return [
+        'id' => 1,
+        'smtp_host' => '',
+        'smtp_port' => 587,
+        'smtp_user' => '',
+        'smtp_pass' => '',
+        'smtp_crypto' => 'tls',
+        'from_email' => '',
+        'from_name' => 'Mikbotam Admin'
+    ];
+}
+
+function save_smtp_settings($data) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    $pass = isset($data['smtp_pass']) ? $data['smtp_pass'] : '';
+    $enc_pass = !empty($pass) ? encrypturl($pass) : '';
+
+    $insert_data = [
+        'smtp_host' => isset($data['smtp_host']) ? trim($data['smtp_host']) : '',
+        'smtp_port' => isset($data['smtp_port']) ? intval($data['smtp_port']) : 587,
+        'smtp_user' => isset($data['smtp_user']) ? trim($data['smtp_user']) : '',
+        'smtp_pass' => $enc_pass,
+        'smtp_crypto' => isset($data['smtp_crypto']) ? trim($data['smtp_crypto']) : 'tls',
+        'from_email' => isset($data['from_email']) ? trim($data['from_email']) : '',
+        'from_name' => isset($data['from_name']) ? trim($data['from_name']) : 'Mikbotam Admin',
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+
+    $exists = $mikbotamdata->get('app_smtp_settings', 'id', ['id' => 1]);
+    if ($exists) {
+        return $mikbotamdata->update('app_smtp_settings', $insert_data, ['id' => 1]);
+    } else {
+        $insert_data['id'] = 1;
+        return $mikbotamdata->insert('app_smtp_settings', $insert_data);
+    }
+}
+
+function send_custom_smtp_email($to, $subject, $html_body) {
+    $settings = get_smtp_settings();
+
+    // If SMTP Host or User is empty, fallback to standard mail()
+    if (empty($settings['smtp_host']) || empty($settings['smtp_user'])) {
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+        $from = !empty($settings['from_email']) ? $settings['from_email'] : "no-reply@" . $host;
+        $headers  = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= "From: " . $settings['from_name'] . " <" . $from . ">" . "\r\n";
+        $sent = @mail($to, $subject, $html_body, $headers);
+        if ($sent) {
+            return ['success' => true, 'message' => "Email dikirim via PHP mail() standar."];
+        } else {
+            return ['success' => false, 'message' => "Gagal mengirim email via mail() standar. Silakan konfigurasi server SMTP di Pengaturan SMTP."];
+        }
+    }
+
+    $host = $settings['smtp_host'];
+    $port = intval($settings['smtp_port']) > 0 ? intval($settings['smtp_port']) : 587;
+    $user = $settings['smtp_user'];
+    $pass = $settings['smtp_pass'];
+    $crypto = strtolower($settings['smtp_crypto']);
+    $from_email = !empty($settings['from_email']) ? $settings['from_email'] : $user;
+    $from_name  = !empty($settings['from_name']) ? $settings['from_name'] : 'Mikbotam Admin';
+
+    $remote_host = ($crypto === 'ssl') ? 'ssl://' . $host : $host;
+    $context = stream_context_create([
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        ]
+    ]);
+
+    $socket = @stream_socket_client($remote_host . ':' . $port, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $context);
+    if (!$socket) {
+        return ['success' => false, 'message' => "Koneksi SMTP ke $host:$port gagal: $errstr ($errno)"];
+    }
+
+    stream_set_timeout($socket, 10);
+
+    $read_resp = function() use ($socket) {
+        $resp = '';
+        while ($line = fgets($socket, 512)) {
+            $resp .= $line;
+            if (substr($line, 3, 1) === ' ') break;
+        }
+        return $resp;
+    };
+
+    $send_cmd = function($cmd) use ($socket, $read_resp) {
+        fputs($socket, $cmd . "\r\n");
+        return $read_resp();
+    };
+
+    $greeting = $read_resp();
+    if (substr($greeting, 0, 3) !== '220') {
+        fclose($socket);
+        return ['success' => false, 'message' => "Respons server SMTP invalid: $greeting"];
+    }
+
+    $ehlo = $send_cmd("EHLO " . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost'));
+
+    if ($crypto === 'tls') {
+        $starttls = $send_cmd("STARTTLS");
+        if (substr($starttls, 0, 3) === '220') {
+            if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                fclose($socket);
+                return ['success' => false, 'message' => "Gagal mengaktifkan enkripsi STARTTLS dengan server SMTP."];
+            }
+            $send_cmd("EHLO " . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost'));
+        }
+    }
+
+    if (!empty($user) && !empty($pass)) {
+        $auth = $send_cmd("AUTH LOGIN");
+        if (substr($auth, 0, 3) === '334') {
+            $user_resp = $send_cmd(base64_encode($user));
+            if (substr($user_resp, 0, 3) === '334') {
+                $pass_resp = $send_cmd(base64_encode($pass));
+                if (substr($pass_resp, 0, 3) !== '235') {
+                    fclose($socket);
+                    return ['success' => false, 'message' => "Autentikasi SMTP gagal: Username atau Password SMTP salah ($pass_resp)"];
+                }
+            } else {
+                fclose($socket);
+                return ['success' => false, 'message' => "Username SMTP ditolak: $user_resp"];
+            }
+        }
+    }
+
+    $send_cmd("MAIL FROM:<$from_email>");
+    $send_cmd("RCPT TO:<$to>");
+    $send_cmd("DATA");
+
+    $headers = "MIME-Version: 1.0\r\n"
+             . "Content-Type: text/html; charset=UTF-8\r\n"
+             . "From: =?UTF-8?B?" . base64_encode($from_name) . "?= <$from_email>\r\n"
+             . "To: <$to>\r\n"
+             . "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n"
+             . "Date: " . date('r') . "\r\n";
+
+    $email_data = $headers . "\r\n" . $html_body . "\r\n.\r\n";
+    $data_resp = $send_cmd($email_data);
+
+    $send_cmd("QUIT");
+    fclose($socket);
+
+    if (substr($data_resp, 0, 3) === '250') {
+        return ['success' => true, 'message' => "Email berhasil dikirimkan via SMTP!"];
+    } else {
+        return ['success' => false, 'message' => "Gagal mengirim data email: $data_resp"];
+    }
+}
+
 function send_verification_email($email, $full_name, $token) {
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
@@ -2309,11 +2485,8 @@ function send_verification_email($email, $full_name, $token) {
     </html>
     ';
 
-    $headers  = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: Mikbotam System <no-reply@" . $host . ">" . "\r\n";
-
-    return @mail($email, $subject, $message, $headers);
+    $res = send_custom_smtp_email($email, $subject, $message);
+    return is_array($res) ? $res['success'] : $res;
 }
 
 function register_new_app_user($email, $full_name, $password) {

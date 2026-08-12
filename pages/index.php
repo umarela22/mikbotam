@@ -67,6 +67,9 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 		case "SettingsVocnonsaldo":
 			include "settingsvocnonsaldo.php";
 			break;
+		case "smtpsettings":
+			include "smtp_settings.php";
+			break;
 		case "setwebhook":
 			include "../tools/setwebhook.php";
 			break;
