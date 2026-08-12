@@ -2250,19 +2250,32 @@ function generate_monthly_invoices($month_year, $secrets_list) {
         ]);
 
         if (!$exists) {
+            // Check if customer has already paid advance (exp_date >= target month_year)
+            $status = 'UNPAID';
+            $notes = null;
+            $cust = $mikbotamdata->get('ppp_customers', '*', ['username_ppp' => $user]);
+
+            if ($cust && !empty($cust['exp_date'])) {
+                $exp_month_year = date('Y-m', strtotime($cust['exp_date']));
+                if ($exp_month_year >= $month_year) {
+                    $status = 'PAID';
+                    $notes  = 'Lunas (Bayar Dimuka)';
+                }
+            }
+
             $inv_no = 'INV-' . str_replace('-', '', $month_year) . '-' . sprintf('%04d', rand(1, 9999));
             $mikbotamdata->insert('ppp_invoices', [
                 'invoice_number' => $inv_no,
                 'username_ppp' => $user,
                 'month_year' => $month_year,
                 'amount' => $price,
-                'status' => 'UNPAID',
+                'status' => $status,
+                'notes' => $notes,
                 'app_user_id' => $tenant_id
             ]);
 
             // Auto-create customer record with standard isolir due date if not present
-            $cust_exists = $mikbotamdata->get('ppp_customers', 'id', ['username_ppp' => $user]);
-            if (!$cust_exists) {
+            if (!$cust) {
                 $isolir_set = get_ppp_isolir_settings();
                 $def_day = intval($isolir_set['due_date']);
                 $init_exp = $month_year . '-' . sprintf('%02d', $def_day);

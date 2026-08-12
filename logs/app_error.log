@@ -253,3 +253,13 @@ Stack trace:
 [12-Aug-2026 22:27:40 Asia/Jakarta] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in C:\xampp\htdocs\mikbotam\scratch\test_registration_flow.php on line 26
 [12-Aug-2026 22:47:32 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
 [12-Aug-2026 22:47:49 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 23:19:35 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 23:19:35 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000]: General error: 1 no such table: st_mikbotam in C:\xampp\htdocs\mikbotam\config\system.medoo.php:130
+Stack trace:
+#0 C:\xampp\htdocs\mikbotam\config\system.medoo.php(130): PDO->query('SELECT "_id","T...')
+#1 C:\xampp\htdocs\mikbotam\config\system.medoo.php(666): medoo->query('SELECT "_id","T...')
+#2 C:\xampp\htdocs\mikbotam\config\system.database.php(1284): medoo->get('st_mikbotam', Array)
+#3 C:\xampp\htdocs\mikbotam\config\system.conn.php(57): getsettings()
+#4 C:\xampp\htdocs\mikbotam\scratch\test_advance_generation.php(2): include_once('C:\\xampp\\htdocs...')
+#5 {main}
+  thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 130
