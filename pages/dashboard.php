@@ -103,7 +103,113 @@ var _0x4214=["\x66\x61\x73\x74","\x66\x61\x64\x65\x49\x6E","\x2E\x2E\x2F\x47\x72
 </script>
 <div class="sl-pagebody">
 
-	<div class="row row-sm">
+<?php
+$is_superadmin = (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin' && (!isset($_SESSION['impersonate_user_id']) || intval($_SESSION['impersonate_user_id']) === 0));
+$all_tenants = $is_superadmin ? get_all_app_users() : [];
+$selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenant_id'] : 'all';
+?>
+
+<?php if ($is_superadmin): ?>
+<div class="card pd-20 mg-b-20 bg-white bd bd-warning shadow-sm">
+	<div class="d-flex align-items-center justify-content-between flex-wrap">
+		<div>
+			<h5 class="tx-inverse font-weight-bold mg-b-5">
+				<i class="fa fa-dashboard text-warning mg-r-8"></i> Dashboard Monitoring SuperAdmin
+			</h5>
+			<p class="tx-12 text-muted mg-b-0">
+				Monitor seluruh transaksi, mutasi voucher, dan deposit reseller dari semua Admin (Tenant) atau pilih admin spesifik.
+			</p>
+		</div>
+		<div class="mg-t-10 mg-sm-t-0 d-flex align-items-center flex-wrap">
+			<form method="GET" action="./" class="form-inline">
+				<input type="hidden" name="Mikbotam" value="Dashboard">
+				<label class="tx-13 font-weight-bold mg-r-10 text-inverse"><i class="fa fa-filter text-primary"></i> Filter Tenant / Admin:</label>
+				<select name="filter_tenant_id" class="form-control wd-220" onchange="this.form.submit()">
+					<option value="all" <?=($selected_tenant_filter === 'all' || $selected_tenant_filter === '0') ? 'selected' : '';?>>🌐 Semua Admin (Keseluruhan System)</option>
+					<?php foreach ($all_tenants as $tn): ?>
+						<option value="<?=$tn['id'];?>" <?=($selected_tenant_filter == $tn['id']) ? 'selected' : '';?>>
+							👤 <?=htmlspecialchars($tn['full_name']);?> (<?=htmlspecialchars($tn['username']);?>)
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</form>
+
+			<?php if (intval($selected_tenant_filter) > 0): ?>
+				<form method="POST" action="./?Mikbotam=manageusers" class="mg-l-10">
+					<input type="hidden" name="user_id" value="<?=intval($selected_tenant_filter);?>">
+					<button type="submit" name="action_impersonate" class="btn btn-warning btn-sm font-weight-bold">
+						<i class="fa fa-user-secret mg-r-5"></i> Beralih ke Dashboard Admin Ini
+					</button>
+				</form>
+			<?php endif; ?>
+		</div>
+	</div>
+</div>
+
+<?php if ($selected_tenant_filter === 'all' || $selected_tenant_filter === '0'): ?>
+<div class="card bd-warning mg-b-20">
+	<div class="card-header bg-warning tx-white font-weight-bold d-flex justify-content-between align-items-center">
+		<span><i class="fa fa-users mg-r-5"></i> Rekapitulasi Aktivitas Seluruh Admin (Tenant Multi-User)</span>
+		<span class="badge badge-light tx-12"><?=count($all_tenants);?> Admin Terdaftar</span>
+	</div>
+	<div class="card-body pd-0">
+		<div class="table-responsive">
+			<table class="table table-hover table-striped mg-b-0">
+				<thead class="bg-gray-100 tx-12 text-uppercase">
+					<tr>
+						<th>No</th>
+						<th>Nama Admin / Owner</th>
+						<th>Username</th>
+						<th>Router MikroTik</th>
+						<th>Role</th>
+						<th>Status</th>
+						<th class="text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php 
+					$no = 1;
+					foreach ($all_tenants as $tenant_item): 
+					?>
+						<tr>
+							<td><?=$no++;?></td>
+							<td class="font-weight-bold"><?=htmlspecialchars($tenant_item['full_name']);?></td>
+							<td><code><?=htmlspecialchars($tenant_item['username']);?></code></td>
+							<td>
+								<span class="badge badge-info pd-5 font-weight-bold">
+									<i class="fa fa-server mg-r-3"></i> <?=htmlspecialchars($tenant_item['mikrotik_ip'] ?: '127.0.0.1');?>
+								</span>
+							</td>
+							<td>
+								<span class="badge badge-<?=($tenant_item['role'] === 'superadmin') ? 'warning' : 'primary';?>">
+									<?=strtoupper($tenant_item['role']);?>
+								</span>
+							</td>
+							<td>
+								<span class="badge badge-<?=($tenant_item['status'] === 'active') ? 'success' : 'danger';?>">
+									<?=strtoupper($tenant_item['status']);?>
+								</span>
+							</td>
+							<td class="text-right">
+								<form method="POST" action="./?Mikbotam=manageusers" style="display:inline;">
+									<input type="hidden" name="user_id" value="<?=$tenant_item['id'];?>">
+									<button type="submit" name="action_impersonate" class="btn btn-sm btn-outline-warning font-weight-bold" title="Masuk Mode Dashboard Admin Ini">
+										<i class="fa fa-user-secret mg-r-3"></i> Impersonate
+									</button>
+								</form>
+								<a href="./?Mikbotam=Dashboard&filter_tenant_id=<?=$tenant_item['id'];?>" class="btn btn-sm btn-outline-info font-weight-bold mg-l-3" title="Filter Statistik Dashboard">
+									<i class="fa fa-filter mg-r-3"></i> Filter Stats
+								</a>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+<?php endif; ?>
 		<div class="col-sm-6 col-xl-3">
 			<div class="card pd-20 pd-sm-10 boxed">
 				<div class="d-flex align-items-center">

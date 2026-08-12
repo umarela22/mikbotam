@@ -138,7 +138,13 @@
 
       <div class="sl-sideleft-menu">
         <?php if ($is_superadmin_clean): ?>
-        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers' || empty($page)) ? 'active' : '';?>">
+        <a href="./?Mikbotam=Dashboard" class="sl-menu-link <?=($page == 'Dashboard') ? 'active' : '';?>">
+          <div class="sl-menu-item">
+            <i class="menu-item-icon fa fa-dashboard tx-20 text-warning"></i>
+            <span class="menu-item-label font-weight-bold"> Dashboard Monitoring</span>
+          </div>
+        </a>
+        <a href="./?Mikbotam=manageusers" class="sl-menu-link <?=($page == 'manageusers') ? 'active' : '';?>">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa fa-users tx-20 text-warning"></i>
             <span class="menu-item-label font-weight-bold"> Kelola User Admin</span>

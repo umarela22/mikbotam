@@ -23,6 +23,14 @@ date_default_timezone_set('Asia/Jakarta');
 include 'system.config.php';
 
 function get_current_tenant_id() {
+	if (isset($_GET['filter_tenant_id'])) {
+		if ($_GET['filter_tenant_id'] === 'all' || intval($_GET['filter_tenant_id']) === -1) {
+			return 0; // 0 means all tenants / no tenant filter
+		}
+		if (intval($_GET['filter_tenant_id']) > 0) {
+			return intval($_GET['filter_tenant_id']);
+		}
+	}
 	if (isset($_GET['uid']) && intval($_GET['uid']) > 0) {
 		return intval($_GET['uid']);
 	}
@@ -30,6 +38,9 @@ function get_current_tenant_id() {
 		return intval($_SESSION['impersonate_user_id']);
 	}
 	if (isset($_SESSION['app_user_id']) && intval($_SESSION['app_user_id']) > 0) {
+		if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin') {
+			return 0; // Superadmin default sees global aggregate unless filtered
+		}
 		return intval($_SESSION['app_user_id']);
 	}
 	return 1;
