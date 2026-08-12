@@ -184,3 +184,54 @@ Stack trace:
 [12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database3 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1558
 [12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database4 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1564
 [12-Aug-2026 13:02:34 Asia/Jakarta] PHP Warning:  Undefined variable $database5 in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1565
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Undefined array key "text" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 111
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:46:41 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 128
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Undefined array key "text" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 111
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type bool in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 128
+[12-Aug-2026 16:47:21 Asia/Jakarta] PHP Warning:  Undefined variable $echoexperid in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1344
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Undefined array key "text" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 111
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Undefined array key "result" in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 114
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 117
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 118
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 119
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 122
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 123
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 124
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 125
+[12-Aug-2026 16:47:23 Asia/Jakarta] PHP Warning:  Trying to access array offset on value of type null in /home/andronet/mikbotam.andronet.xyz/Saldo/src/Bot.php on line 128
+[12-Aug-2026 16:47:24 Asia/Jakarta] PHP Warning:  Undefined variable $gagalprint in /home/andronet/mikbotam.andronet.xyz/Saldo/Core.php on line 1454

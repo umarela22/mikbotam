@@ -108,24 +108,24 @@ class Bot {
 
         if (FrameBot::$debug && $action != 'getUpdates') {
             self::$debug .= 'Method: ' . $action . "\n";
-            $datas = $data['text'];
+            $datas = isset($data['text']) ? $data['text'] : '';
             self::$debug .= 'Data: ' . str_replace("Array\n", '', print_r($data, true)) . "\n";
             $json    = json_decode($result, true);
-            $results = $json['result'];
+            $results = (is_array($json) && isset($json['result']) && is_array($json['result'])) ? $json['result'] : [];
             self::$debug .= "\n\n==========RESPONT BOT=========================\n\n\n";
             self::$debug .= "-------------------FROM---------------------------\n";
-            self::$debug .= "From ID : " . $results['from']['id'] . "\n";
-            self::$debug .= "From Username : " . $results['from']['username'] . "\n";
-            self::$debug .= "From Name : " . $results['from']['first_name'] . "\n";
+            self::$debug .= "From ID : " . (isset($results['from']['id']) ? $results['from']['id'] : '') . "\n";
+            self::$debug .= "From Username : " . (isset($results['from']['username']) ? $results['from']['username'] : '') . "\n";
+            self::$debug .= "From Name : " . (isset($results['from']['first_name']) ? $results['from']['first_name'] : '') . "\n";
             self::$debug .= "--------------------------------------------------\n\n\n";
             self::$debug .= "-------------------CHAT---------------------------\n";
-            self::$debug .= "Chat ID : " . $results['chat']['id'] . "\n";
-            self::$debug .= "Chat Name : " . $results["chat"]['first_name'] . "\n";
-            self::$debug .= "Chat Username : " . $results["chat"]["username"] . "\n";
-            self::$debug .= "Chat Type : " . $results["chat"]["type"] . "\n";
+            self::$debug .= "Chat ID : " . (isset($results['chat']['id']) ? $results['chat']['id'] : '') . "\n";
+            self::$debug .= "Chat Name : " . (isset($results['chat']['first_name']) ? $results['chat']['first_name'] : '') . "\n";
+            self::$debug .= "Chat Username : " . (isset($results['chat']['username']) ? $results['chat']['username'] : '') . "\n";
+            self::$debug .= "Chat Type : " . (isset($results['chat']['type']) ? $results['chat']['type'] : '') . "\n";
             self::$debug .= "--------------------------------------------------\n\n";
             self::$debug .= "--------------------TEXT--------------------------\n";
-            self::$debug .= $results["text"] . "\n";
+            self::$debug .= (isset($results['text']) ? $results['text'] : '') . "\n";
         }
 
         if ($httpcode == 401) {

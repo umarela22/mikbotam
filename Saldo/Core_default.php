@@ -1408,13 +1408,22 @@
                                  'parse_mode' => 'html'
                               ];
                               $succes = Bot::sendPhoto($qrcode, $options);
-                           }
-
-                           $success = json_decode($succes, true);
-                           if ($success['ok'] !== true) {
-                              $errorprint = true;
-                           }
-                        } else {
+                              $success = json_decode($succes, true);
+                              if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
+                                 $msg_options = [
+                                    'chat_id' => $chatidtele,
+                                    'text' => $caption,
+                                    'reply_markup' => json_encode(['inline_keyboard' => $keyboard]),
+                                    'parse_mode' => 'html'
+                                 ];
+                                 $succes = Bot::sendMessage($caption, $msg_options);
+                                 $success = json_decode($succes, true);
+                                 if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
+                                    $errorprint = true;
+                                 }
+                               }
+                            }
+                         } else {
                            $ganguan = true;
                         }
 
@@ -1452,7 +1461,7 @@
                      $ARRAY2 = $API->comm("/ip/hotspot/user/remove", ["numbers" => $add_user_api, ]);
                   }
 
-                  $gagalprint .= "";
+                  $gagalprint = "";
                   $gagalprint .= "<code>   Beli Voucher " . rupiah($princevoc) . "  </code>\n";
                   $gagalprint .= "<code>========================</code>\n";
                   $gagalprint .= "<code>  ID User  :</code> <code>$id</code>\n";

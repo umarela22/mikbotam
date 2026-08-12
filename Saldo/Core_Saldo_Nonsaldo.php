@@ -1454,15 +1454,24 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                               $options = [
                                  'chat_id' => $chatidtele,
                                  'caption' => $caption,
-                                 'reply_markup' => ['inline_keyboard' => $keyboard],
+                                 'reply_markup' => json_encode(['inline_keyboard' => $keyboard]),
                                  'parse_mode' => 'html'
                               ];
                               $succes = Bot::sendPhoto($qrcode, $options);
-                           }
-
-                           $success = json_decode($succes, true);
-                           if ($success['ok'] !== true) {
-                              $errorprint = true;
+                              $success = json_decode($succes, true);
+                              if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
+                                 $msg_options = [
+                                    'chat_id' => $chatidtele,
+                                    'text' => $caption,
+                                    'reply_markup' => json_encode(['inline_keyboard' => $keyboard]),
+                                    'parse_mode' => 'html'
+                                 ];
+                                 $succes = Bot::sendMessage($caption, $msg_options);
+                                 $success = json_decode($succes, true);
+                                 if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
+                                    $errorprint = true;
+                                 }
+                              }
                            }
                         } else {
                            $ganguan = true;
@@ -1502,7 +1511,7 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                      $ARRAY2 = $API->comm("/ip/hotspot/user/remove", ["numbers" => $add_user_api, ]);
                   }
 
-                  $gagalprint .= "";
+                  $gagalprint = "";
                   $gagalprint .= "<code>   Beli Voucher " . rupiah($princevoc) . "  </code>\n";
                   $gagalprint .= "<code>========================</code>\n";
                   $gagalprint .= "<code>  ID User  :</code> <code>$id</code>\n";
@@ -1826,7 +1835,7 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                               } else {
                                  $url = "http://$dnsname/login?username=$usernamereal&password=$passwordreal";}
 
-                              $qrcode     = 'http://qrickit.com/api/qr.php?d=' . urlencode($url) . '&addtext=' . urlencode($Name_router) . '&txtcolor=000000&fgdcolor=' . $Color . '&bgdcolor=FFFFFF&qrsize=500';
+                              $qrcode = 'http://qrickit.com/api/qr.php?d=' . urlencode($url) . '&addtext=' . urlencode($Name_router) . '&txtcolor=000000&fgdcolor=' . $Color . '&bgdcolor=FFFFFF&qrsize=500';
                               $keyboard[] = [
                                  ['text' => 'Go to Login', 'url' => $url],
                               ];
@@ -1834,15 +1843,24 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                               $options = [
                                  'chat_id' => $chatidtele,
                                  'caption' => $caption,
-                                 'reply_markup' => ['inline_keyboard' => $keyboard],
+                                 'reply_markup' => json_encode(['inline_keyboard' => $keyboard]),
                                  'parse_mode' => 'html'
                               ];
                               $succes = Bot::sendPhoto($qrcode, $options);
-                           }
-                                $success = json_decode($succes, true);
-                                if ($success['ok'] !== true) {
+                              $success = json_decode($succes, true);
+                              if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
+                                 $msg_options = [
+                                    'chat_id' => $chatidtele,
+                                    'reply_markup' => json_encode(['inline_keyboard' => $keyboard]),
+                                    'parse_mode' => 'html'
+                                 ];
+                                 $succes = Bot::sendMessage($caption, $msg_options);
+                                 $success = json_decode($succes, true);
+                                 if (!is_array($success) || !isset($success['ok']) || $success['ok'] !== true) {
                                     $errorprint = true;
-                                }
+                                 }
+                              }
+                           }
                             } else {
                                 $ganguan = true;
                             }
@@ -1879,7 +1897,7 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                      $ARRAY2 = $API->comm("/ip/hotspot/user/remove", ["numbers" => $add_user_api, ]);
                   }
 
-                  $gagalprint .= "";
+                  $gagalprint = "";
                   $gagalprint .= "<code>========================</code>\n";
                   $gagalprint .= "<code>  ID User  :</code> <code>$id</code>\n";
                   $gagalprint .= "<code>  Username :</code> @$usernamepelanggan\n";
