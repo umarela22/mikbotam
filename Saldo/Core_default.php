@@ -285,9 +285,10 @@
          $text .= "/qrcode - Terjemahkan QRCODE\n";
          $text .= "/deposit - Permintaan Deposit\n\n";
          $text .= "Admin commands==============\n";
-         $text .= "/tagihan_ppp - Ringkasan Tagihan PPPoE\n";
-         $text .= "/bayar_ppp &lt;user&gt; - Tandai Lunas PPPoE\n";
-         $text .= "/isolir_ppp &lt;user&gt; - Isolir User PPPoE\n";
+         $text .= "/tagihan - Ringkasan & Detail Tagihan PPPoE\n";
+         $text .= "/bayar &lt;user&gt; [bulan] - Bayar Tagihan PPPoE\n";
+         $text .= "/isolir &lt;user&gt; - Isolir User PPPoE\n";
+         $text .= "/buka &lt;user&gt; - Buka Isolir User PPPoE\n";
          $text .= "/daftarid - Daftar User Manual\n";
          $text .= "/topdown - Mengurangi Saldo User\n";
          $text .= "/topup - Top-up Saldo User\n";
