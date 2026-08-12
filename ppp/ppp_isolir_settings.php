@@ -13,6 +13,7 @@ include_once '../config/system.byte.php';
 include_once '../config/system.database.php';
 
 $message = '';
+$is_superadmin = (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin');
 
 if (isset($_POST['save_settings'])) {
 	$data = [
@@ -23,11 +24,17 @@ if (isset($_POST['save_settings'])) {
 	];
 
 	save_ppp_isolir_settings($data);
-	$message = '<div class="alert alert-success mg-b-15">Berhasil menyimpan pengaturan isolir & pengingat tagihan!</div>';
+	$message = '<div class="alert alert-success mg-b-15"><i class="fa fa-check-circle mg-r-5"></i> Berhasil menyimpan pengaturan isolir & pengingat tagihan!</div>';
 }
 
 $settings = get_ppp_isolir_settings();
 
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+$script_dir = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : '';
+$script_dir = str_replace(['/ppp', '\\ppp'], '', $script_dir);
+$base_url = rtrim($protocol . $host . $script_dir, '/');
+$cron_url = $base_url . '/tools/cron_ppp_billing.php';
 ?>
 
 <div class="sl-pagebody">
@@ -39,9 +46,9 @@ $settings = get_ppp_isolir_settings();
 	<?=$message;?>
 
 	<div class="row row-sm mg-t-10">
-		<div class="col-lg-8">
+		<div class="col-lg-<?= $is_superadmin ? '7' : '12'; ?>">
 			<div class="card bd-primary">
-				<div class="card-header bg-primary tx-white">
+				<div class="card-header bg-primary tx-white font-weight-bold">
 					<i class="fa fa-cogs mg-r-5"></i> Form Pengaturan Isolir & Tagihan
 				</div>
 				<div class="card-body pd-20">
@@ -83,27 +90,61 @@ $settings = get_ppp_isolir_settings();
 
 						<hr>
 
-						<button type="submit" name="save_settings" class="btn btn-primary"><i class="fa fa-save"></i> Simpan Pengaturan</button>
+						<button type="submit" name="save_settings" class="btn btn-primary font-weight-bold"><i class="fa fa-save mg-r-5"></i> Simpan Pengaturan</button>
 					</form>
 				</div>
 			</div>
 		</div>
 
-		<div class="col-lg-4">
+		<?php if ($is_superadmin): ?>
+		<div class="col-lg-5">
 			<div class="card bd-info">
-				<div class="card-header bg-info tx-white">
-					<i class="fa fa-info-circle mg-r-5"></i> Informasi Cron Task Otomatis
+				<div class="card-header bg-info tx-white font-weight-bold d-flex justify-content-between align-items-center">
+					<span><i class="fa fa-clock-o mg-r-5"></i> Informasi Cron Task Otomatis</span>
+					<span class="badge badge-warning tx-10">SUPERADMIN ONLY</span>
 				</div>
 				<div class="card-body pd-15 tx-13">
-					<p>Untuk mengaktifkan otomatisasi pengiriman pengingat Telegram dan eksekusi isolir tanpa membuka web, tambahkan perintah berikut ke <strong>Cron Job Linux</strong> atau <strong>Windows Task Scheduler</strong>:</p>
+					<p class="mg-b-10">Untuk mengaktifkan pengingat Telegram dan eksekusi auto-isolir secara otomatis, tambahkan perintah berikut ke menu <strong>Cron Jobs</strong> di server Anda:</p>
 
-					<div class="p-2 bg-dark text-white rounded font-monospace tx-11" style="word-break: break-all;">
-						php.exe c:\xampp\htdocs\mikbotam\tools\cron_ppp_billing.php
+					<!-- Option 1: cPanel CLI Method -->
+					<div class="mg-b-15">
+						<strong class="text-dark d-block mg-b-3"><i class="fa fa-server text-info"></i> 1. Hosting cPanel (PHP CLI Method):</strong>
+						<div class="p-2 bg-dark text-white rounded font-monospace tx-11" style="word-break: break-all;">
+							/usr/local/bin/php /home/username/public_html/tools/cron_ppp_billing.php &gt;/dev/null 2&gt;&amp;1
+						</div>
+						<small class="text-muted">Sesuaikan <code>/home/username/public_html</code> dengan path root direktori web cPanel Anda.</small>
 					</div>
 
-					<p class="mg-t-15 mg-b-0">Disarankan untuk menjalankan script ini 1x sehari pada jam 07:00 WIB.</p>
+					<!-- Option 2: cPanel Wget/Curl Method -->
+					<div class="mg-b-15">
+						<strong class="text-dark d-block mg-b-3"><i class="fa fa-globe text-primary"></i> 2. Hosting cPanel (Wget URL Method):</strong>
+						<div class="p-2 bg-dark text-white rounded font-monospace tx-11" style="word-break: break-all;">
+							wget -q -O - <?= htmlspecialchars($cron_url); ?> &gt;/dev/null 2&gt;&amp;1
+						</div>
+						<small class="text-muted">Metode paling praktis untuk cPanel shared hosting tanpa konfigurasi path CLI.</small>
+					</div>
+
+					<!-- Option 3: Linux VPS -->
+					<div class="mg-b-15">
+						<strong class="text-dark d-block mg-b-3"><i class="fa fa-linux text-success"></i> 3. Linux VPS / Crontab (Ubuntu / Debian):</strong>
+						<div class="p-2 bg-dark text-white rounded font-monospace tx-11" style="word-break: break-all;">
+							0 7 * * * php /var/www/html/tools/cron_ppp_billing.php &gt;/dev/null 2&gt;&amp;1
+						</div>
+					</div>
+
+					<!-- Option 4: Windows XAMPP -->
+					<div class="mg-b-10">
+						<strong class="text-dark d-block mg-b-3"><i class="fa fa-windows text-warning"></i> 4. Windows Server / Local XAMPP:</strong>
+						<div class="p-2 bg-dark text-white rounded font-monospace tx-11" style="word-break: break-all;">
+							C:\xampp\php\php.exe C:\xampp\htdocs\mikbotam\tools\cron_ppp_billing.php
+						</div>
+					</div>
+
+					<hr class="mg-y-10">
+					<p class="mg-b-0 tx-12 text-muted"><i class="fa fa-info-circle text-info"></i> <strong>Rekomendasi Waktu:</strong> Eksekusi cron 1x sehari pada jam <strong>07:00 WIB</strong> (Cron Format: <code>0 7 * * *</code>).</p>
 				</div>
 			</div>
 		</div>
+		<?php endif; ?>
 	</div>
 </div>
