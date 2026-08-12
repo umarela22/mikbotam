@@ -472,7 +472,7 @@
       }
 
       $inv_id = $invoices[0]['id'];
-      pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin');
+      $next_exp = pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin');
 
       // Re-enable on MikroTik
       $API = new routeros_api();
@@ -489,8 +489,13 @@
          $API->disconnect();
       }
 
-      $text = "✅ <b>PEMBAYARAN SUCCESS!</b>\n"
-            . "Tagihan PPPoE user <b>$user</b> berhasil ditandai <b>LUNAS</b> dan koneksi diaktifkan kembali.";
+      $tgl_jt = !empty($next_exp) ? date('d-m-Y', strtotime($next_exp)) : '-';
+
+      $text = "✅ <b>PEMBAYARAN SUCCESS!</b>\n\n"
+            . "👤 <b>User PPPoE:</b> <code>$user</code>\n"
+            . "💵 <b>Status:</b> <b>LUNAS</b>\n"
+            . "📅 <b>Jatuh Tempo Selanjutnya:</b> <b>$tgl_jt</b>\n\n"
+            . "Koneksi user telah diaktifkan kembali.";
 
       return Bot::sendMessage($text, ['parse_mode' => 'html']);
    });

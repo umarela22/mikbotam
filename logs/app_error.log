@@ -239,3 +239,17 @@ Stack trace:
 [12-Aug-2026 18:27:57 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
 [12-Aug-2026 18:28:11 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
 [12-Aug-2026 18:28:22 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:35:09 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:35:09 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined method medoo::id() in C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php:20
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php on line 20
+[12-Aug-2026 18:35:17 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:35:17 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: ppp_invoices.invoice_number in C:\xampp\htdocs\mikbotam\config\system.medoo.php:143
+Stack trace:
+#0 C:\xampp\htdocs\mikbotam\config\system.medoo.php(143): PDO->exec('INSERT INTO "pp...')
+#1 C:\xampp\htdocs\mikbotam\config\system.medoo.php(582): medoo->exec('INSERT INTO "pp...')
+#2 C:\xampp\htdocs\mikbotam\scratch\test_bayar_ppp_due_date.php(12): medoo->insert('ppp_invoices', Array)
+#3 {main}
+  thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 143
+[12-Aug-2026 18:35:25 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53

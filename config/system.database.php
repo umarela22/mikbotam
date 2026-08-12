@@ -2096,7 +2096,10 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
             'payment_method' => $method,
             'notes' => $notes
         ], $where_inv);
+
+        return isset($next_exp) ? $next_exp : null;
     }
+    return null;
 }
 
 function update_ppp_invoice_status($id, $status) {
