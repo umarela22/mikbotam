@@ -1521,43 +1521,56 @@ function resetdone($password) {
 function st_monitoring() {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = [];
+	if ($tenant_id) {
+		$where['app_user_id'] = $tenant_id;
+	}
 	$idowner = $mikbotamdata->select('st_monitoring', [
 		'id',
 		'Name',
 		'Host',
 		'Lokasi',
-	]);
-	return $idowner;
+	], $where);
+	return is_array($idowner) ? $idowner : [];
 }
 
 function st_monitoringnew($host, $name, $lokasi) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
 	$idowner = $mikbotamdata->insert('st_monitoring', [
 		'Name' => $name,
 		'Host' => $host,
 		'Lokasi' => $lokasi,
+		'app_user_id' => $tenant_id
 	]);
 }
 
 function st_monitoringupd($id, $host, $name, $lokasi) {
 
 	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ['id' => $id];
+	if ($tenant_id) {
+		$where = ['AND' => ['id' => $id, 'app_user_id' => $tenant_id]];
+	}
 	$idowner = $mikbotamdata->update('st_monitoring', [
 		'Name' => $name,
 		'Host' => $host,
 		'Lokasi' => $lokasi,
-	], [
-		'id' => $id
-	]);
+	], $where);
 }
 
 function st_monitoringdel($id) {
 
 	global $mikbotamdata;
-	$idowner = $mikbotamdata->delete('st_monitoring', [
-		'id' => $id
-	]);
+	$tenant_id = get_current_tenant_id();
+	$where = ['id' => $id];
+	if ($tenant_id) {
+		$where = ['AND' => ['id' => $id, 'app_user_id' => $tenant_id]];
+	}
+	$idowner = $mikbotamdata->delete('st_monitoring', $where);
 }
 
 function sikider() {
@@ -1736,6 +1749,7 @@ function init_ppp_billing_tables() {
         try { $pdo->exec("ALTER TABLE ppp_invoices ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE ppp_isolir_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_mikbotam ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE st_monitoring ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try {
             $pdo->exec("UPDATE re_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE re_operating SET app_user_id = 1 WHERE app_user_id IS NULL");
@@ -1745,6 +1759,7 @@ function init_ppp_billing_tables() {
             $pdo->exec("UPDATE ppp_invoices SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE ppp_isolir_settings SET app_user_id = 1 WHERE app_user_id IS NULL");
             $pdo->exec("UPDATE st_mikbotam SET app_user_id = 1 WHERE app_user_id IS NULL");
+            $pdo->exec("UPDATE st_monitoring SET app_user_id = 1 WHERE app_user_id IS NULL");
         } catch (Exception $ex) {}
 
         // Auto-migrate existing admin as Superadmin if app_users is empty
