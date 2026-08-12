@@ -2047,18 +2047,20 @@ function get_ppp_invoices($month_year = null, $status = null, $search = null) {
     return is_array($data) ? $data : [];
 }
 
-function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
+function pay_ppp_invoice($id, $method = 'CASH', $notes = '', $months = 1) {
     global $mikbotamdata;
     init_ppp_billing_tables();
     date_default_timezone_set('Asia/Jakarta');
     $tenant_id = get_current_tenant_id();
+
+    $months = intval($months) > 0 ? intval($months) : 1;
 
     $where_inv = ['id' => intval($id)];
     if ($tenant_id) {
         $where_inv = ['AND' => ['id' => intval($id), 'app_user_id' => $tenant_id]];
     }
 
-    $inv = $mikbotamdata->get('ppp_invoices', ['username_ppp', 'month_year'], $where_inv);
+    $inv = $mikbotamdata->get('ppp_invoices', ['username_ppp', 'month_year', 'amount'], $where_inv);
     if ($inv) {
         $user_ppp = $inv['username_ppp'];
         $settings = get_ppp_isolir_settings();
@@ -2073,9 +2075,9 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
 
         if ($cust && !empty($cust['exp_date'])) {
             $cur_exp = $cust['exp_date'];
-            $next_exp = date('Y-m-d', strtotime('+1 month', strtotime($cur_exp)));
+            $next_exp = date('Y-m-d', strtotime("+$months month", strtotime($cur_exp)));
         } else {
-            $next_month = date('Y-m', strtotime('+1 month'));
+            $next_month = date('Y-m', strtotime("+$months month"));
             $next_exp = $next_month . '-' . sprintf('%02d', $day);
         }
 
@@ -2090,12 +2092,34 @@ function pay_ppp_invoice($id, $method = 'CASH', $notes = '') {
             ]);
         }
 
+        $paid_notes = $notes . ($months > 1 ? " ($months Bulan)" : "");
+        $total_amount = intval($inv['amount']) * $months;
+
         $mikbotamdata->update('ppp_invoices', [
             'status' => 'PAID',
+            'amount' => $total_amount,
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_method' => $method,
-            'notes' => $notes
+            'notes' => $paid_notes
         ], $where_inv);
+
+        // Mark any future invoices for this customer within the paid period as PAID as well
+        if ($months > 1) {
+            for ($m = 1; $m < $months; $m++) {
+                $future_m = date('Y-m', strtotime("+$m month", strtotime($inv['month_year'] . '-01')));
+                $mikbotamdata->update('ppp_invoices', [
+                    'status' => 'PAID',
+                    'payment_date' => date('Y-m-d H:i:s'),
+                    'payment_method' => $method,
+                    'notes' => 'Dibayar di awal via invoice #' . $id
+                ], [
+                    'AND' => [
+                        'username_ppp' => $user_ppp,
+                        'month_year' => $future_m
+                    ]
+                ]);
+            }
+        }
 
         return isset($next_exp) ? $next_exp : null;
     }

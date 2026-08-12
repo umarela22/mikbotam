@@ -254,3 +254,7 @@ Stack trace:
   thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 143
 [12-Aug-2026 18:35:25 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
 [12-Aug-2026 18:39:54 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined variable $inv_id in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2114
+[12-Aug-2026 18:43:07 Asia/Jakarta] PHP Warning:  Undefined variable $inv_id in C:\xampp\htdocs\mikbotam\config\system.database.php on line 2114
+[12-Aug-2026 18:43:18 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53

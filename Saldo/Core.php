@@ -448,8 +448,8 @@
       return Bot::sendMessage($text, ['parse_mode' => 'html']);
    });
 
-   // Admin: /bayar_ppp <user>
-   $mkbot->cmd('/bayar_ppp', function ($user = null) {
+   // Admin: /bayar_ppp <user> [jumlah_bulan]
+   $mkbot->cmd('/bayar_ppp', function ($param = null, $arg2 = null) {
       include ('../config/system.conn.php');
       include_once ('../config/system.database.php');
       include_once ('../Api/routeros_api.class.php');
@@ -460,8 +460,12 @@
          return Bot::sendMessage("Maaf, perintah ini hanya untuk Administrator.");
       }
 
+      $parts = preg_split('/\s+/', trim($param));
+      $user = isset($parts[0]) ? $parts[0] : null;
+      $months = (isset($parts[1]) && intval($parts[1]) > 0) ? intval($parts[1]) : ((intval($arg2) > 0) ? intval($arg2) : 1);
+
       if (empty($user)) {
-         return Bot::sendMessage("Format salah. Gunakan: <code>/bayar_ppp &lt;username_pppoe&gt;</code>", ['parse_mode' => 'html']);
+         return Bot::sendMessage("Format salah. Gunakan: <code>/bayar_ppp &lt;username_pppoe&gt; [jumlah_bulan]</code>\nContoh bayar 3 bulan: <code>/bayar_ppp user_john 3</code>", ['parse_mode' => 'html']);
       }
 
       $month_year = date('Y-m');
@@ -474,7 +478,9 @@
       $inv = $invoices[0];
       $inv_id = $inv['id'];
       $inv_no = isset($inv['invoice_number']) ? $inv['invoice_number'] : "INV-$inv_id";
-      $amount_fmt = isset($inv['amount']) ? rupiah($inv['amount']) : 'Rp 0';
+      $monthly_amount = isset($inv['amount']) ? intval($inv['amount']) : 0;
+      $total_amount = $monthly_amount * $months;
+      $amount_fmt = rupiah($total_amount);
       $status = isset($inv['status']) ? $inv['status'] : 'UNPAID';
 
       if ($status === 'PAID') {
@@ -488,24 +494,27 @@
       $day = ($cust && !empty($cust['due_date'])) ? intval($cust['due_date']) : $default_day;
 
       if ($cust && !empty($cust['exp_date'])) {
-          $next_exp_preview = date('d-m-Y', strtotime('+1 month', strtotime($cust['exp_date'])));
+          $next_exp_preview = date('d-m-Y', strtotime("+$months month", strtotime($cust['exp_date'])));
       } else {
-          $next_exp_preview = date('d-m-Y', strtotime(date('Y-m', strtotime('+1 month')) . '-' . sprintf('%02d', $day)));
+          $next_exp_preview = date('d-m-Y', strtotime(date('Y-m', strtotime("+$months month")) . '-' . sprintf('%02d', $day)));
       }
 
-      $text = "⚠️ <b>KONFIRMASI PEMBAYARAN PPPoE</b>\n\n"
+      $durasi_str = ($months > 1) ? "$months Bulan" : "1 Bulan";
+
+      $text = "⚠️ <b>KONFIRMASI PEMBAYARAN PPPoE (" . strtoupper($durasi_str) . ")</b>\n\n"
             . "👤 <b>User PPPoE:</b> <code>$user</code>\n"
             . "🧾 <b>No Invoice:</b> <code>$inv_no</code>\n"
-            . "📋 <b>Periode:</b> $month_year\n"
-            . "💰 <b>Total Tagihan:</b> <b>$amount_fmt</b>\n"
+            . "📋 <b>Periode:</b> $month_year" . ($months > 1 ? " (s/d $months bulan ke depan)" : "") . "\n"
+            . "🗓️ <b>Durasi Pembayaran:</b> <b>$durasi_str</b>\n"
+            . "💰 <b>Total Tagihan:</b> <b>$amount_fmt</b>" . ($months > 1 ? " (" . rupiah($monthly_amount) . " x $months)" : "") . "\n"
             . "📅 <b>Jatuh Tempo Baru:</b> <b>$next_exp_preview</b>\n\n"
-            . "Apakah Anda yakin ingin memproses pelunasan tagihan ini?";
+            . "Apakah Anda yakin ingin memproses pelunasan $durasi_str ini?";
 
       $keyboard = [
          'inline_keyboard' => [
             [
-               ['text' => '✅ BAYAR SEKARANG', 'callback_data' => 'pay_ppp_yes_' . $inv_id],
-               ['text' => '❌ BATAL', 'callback_data' => 'pay_ppp_no_' . $inv_id]
+               ['text' => "✅ BAYAR ($durasi_str)", 'callback_data' => "pay_ppp_yes_{$inv_id}_{$months}"],
+               ['text' => '❌ BATAL', 'callback_data' => "pay_ppp_no_{$inv_id}"]
             ]
          ]
       ];
@@ -1264,7 +1273,11 @@
          include_once ('../config/system.database.php');
          include_once ('../Api/routeros_api.class.php');
 
-         $inv_id = intval(str_replace('pay_ppp_yes_', '', $command));
+         $raw = str_replace('pay_ppp_yes_', '', $command);
+         $parts = explode('_', $raw);
+         $inv_id = intval($parts[0]);
+         $months = (isset($parts[1]) && intval($parts[1]) > 0) ? intval($parts[1]) : 1;
+
          $invs = get_ppp_invoices(null, null, null);
          $target_inv = null;
          foreach ($invs as $i_item) {
@@ -1279,8 +1292,11 @@
          }
 
          $user = $target_inv['username_ppp'];
-         $amount_fmt = rupiah($target_inv['amount']);
-         $next_exp = pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin');
+         $next_exp = pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin', $months);
+
+         $monthly_amount = intval($target_inv['amount']);
+         $total_amount = $monthly_amount * $months;
+         $amount_fmt = rupiah($total_amount);
 
          // Re-enable on MikroTik
          $API = new routeros_api();
@@ -1298,13 +1314,14 @@
          }
 
          $tgl_jt = !empty($next_exp) ? date('d-m-Y', strtotime($next_exp)) : '-';
+         $durasi_str = ($months > 1) ? "$months Bulan" : "1 Bulan";
 
          $text = "✅ <b>PEMBAYARAN SUCCESS!</b>\n\n"
                . "👤 <b>User PPPoE:</b> <code>$user</code>\n"
-               . "💵 <b>Status:</b> <b>LUNAS</b>\n"
-               . "💰 <b>Nominal:</b> <b>$amount_fmt</b>\n"
+               . "💵 <b>Status:</b> <b>LUNAS ($durasi_str)</b>\n"
+               . "💰 <b>Total Nominal:</b> <b>$amount_fmt</b>\n"
                . "📅 <b>Jatuh Tempo Selanjutnya:</b> <b>$tgl_jt</b>\n\n"
-               . "Koneksi user telah diaktifkan kembali.";
+               . "Koneksi user telah diaktifkan kembali dan masa aktif ditambah $months bulan!";
 
          return Bot::sendMessage($text, ['parse_mode' => 'html']);
       }
