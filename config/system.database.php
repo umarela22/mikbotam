@@ -137,19 +137,28 @@ function decrypturl($pamerbojo) {
 }
 
 function lihatsaldo($id) {
-
 	global $mikbotamdata;
+	if (empty($id)) {
+		return 0;
+	}
 	$data = $mikbotamdata->get('re_settings', [
 		'saldo',
 		'id_user'
 	], [
-		'id_user' => $id
-
+		'id_user' => strval($id)
 	]);
 
-	$hasil = $data["saldo"];
+	if (!is_array($data) || !isset($data['saldo'])) {
+		// Fallback try with integer id
+		$data = $mikbotamdata->get('re_settings', [
+			'saldo',
+			'id_user'
+		], [
+			'id_user' => intval($id)
+		]);
+	}
 
-	return $hasil;
+	return (is_array($data) && isset($data['saldo'])) ? intval($data['saldo']) : 0;
 }
 
 function bagisaldo($fromid, $to_id, $subtotal){
