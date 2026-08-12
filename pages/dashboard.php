@@ -210,6 +210,8 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 </div>
 <?php endif; ?>
 <?php endif; ?>
+
+	<div class="row row-sm">
 		<div class="col-sm-6 col-xl-3">
 			<div class="card pd-20 pd-sm-10 boxed">
 				<div class="d-flex align-items-center">
