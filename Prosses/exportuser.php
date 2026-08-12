@@ -266,75 +266,81 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 				});
 			</script>
 			<?php
+		} elseif ($_GET['profile'] == 'save') {
+			$id_user  = isset($_POST['id_user']) ? trim($_POST['id_user']) : $id;
+			$username = isset($_POST['username']) ? trim($_POST['username']) : '';
+			$tlp      = isset($_POST['tlp']) ? trim($_POST['tlp']) : '';
+			$raw_saldo= isset($_POST['saldo']) ? trim($_POST['saldo']) : '0';
+			$saldo    = intval(preg_replace('/[^0-9]/', '', $raw_saldo));
+
+			updateuser($id_user, $username, $tlp, $saldo);
+			echo "<script>alert('Data user berhasil diperbarui!'); window.location.href = '../pages/index.php?Mikbotam=userlist';</script>";
+			exit();
 		} elseif ($_GET['profile'] == 'yes') {
 
 			$seeuser = lihatuser($id);
-			if (isset($_POST['save']) == 'save') {}
 			?>
 
-			<div class="card bd bd-primary ">
-				<div class="card-body ">
-					<div class="card mg-b-20  pd-20 pd-sm-20  bg-primary ">
-						<div class="signin-logo tx-center text-capitalize tx-20 tx-bold tx-white">
-							<img src="../img/newuser.svg" alt="Mikbotam.id" style="width: 85%;" class="rounded-circle border-light ">
-							<br>
-							<?=$seeuser['nama_seller'];
-							?>
-						</div>
-						<div class="tx-center text-capitalize tx-white">
-							<?=rupiah($seeuser['saldo']);
-							?>
-						</div>
-					</div>
-
-
-					<div class="input-group mg-t-10">
-						<span class="input-group-addon"><i class="fa fa-user tx-primary "></i></span>
-						<input type="text" class="form-control" placeholder="Username" name="username" value="<?=$seeuser['nama_seller'];
-						?>">
-					</div>
-					<div class="input-group mg-t-10">
-						<span class="input-group-addon "><i class="fa fa-qrcode tx-primary"></i></span>
-						<input type="text" class="form-control" placeholder="ID user" name="id_user"value="<?=$seeuser['id_user'];
-						?>">
-
-					</div>
-					<div class="input-group mg-t-10">
-						<span class="input-group-addon "><i class="fa fa-whatsapp tx-primary"></i></span>
-						<input type="text" class="form-control" placeholder="Whatsaap" name="tlp" value="<?=$seeuser['nomer_tlp'];
-						?>">
-
-					</div>
-					<div class="input-group mg-t-10">
-						<span class="input-group-addon "><i class="fa fa-usd tx-primary"></i></span>
-						<input type="text" class="form-control" placeholder="Saldo" name="saldo" value="<?=rupiah($seeuser['saldo']);
-						?>">
-
-					</div>
-
-
-				</div>
-				<div class="card-footer py-sm-custom">
-					<div class="row mg-t-0">
-
-						<div class="col-sm-15 mg-l-auto">
-							<div class="form-layout-footer">
-								<button class="btn btn-success lh-0 tx-xthin mg-r-0 mg-t-8" onclick="topupsaldo();return false;"><i class="fa fa-thumbs-up mg-r-2"></i>  Save</button>
-								<button class="btn btn-success lh-0 tx-xthin mg-r-2 mg-t-8"><i class="fa  fa-trash"> </i> Delete</button>
+			<form method="POST" action="../Prosses/exportuser.php?id=<?=htmlspecialchars($seeuser['id_user']);?>&profile=save">
+				<div class="card bd bd-primary">
+					<div class="card-body pd-20">
+						<div class="card mg-b-20 pd-20 pd-sm-20 bg-primary">
+							<div class="signin-logo tx-center text-capitalize tx-20 tx-bold tx-white">
+								<img src="../img/newuser.svg" alt="Mikbotam.id" style="width: 85%;" class="rounded-circle border-light">
+								<br>
+								<?=htmlspecialchars($seeuser['nama_seller']);?>
 							</div>
-							<!-- form-layout-footer -->
+							<div class="tx-center text-capitalize tx-white font-weight-bold mg-t-5">
+								Saldo: <?=rupiah($seeuser['saldo']);?>
+							</div>
 						</div>
 
-						<!-- col-8 -->
+						<div class="form-group mg-b-15">
+							<label class="font-weight-bold tx-12">ID User Telegram / System:</label>
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-qrcode tx-primary"></i></span>
+								<input type="text" class="form-control" name="id_user" value="<?=htmlspecialchars($seeuser['id_user']);?>" readonly>
+							</div>
+						</div>
+
+						<div class="form-group mg-b-15">
+							<label class="font-weight-bold tx-12">Nama User / Seller:</label>
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-user tx-primary"></i></span>
+								<input type="text" class="form-control" placeholder="Nama User" name="username" value="<?=htmlspecialchars($seeuser['nama_seller']);?>" required>
+							</div>
+						</div>
+
+						<div class="form-group mg-b-15">
+							<label class="font-weight-bold tx-12">Nomor Telepon / WhatsApp:</label>
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-whatsapp tx-primary"></i></span>
+								<input type="text" class="form-control" placeholder="No WhatsApp" name="tlp" value="<?=htmlspecialchars($seeuser['nomer_tlp']);?>">
+							</div>
+						</div>
+
+						<div class="form-group mg-b-15">
+							<label class="font-weight-bold tx-12">Jumlah Saldo (Rp):</label>
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-money tx-primary"></i></span>
+								<input type="number" class="form-control" placeholder="Saldo" name="saldo" value="<?=$seeuser['saldo'];?>" required>
+							</div>
+						</div>
 					</div>
-					<!-- card -->
+					<div class="card-footer pd-y-15 pd-x-20 bg-gray-200 d-flex justify-content-between align-items-center">
+						<button type="submit" class="btn btn-success pd-x-20"><i class="fa fa-save mg-r-5"></i> Simpan Perubahan</button>
+						<a href="../Prosses/exportuser.php?id=<?=htmlspecialchars($seeuser['id_user']);?>&profile=delete" class="btn btn-danger pd-x-15" onclick="return confirm('Hapus user ini beserta seluruh histori?');">
+							<i class="fa fa-trash mg-r-5"></i> Hapus User
+						</a>
+					</div>
 				</div>
-			</div>
+			</form>
 
 			<?php
 		} elseif ($_GET['profile'] == 'delete') {
 			$delete = deleteuser($id);
-			echo "<script>setTimeout(\"location.href = '../pages/index.php?Mikbotam=userlist';\");</script>";
+			echo "<script>alert('User berhasil dihapus!'); window.location.href = '../pages/index.php?Mikbotam=userlist';</script>";
+			exit();
 		}
 
 	} else {}

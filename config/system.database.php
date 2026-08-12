@@ -526,6 +526,21 @@ function lihatuser($id) {
 
 	return is_array($data) ? $data : [];
 }
+function updateuser($id, $nama_seller, $nomer_tlp, $saldo) {
+	global $mikbotamdata;
+	$tenant_id = get_current_tenant_id();
+	$where = ['id_user' => $id];
+	if ($tenant_id) {
+		$where = ['AND' => ['id_user' => $id, 'app_user_id' => $tenant_id]];
+	}
+	$update = $mikbotamdata->update('re_settings', [
+		'nama_seller' => $nama_seller,
+		'nomer_tlp'   => $nomer_tlp,
+		'saldo'       => $saldo
+	], $where);
+
+	return $update;
+}
 function deleteuser($id) {
 	global $mikbotamdata;
 	$tenant_id = get_current_tenant_id();
