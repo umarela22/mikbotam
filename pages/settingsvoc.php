@@ -40,6 +40,10 @@ if (!is_array($vouchers)) {
 $vouchers = array_values(array_filter($vouchers));
 
 $message = '';
+if (isset($_SESSION['flash_msg'])) {
+	$message = $_SESSION['flash_msg'];
+	unset($_SESSION['flash_msg']);
+}
 
 // Handle Form Submission (Add / Edit / Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -67,24 +71,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 		if ($index >= 0 && isset($vouchers[$index])) {
 			$vouchers[$index] = $item;
-			$message = '<div class="alert alert-success mg-b-15">Berhasil memperbarui paket voucher <strong>' . htmlspecialchars($item['Voucher']) . '</strong>!</div>';
+			$_SESSION['flash_msg'] = '<div class="alert alert-success mg-b-15">Berhasil memperbarui paket voucher <strong>' . htmlspecialchars($item['Voucher']) . '</strong>!</div>';
 		} else {
 			$vouchers[] = $item;
-			$message = '<div class="alert alert-success mg-b-15">Berhasil menambahkan paket voucher baru <strong>' . htmlspecialchars($item['Voucher']) . '</strong>!</div>';
+			$_SESSION['flash_msg'] = '<div class="alert alert-success mg-b-15">Berhasil menambahkan paket voucher baru <strong>' . htmlspecialchars($item['Voucher']) . '</strong>!</div>';
 		}
 
-		$json_save = json_encode(array_values($vouchers));
+		$vouchers = array_values(array_filter($vouchers));
+		foreach ($vouchers as $k => $v) {
+			$vouchers[$k]['id'] = strval($k);
+		}
+
+		$json_save = json_encode($vouchers);
 		upvoc($json_save, $id);
+		header("Location: ./?Mikbotam=SettingsVoc");
+		exit();
 	} elseif (isset($_POST['action_delete_voucher'])) {
 		$del_idx = intval($_POST['delete_index']);
 		if (isset($vouchers[$del_idx])) {
 			$deleted_name = $vouchers[$del_idx]['Voucher'];
 			unset($vouchers[$del_idx]);
 			$vouchers = array_values($vouchers);
+			foreach ($vouchers as $k => $v) {
+				$vouchers[$k]['id'] = strval($k);
+			}
 			$json_save = json_encode($vouchers);
 			upvoc($json_save, $id);
-			$message = '<div class="alert alert-info mg-b-15">Berhasil menghapus paket voucher <strong>' . htmlspecialchars($deleted_name) . '</strong>!</div>';
+			$_SESSION['flash_msg'] = '<div class="alert alert-info mg-b-15">Berhasil menghapus paket voucher <strong>' . htmlspecialchars($deleted_name) . '</strong>!</div>';
 		}
+		header("Location: ./?Mikbotam=SettingsVoc");
+		exit();
 	}
 }
 
