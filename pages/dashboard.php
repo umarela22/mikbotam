@@ -146,6 +146,7 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 			<?php endif; ?>
 		</div>
 	</div>
+</div>
 <?php endif; ?>
 
 	<div class="row row-sm">
@@ -289,9 +290,6 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 					</div>
 					<!-- card-body -->
 				</div>
-
-			</div>
-		
 			</div>
 		
 			<?php if (!$is_superadmin): ?>
