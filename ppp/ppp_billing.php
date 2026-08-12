@@ -277,8 +277,11 @@ foreach ($invoices as $inv) {
 									$badge = '<span class="badge badge-warning tx-12 pd-5-10">BELUM BAYAR</span>';
 								}
 
+								$isolir_set = get_ppp_isolir_settings();
+								$def_day = intval($isolir_set['due_date']);
 								$cust_info = $mikbotamdata->get('ppp_customers', ['exp_date', 'due_date'], ['username_ppp' => $inv['username_ppp']]);
-								$exp_disp = ($cust_info && !empty($cust_info['exp_date'])) ? $cust_info['exp_date'] : $inv['month_year'] . '-' . sprintf('%02d', ($cust_info && !empty($cust_info['due_date']) ? $cust_info['due_date'] : 20));
+								$user_day = ($cust_info && !empty($cust_info['due_date'])) ? intval($cust_info['due_date']) : $def_day;
+								$exp_disp = ($cust_info && !empty($cust_info['exp_date'])) ? $cust_info['exp_date'] : $inv['month_year'] . '-' . sprintf('%02d', $user_day);
 								?>
 								<tr>
 									<td><?=$no++;?></td>

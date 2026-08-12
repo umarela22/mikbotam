@@ -2228,6 +2228,21 @@ function generate_monthly_invoices($month_year, $secrets_list) {
                 'status' => 'UNPAID',
                 'app_user_id' => $tenant_id
             ]);
+
+            // Auto-create customer record with standard isolir due date if not present
+            $cust_exists = $mikbotamdata->get('ppp_customers', 'id', ['username_ppp' => $user]);
+            if (!$cust_exists) {
+                $isolir_set = get_ppp_isolir_settings();
+                $def_day = intval($isolir_set['due_date']);
+                $init_exp = $month_year . '-' . sprintf('%02d', $def_day);
+                $mikbotamdata->insert('ppp_customers', [
+                    'username_ppp' => $user,
+                    'due_date' => $def_day,
+                    'exp_date' => $init_exp,
+                    'app_user_id' => $tenant_id
+                ]);
+            }
+
             $count++;
         }
     }
