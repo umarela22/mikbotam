@@ -16,7 +16,7 @@ $profile = get_current_app_user_profile();
 if (isset($_POST['save_profile'])) {
     $full_name    = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
     $username     = isset($_POST['username']) ? trim($_POST['username']) : '';
-    $email        = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $email        = !empty($profile['email']) ? $profile['email'] : (isset($_POST['email']) ? trim($_POST['email']) : '');
     $new_password = isset($_POST['password']) ? $_POST['password'] : '';
 
     $res = update_app_user_profile($profile['id'], $full_name, $username, $email, $new_password);
@@ -70,7 +70,8 @@ if (isset($_POST['save_profile'])) {
 
                         <div class="form-group mg-b-15">
                             <label class="font-weight-bold">Alamat Email:</label>
-                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($profile['email']); ?>" required>
+                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($profile['email']); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+                            <small class="text-muted"><i class="fa fa-lock mg-r-2"></i> Alamat email digunakan sebagai identitas verifikasi akun dan tidak dapat diubah.</small>
                         </div>
 
                         <hr>
@@ -78,7 +79,7 @@ if (isset($_POST['save_profile'])) {
                         <div class="form-group mg-b-20">
                             <label class="font-weight-bold">Password Baru (Opsional):</label>
                             <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
-                            <small class="text-muted">Biarkan kosong jika hanya ingin mengubah nama, email, atau username.</small>
+                            <small class="text-muted">Biarkan kosong jika hanya ingin mengubah nama atau username.</small>
                         </div>
 
                         <button type="submit" name="save_profile" class="btn btn-success font-weight-bold pd-x-20">
