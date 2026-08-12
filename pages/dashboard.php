@@ -33,11 +33,11 @@
 		if (!is_array($datavoucher)) {
 			$datavoucher = [];
 		}
-		date_default_timezone_set('Asia/Jakarta');
+		$is_superadmin = (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin' && (!isset($_SESSION['impersonate_user_id']) || intval($_SESSION['impersonate_user_id']) === 0));
 		$API = new routeros_api();
 		$API->timeout = 1;
 
-		if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
+		if (!$is_superadmin && !empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
 			$IDENTITY      = $API->comm('/system/identity/getall');
 			$routername    = isset($IDENTITY['0']['name']) ? $IDENTITY['0']['name'] : 'Unknown';
 			$health        = $API->comm("/system/health/print");
@@ -99,7 +99,9 @@
 		});
 	});
 		
+<?php if (!$is_superadmin): ?>
 var _0x4214=["\x66\x61\x73\x74","\x66\x61\x64\x65\x49\x6E","\x2E\x2E\x2F\x47\x72\x61\x70\x68\x2F\x47\x65\x74\x61\x63\x74\x69\x76\x65\x2E\x70\x68\x70\x3F\x4F\x6E\x6C\x69\x6E\x65","\x6C\x6F\x61\x64","\x2E\x75\x73\x65\x72\x2D\x6F\x6E\x6C\x69\x6E\x65","\x2E\x2E\x2F\x47\x72\x61\x70\x68\x2F\x47\x65\x74\x61\x63\x74\x69\x76\x65\x2E\x70\x68\x70\x3F\x63\x70\x75","\x2E\x63\x70\x75\x2D\x6C\x6F\x61\x64","\x2E\x2E\x2F\x47\x72\x61\x70\x68\x2F\x47\x65\x74\x61\x63\x74\x69\x76\x65\x2E\x70\x68\x70\x3F\x66\x72\x65\x65\x2D\x6D\x65\x6D\x6F\x72\x79","\x2E\x66\x72\x65\x65\x2D\x6D\x65\x6D\x6F\x72\x79","\x2E\x2E\x2F\x47\x72\x61\x70\x68\x2F\x47\x65\x74\x61\x63\x74\x69\x76\x65\x2E\x70\x68\x70\x3F\x75\x70\x74\x69\x6D\x65","\x2E\x75\x70\x2D\x74\x69\x6D\x65","\x2E\x2E\x2F\x47\x72\x61\x70\x68\x2F\x47\x65\x74\x61\x63\x74\x69\x76\x65\x2E\x70\x68\x70\x3F\x61\x70\x6F\x6E\x6C\x69\x6E\x65","\x2E\x61\x70\x2D\x6F\x6E\x6C\x69\x6E\x65"];var timer;var auto_refresh=setInterval(function(){$(_0x4214[4])[_0x4214[3]](_0x4214[2])[_0x4214[1]](_0x4214[0]);$(_0x4214[6])[_0x4214[3]](_0x4214[5])[_0x4214[1]](_0x4214[0]);$(_0x4214[8])[_0x4214[3]](_0x4214[7])[_0x4214[1]](_0x4214[0]);$(_0x4214[10])[_0x4214[3]](_0x4214[9])[_0x4214[1]](_0x4214[0]);$(_0x4214[12])[_0x4214[3]](_0x4214[11])[_0x4214[1]](_0x4214[0])},10000)
+<?php endif; ?>
 </script>
 <div class="sl-pagebody">
 
@@ -281,8 +283,7 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 		</div>
 	
 		<div class="row row-sm mg-t-10-force">
-			<div class="col-lg-8">	<?php info();
-		?>
+			<div class="col-lg-<?=($is_superadmin ? '12' : '8');?>">	<?php if (!$is_superadmin) { info(); } ?>
 				<div class="card bd-primary mg-t-10 ">
 					<div class="card-header bg-primary tx-white ">
 							Transaksi dalam 1 bulan terkahir
@@ -356,6 +357,9 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 
 			</div>
 		
+			</div>
+		
+			<?php if (!$is_superadmin): ?>
 			<div class="col-lg-4 mg-t-10">
 			
 	
@@ -459,5 +463,6 @@ $selected_tenant_filter = isset($_GET['filter_tenant_id']) ? $_GET['filter_tenan
 					</div>
 				</div>
 			</div>
+			<?php endif; ?>
 		</div>
 	</div>
