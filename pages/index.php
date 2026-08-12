@@ -111,6 +111,9 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 		case "about":
 			include "../about/about.php";
 			break;
+		case "sessionedit":
+			include "../admin/sessionedit.php";
+			break;
 		case "boteditor":
 			include "boteditor.php";
 			break;

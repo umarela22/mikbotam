@@ -158,24 +158,6 @@
             <span class="badge badge-info tx-10 pd-3-8 mg-l-auto">SMTP</span>
           </div>
         </a>
-        <a href="#" class="sl-menu-link <?=$toolsshow;?>">
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-wrench tx-20"></i>
-            <span class="menu-item-label"> Tools</span>
-            <i class="menu-item-arrow fa fa-angle-down"></i>
-          </div>
-        </a>
-        <ul class="sl-menu-sub nav flex-column">
-          <li class="nav-item"><a class="nav-link <?=$setwebhookmenu;?>" href="./?Mikbotam=setwebhook"><i class="fa fa-cog "></i> Set Webhook</a></li>
-          <li class="nav-item"><a class="nav-link <?=$boteditor;?> " href="./?Mikbotam=boteditor&bottype=Core"><i class="fa fa-pencil "></i> Edit Bot Core</a></li>
-        </ul>
-        <a href="./?Mikbotam=about" class="sl-menu-link <?=$about;?>">
-          <div class="sl-menu-item">
-            <i class="menu-item-icon fa fa-info-circle tx-20"></i>
-            <span class="menu-item-label"> About</span>
-          </div>
-        </a>
-
         <?php else: ?>
         <a href="index.php" class="sl-menu-link <?=empty($page) ? 'active' : '';?>">
           <div class="sl-menu-item">
@@ -183,6 +165,8 @@
             <span class="menu-item-label"> Dashboard</span>
           </div><!-- menu-item -->
         </a>
+        <?php endif; ?>
+
         <a href="#" class="sl-menu-link  <?=$Record . $Broadcast . $sendVoc . $NewUser . $UserList . $topdownsaldo . $topupsaldo . " " . $Nshow;?> ">
           <div class="sl-menu-item">
              <i class="menu-item-icon fa fa-clipboard tx-22"></i>
@@ -268,7 +252,6 @@
             <span class="menu-item-label"> About</span>
           </div>
         </a>
-        <?php endif; ?>
       </div>
 
       <br>
@@ -298,7 +281,7 @@
                 <?php if (isset($_SESSION['app_user_role']) && $_SESSION['app_user_role'] === 'superadmin'): ?>
                 <li><a href="./?Mikbotam=manageusers"><i class="menu-item-icon fa fa-users text-primary"></i> <span class="font-weight-bold"> Kelola User</span></a></li>
                 <?php endif; ?>
-                <li><a href="../admin/index.php?admin=sessionedit"><i class="menu-item-icon fa fa-user"></i> <span class=""> Edit Profile</span></a></li>
+                <li><a href="./?Mikbotam=sessionedit"><i class="menu-item-icon fa fa-user"></i> <span class=""> Edit Profile</span></a></li>
                 <li><a href="./?Mikbotam=Settings"><i class="menu-item-icon fa fa-file"></i><span class=""> Settings</span></a></li>
                 <li><a href="./?Mikbotam=logout"><i class="menu-item-icon fa fa-sign-out"></i><span class=""> Sign Out</span></a></li>
               </ul>
