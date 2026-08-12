@@ -32,7 +32,7 @@ function get_current_tenant_id() {
 	if (isset($_SESSION['app_user_id']) && intval($_SESSION['app_user_id']) > 0) {
 		return intval($_SESSION['app_user_id']);
 	}
-	return null;
+	return 1;
 }
 
 function daftar($id, $name) {
@@ -145,7 +145,8 @@ function lihatsaldo($id) {
 		'saldo',
 		'id_user'
 	], [
-		'id_user' => strval($id)
+		'AND' => ['id_user' => strval($id)],
+		'ORDER' => ['id' => 'DESC']
 	]);
 
 	if (!is_array($data) || !isset($data['saldo'])) {
@@ -154,7 +155,8 @@ function lihatsaldo($id) {
 			'saldo',
 			'id_user'
 		], [
-			'id_user' => intval($id)
+			'AND' => ['id_user' => intval($id)],
+			'ORDER' => ['id' => 'DESC']
 		]);
 	}
 
@@ -538,15 +540,14 @@ function lihatuser($id) {
 function updateuser($id, $nama_seller, $nomer_tlp, $saldo) {
 	global $mikbotamdata;
 	$tenant_id = get_current_tenant_id();
-	$where = ['id_user' => $id];
-	if ($tenant_id) {
-		$where = ['AND' => ['id_user' => $id, 'app_user_id' => $tenant_id]];
-	}
 	$update = $mikbotamdata->update('re_settings', [
 		'nama_seller' => $nama_seller,
 		'nomer_tlp'   => $nomer_tlp,
-		'saldo'       => $saldo
-	], $where);
+		'saldo'       => $saldo,
+		'app_user_id' => $tenant_id ? $tenant_id : 1
+	], [
+		'id_user' => $id
+	]);
 
 	return $update;
 }
