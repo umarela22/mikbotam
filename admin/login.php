@@ -51,9 +51,9 @@
         <meta name="msapplication-TileColor" content="#008080">
         <meta name="theme-color" content="#008080">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="Premium Govoucher Mikrotik">
-        <meta name="author" content="Mikbotam">
-        <title>MIKBOTAM</title>
+        <meta name="description" content="MIKBOTAM - Mod by Andro Network">
+        <meta name="author" content="Andro Network">
+        <title>MIKBOTAM - Mod by Andro Network</title>
     <link href="../lib/font-awesome/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/Mikbotam.min.css">
 
@@ -67,12 +67,10 @@
         
         
         <div class="signin-logo">
-            <center><img src="../img/logoM.svg" alt="Mikbotam" class="img-fluid center" style="width: 60%;padding-top: 0;">
-          <h5><p class="mg-b-0" style="
-    font-size: 30px;
-    /* align-items: center; */
-    letter-spacing: -1px;
-">MIKBOTAM</p></h5></center></div>
+            <center><img src="../img/logoM.svg" alt="Mikbotam" class="img-fluid center" style="width: 50%;padding-top: 0;">
+          <h5><p class="mg-b-0" style="font-size: 26px; letter-spacing: -1px;">MIKBOTAM</p></h5>
+          <span class="tx-12 font-weight-bold text-success d-block mg-t-2">Mod by Andro Network</span>
+          </center></div>
 
         <div class="input-group mg-t-10">
   <span class="input-group-addon"><i class="fa fa-user tx-primary "></i></span>

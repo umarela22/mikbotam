@@ -20,10 +20,10 @@
         <meta name="msapplication-TileColor" content="#008080">
         <meta name="theme-color" content="#008080">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="Premium Govoucher Mikrotik">
-        <meta name="author" content="Mikbotam">
+        <meta name="description" content="MIKBOTAM - Mod by Andro Network">
+        <meta name="author" content="Andro Network">
         <meta name="thumbnail" content="../img/logoM.png" />
-        <title>MIKBOTAM</title>
+        <title>MIKBOTAM - Mod by Andro Network</title>
         <link href="../lib/font-awesome/css/font-awesome.css" rel="stylesheet">
         <link href="../lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
         <link rel="stylesheet" href="../css/Mikbotam.min.css">

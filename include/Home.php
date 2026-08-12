@@ -113,8 +113,10 @@
 
 
 
- <body <?=$hideBodyHotspot . $hideBodyPPP;?>>
-    <div id="mikbotam" class="sl-logo bg-primary tx-white">MIKBOTAM</div>
+    <div id="mikbotam" class="sl-logo bg-primary tx-white d-flex flex-column align-items-center justify-content-center pd-y-10">
+      <span class="tx-18 tx-bold tx-spacing-1">MIKBOTAM</span>
+      <span class="tx-11 tx-normal text-warning font-weight-bold" style="letter-spacing:0px;">Mod by Andro Network</span>
+    </div>
 
     <div class="sl-sideleft">
       <div class="input-group input-group-search">
