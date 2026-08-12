@@ -72,18 +72,32 @@
           <span class="tx-12 font-weight-bold text-success d-block mg-t-2">Mod by Andro Network</span>
           </center></div>
 
+        <?php if (isset($_SESSION['login_error']) && $_SESSION['login_error'] === 'unverified'): ?>
+            <?php $un_email = isset($_SESSION['unverified_email']) ? $_SESSION['unverified_email'] : ''; ?>
+            <div class="alert alert-warning pd-10 tx-12 mg-t-10 text-center">
+                <strong><i class="fa fa-warning"></i> Email Belum Diverifikasi!</strong><br>
+                Silakan cek Inbox/Spam email Anda.<br>
+                <a href="resend_verification.php?email=<?= urlencode($un_email); ?>" class="tx-bold tx-primary">Kirim Ulang Link Verifikasi</a>
+            </div>
+            <?php 
+                unset($_SESSION['login_error']);
+                unset($_SESSION['unverified_email']);
+            ?>
+        <?php endif; ?>
+
         <div class="input-group mg-t-10">
   <span class="input-group-addon"><i class="fa fa-user tx-primary "></i></span>
-  <input type="text" class="form-control" placeholder="Username" name="username" id="username">
+  <input type="text" class="form-control" placeholder="Email atau Username" name="username" id="username">
 </div>
 <div class="input-group mg-t-10">
   <span class="input-group-addon "><i class="fa fa-lock tx-primary"></i></span>
-  <input type="password" class="form-control" id="password" placeholder="password" name="password">
+  <input type="password" class="form-control" id="password" placeholder="Password" name="password">
 
 </div>
 
    <button type="submit" class="btn btn-success btn-block mg-t-20 lh-10" title="Sign In">Sign In</button>
-   <a href='../admin/forgot_id.php ' class='btn btn-success btn-block mg-t-10 lh-10'>Forgot password?</a>
+   <a href='register.php' class='btn btn-outline-success btn-block mg-t-10 lh-10'>Daftar Akun Baru</a>
+   <a href='../admin/forgot_id.php' class='btn btn-light btn-block mg-t-10 lh-10 text-muted'>Forgot password?</a>
 
       </div>
 

@@ -1072,27 +1072,43 @@ function ceklogin($user, $pass) {
 	global $mikbotamdata;
 	init_ppp_billing_tables();
 
-	$cols = ['id', 'username', 'password', 'full_name', 'role', 'status', 'mikrotik_ip', 'mikrotik_username', 'mikrotik_password', 'mikrotik_port', 'bot_token', 'owner_telegram_id'];
-	$rows = $mikbotamdata->select('app_users', $cols, ['AND' => ['username' => $user, 'status' => 'active']]);
+	$cols = ['id', 'username', 'email', 'password', 'full_name', 'role', 'status', 'mikrotik_ip', 'mikrotik_username', 'mikrotik_password', 'mikrotik_port', 'bot_token', 'owner_telegram_id'];
+	$rows = $mikbotamdata->select('app_users', $cols, [
+		'OR' => [
+			'username' => $user,
+			'email' => $user
+		]
+	]);
 	$app_user = (is_array($rows) && isset($rows[0])) ? $rows[0] : false;
 	if ($app_user) {
-		$valid = false;
-		if (password_verify($pass, $app_user['password'])) {
-			$valid = true;
-		} elseif ($app_user['password'] === $pass) {
-			$valid = true;
-			$newHash = password_hash($pass, PASSWORD_BCRYPT);
-			$mikbotamdata->update('app_users', ['password' => $newHash], ['id' => $app_user['id']]);
-		}
-
-		if ($valid) {
+		if ($app_user['status'] === 'unverified') {
 			if (session_status() === PHP_SESSION_NONE) {
 				@session_start();
 			}
-			$_SESSION['app_user_id']   = $app_user['id'];
-			$_SESSION['app_user_role'] = $app_user['role'];
-			$_SESSION['app_full_name'] = $app_user['full_name'];
-			return true;
+			$_SESSION['login_error'] = 'unverified';
+			$_SESSION['unverified_email'] = !empty($app_user['email']) ? $app_user['email'] : $app_user['username'];
+			return false;
+		}
+
+		if ($app_user['status'] === 'active') {
+			$valid = false;
+			if (password_verify($pass, $app_user['password'])) {
+				$valid = true;
+			} elseif ($app_user['password'] === $pass) {
+				$valid = true;
+				$newHash = password_hash($pass, PASSWORD_BCRYPT);
+				$mikbotamdata->update('app_users', ['password' => $newHash], ['id' => $app_user['id']]);
+			}
+
+			if ($valid) {
+				if (session_status() === PHP_SESSION_NONE) {
+					@session_start();
+				}
+				$_SESSION['app_user_id']   = $app_user['id'];
+				$_SESSION['app_user_role'] = $app_user['role'];
+				$_SESSION['app_full_name'] = $app_user['full_name'];
+				return true;
+			}
 		}
 	}
 
@@ -1777,6 +1793,9 @@ function init_ppp_billing_tables() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )");
 
+        try { $pdo->exec("ALTER TABLE app_users ADD COLUMN email TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE app_users ADD COLUMN verification_token TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE app_users ADD COLUMN token_expires_at DATETIME"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
@@ -2247,4 +2266,177 @@ function generate_monthly_invoices($month_year, $secrets_list) {
         }
     }
     return $count;
+}
+
+function send_verification_email($email, $full_name, $token) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $script_dir = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : '';
+    $script_dir = str_replace(['/admin', '\\admin'], '', $script_dir);
+    $base_url = rtrim($protocol . $host . $script_dir, '/');
+    
+    $verify_link = $base_url . '/admin/verify_email.php?token=' . urlencode($token);
+
+    $subject = "Verifikasi Email Akun Admin Mikbotam";
+    $message = '
+    <html>
+    <head>
+      <title>Verifikasi Email Akun Admin Mikbotam</title>
+      <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 550px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-top: 4px solid #008080; }
+        .btn { display: inline-block; padding: 12px 24px; background-color: #008080; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+        .footer { margin-top: 25px; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 15px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2 style="color: #008080; margin-top: 0;">Selamat Datang di Mikbotam!</h2>
+        <p>Halo <strong>' . htmlspecialchars($full_name) . '</strong>,</p>
+        <p>Terima kasih telah mendaftar akun Admin Mikbotam. Silakan klik tombol di bawah ini untuk mengaktifkan akun Anda:</p>
+        <p style="text-align: center;">
+          <a href="' . $verify_link . '" class="btn">✉️ Verifikasi Email Saya Sekarang</a>
+        </p>
+        <p style="font-size: 13px; color: #666;">Atau salin dan tempel tautan berikut di browser Anda:<br>
+          <a href="' . $verify_link . '">' . $verify_link . '</a>
+        </p>
+        <p style="font-size: 12px; color: #999;">Link verifikasi ini berlaku selama 24 jam.</p>
+        <div class="footer">
+          <p>Jika Anda tidak merasa mendaftar akun ini, silakan abaikan pesan email ini.<br>&copy; ' . date('Y') . ' Mikbotam - Mod by Andro Network</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    ';
+
+    $headers  = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: Mikbotam System <no-reply@" . $host . ">" . "\r\n";
+
+    return @mail($email, $subject, $message, $headers);
+}
+
+function register_new_app_user($email, $full_name, $password) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+
+    $email = trim(strtolower($email));
+    $full_name = trim($full_name);
+
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'Format email tidak valid.'];
+    }
+
+    if (empty($full_name)) {
+        return ['success' => false, 'message' => 'Nama lengkap wajib diisi.'];
+    }
+
+    if (strlen($password) < 6) {
+        return ['success' => false, 'message' => 'Password minimal harus 6 karakter.'];
+    }
+
+    $username = explode('@', $email)[0];
+    $exists = $mikbotamdata->get('app_users', 'id', [
+        'OR' => [
+            'email' => $email,
+            'username' => $username,
+            'username' => $email
+        ]
+    ]);
+
+    if ($exists) {
+        return ['success' => false, 'message' => 'Email atau Username sudah terdaftar di sistem.'];
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $token_expires_at = date('Y-m-d H:i:s', strtotime('+24 hours'));
+    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+    $insert = [
+        'username' => $email,
+        'email' => $email,
+        'password' => $hashed_password,
+        'full_name' => $full_name,
+        'role' => 'admin',
+        'status' => 'unverified',
+        'verification_token' => $token,
+        'token_expires_at' => $token_expires_at,
+        'mikrotik_port' => 8728
+    ];
+
+    $mikbotamdata->insert('app_users', $insert);
+    $user_id = $mikbotamdata->get('app_users', 'id', ['email' => $email]);
+
+    if ($user_id) {
+        send_verification_email($email, $full_name, $token);
+        return [
+            'success' => true,
+            'message' => 'Registrasi berhasil! Link verifikasi telah dikirim ke email <strong>' . htmlspecialchars($email) . '</strong>. Silakan cek Inbox atau folder Spam email Anda untuk mengaktifkan akun.',
+            'token' => $token
+        ];
+    }
+
+    return ['success' => false, 'message' => 'Gagal mendaftarkan akun. Silakan coba lagi.'];
+}
+
+function verify_app_user_email($token) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+
+    if (empty($token)) {
+        return ['success' => false, 'message' => 'Token verifikasi tidak valid.'];
+    }
+
+    $user = $mikbotamdata->get('app_users', '*', ['verification_token' => $token]);
+
+    if (!$user) {
+        return ['success' => false, 'message' => 'Token verifikasi tidak ditemukan atau sudah pernah digunakan.'];
+    }
+
+    if (!empty($user['token_expires_at']) && strtotime($user['token_expires_at']) < time()) {
+        return ['success' => false, 'message' => 'Token verifikasi telah kadaluarsa (lebih dari 24 jam). Silakan kirim ulang email verifikasi.', 'email' => $user['email']];
+    }
+
+    $mikbotamdata->update('app_users', [
+        'status' => 'active',
+        'verification_token' => null,
+        'token_expires_at' => null
+    ], ['id' => $user['id']]);
+
+    return [
+        'success' => true,
+        'message' => 'Email Anda (<strong>' . htmlspecialchars($user['email']) . '</strong>) berhasil diverifikasi! Akun Anda kini AKTIF. Silakan Sign In.',
+        'email' => $user['email']
+    ];
+}
+
+function resend_verification_email($email) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+
+    $email = trim(strtolower($email));
+    $user = $mikbotamdata->get('app_users', '*', ['email' => $email]);
+
+    if (!$user) {
+        return ['success' => false, 'message' => 'Email tidak terdaftar di sistem.'];
+    }
+
+    if ($user['status'] === 'active') {
+        return ['success' => false, 'message' => 'Akun ini sudah AKTIF. Silakan langsung Sign In.'];
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $token_expires_at = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+    $mikbotamdata->update('app_users', [
+        'verification_token' => $token,
+        'token_expires_at' => $token_expires_at
+    ], ['id' => $user['id']]);
+
+    send_verification_email($user['email'], $user['full_name'], $token);
+
+    return [
+        'success' => true,
+        'message' => 'Email verifikasi baru telah dikirimkan ke <strong>' . htmlspecialchars($email) . '</strong>. Silakan cek Inbox atau folder Spam.'
+    ];
 }
