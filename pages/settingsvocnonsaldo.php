@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			"type"           => trim($_POST['type']),
 			"typechar"       => trim($_POST['typechar']),
 			"length"         => strval(intval($_POST['length'])),
+			"prefix"         => trim($_POST['prefix']),
 			"Color"          => trim($_POST['Color'])
 		];
 
@@ -143,6 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 									</td>
 									<td>
 										<small>
+											Prefix: <strong><?=!empty($v['prefix']) ? htmlspecialchars($v['prefix']) : '-';?></strong><br>
 											Tipe: <strong><?=$v['type'] === 'up' ? 'User & Pass' : 'Voucher Only';?></strong><br>
 											Char: <strong><?=htmlspecialchars($v['typechar']);?></strong> (<?=$v['length'];?> Karakter)
 										</small>
@@ -224,14 +226,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						</div>
 
 						<!-- Format Kode -->
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
+							<label class="font-weight-bold">Prefix Kode (Awalan):</label>
+							<input type="text" name="prefix" id="field_prefix" class="form-control" placeholder="Contoh: VC-, NET-">
+						</div>
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Tipe Login Voucher:</label>
 							<select name="type" id="field_type" class="form-control">
 								<option value="vc">Voucher Only (User = Pass)</option>
 								<option value="up">Username & Password Beda</option>
 							</select>
 						</div>
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Karakter Kode:</label>
 							<select name="typechar" id="field_typechar" class="form-control">
 								<option value="lower">Huruf Kecil (abc)</option>
@@ -240,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 								<option value="mix">Campuran (aB1)</option>
 							</select>
 						</div>
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Panjang Kode (Karakter):</label>
 							<input type="number" name="length" id="field_length" class="form-control" value="4" min="3" max="12" required>
 						</div>
@@ -277,6 +283,7 @@ function openAddVoucherModal() {
 	document.getElementById('field_Text_List').value = '';
 	document.getElementById('field_Limit').value = '';
 	document.getElementById('field_limit_total').value = '';
+	document.getElementById('field_prefix').value = '';
 	document.getElementById('field_type').value = 'vc';
 	document.getElementById('field_typechar').value = 'lower';
 	document.getElementById('field_length').value = '4';
@@ -293,6 +300,7 @@ function openEditVoucherModal(idx, v) {
 	document.getElementById('field_server').value = v.server || 'all';
 	document.getElementById('field_Limit').value = v.Limit || '';
 	document.getElementById('field_limit_total').value = v.limit_total || '';
+	document.getElementById('field_prefix').value = v.prefix || '';
 	document.getElementById('field_type').value = v.type || 'vc';
 	document.getElementById('field_typechar').value = v.typechar || 'lower';
 	document.getElementById('field_length').value = v.length || '4';

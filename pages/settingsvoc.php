@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			"type"           => trim($_POST['type']),
 			"typechar"       => trim($_POST['typechar']),
 			"length"         => strval(intval($_POST['length'])),
+			"prefix"         => trim($_POST['prefix']),
 			"Color"          => trim($_POST['Color'])
 		];
 
@@ -154,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 									</td>
 									<td>
 										<small>
+											Prefix: <strong><?=!empty($v['prefix']) ? htmlspecialchars($v['prefix']) : '-';?></strong><br>
 											Tipe: <strong><?=$v['type'] === 'up' ? 'User & Pass' : 'Voucher Only';?></strong><br>
 											Char: <strong><?=htmlspecialchars($v['typechar']);?></strong> (<?=$v['length'];?> Karakter)
 										</small>
@@ -180,53 +182,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	</div>
 </div>
 
-<!-- Modal Form Tambah / Edit Voucher -->
+<!-- Modal Add/Edit Voucher -->
 <div class="modal fade" id="voucherModal" tabindex="-1" role="dialog" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<form method="POST" action="?Mikbotam=SettingsVoc">
 				<input type="hidden" name="voucher_index" id="form_voucher_index" value="-1">
 				<div class="modal-header bg-primary tx-white">
-					<h6 class="modal-title font-weight-bold" id="modalTitle">Form Paket Voucher</h6>
-					<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<h5 class="modal-title" id="modalTitle">Tambah Paket Voucher Baru</h5>
+					<button type="button" class="close tx-white" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				<div class="modal-body pd-20">
 					<div class="row row-sm">
-						<!-- Nama & Deskripsi -->
+						<!-- Nama Paket & Keterangan -->
 						<div class="col-md-6 form-group">
 							<label class="font-weight-bold">Nama Paket Voucher:</label>
-							<input type="text" name="Voucher" id="field_Voucher" class="form-control" placeholder="Contoh: 1 JAM 2k" required>
+							<input type="text" name="Voucher" id="field_Voucher" class="form-control" placeholder="Contoh: 1 Jam 2rb" required>
 						</div>
 						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Keterangan / Text List Bot:</label>
-							<input type="text" name="Text_List" id="field_Text_List" class="form-control" placeholder="Contoh: Paket 1 Jam Kuota Unlimited">
+							<label class="font-weight-bold">Teks Tombol / Deskripsi Bot:</label>
+							<input type="text" name="Text_List" id="field_Text_List" class="form-control" placeholder="Contoh: 1 Jam - Rp 2.000" required>
 						</div>
 
-						<!-- Profile & Server MikroTik -->
+						<!-- Profil MikroTik & Server -->
 						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Profile Hotspot MikroTik:</label>
+							<label class="font-weight-bold">Profil Hotspot MikroTik:</label>
 							<select name="profile" id="field_profile" class="form-control" required>
-								<option value="">-- Pilih Profile --</option>
-								<?php foreach ($ARRAY as $prof): ?>
-									<option value="<?=htmlspecialchars($prof['name']);?>"><?=htmlspecialchars($prof['name']);?></option>
-								<?php endforeach; ?>
+								<?php if (empty($ARRAY)): ?>
+									<option value="">-- Gagal mengambil profil / Router terputus --</option>
+								<?php else: ?>
+									<?php foreach ($ARRAY as $prof): ?>
+										<option value="<?=$prof['name'];?>"><?=$prof['name'];?></option>
+									<?php endforeach; ?>
+								<?php endif; ?>
 							</select>
 						</div>
 						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Server Hotspot MikroTik:</label>
+							<label class="font-weight-bold">Server Hotspot:</label>
 							<select name="server" id="field_server" class="form-control">
 								<option value="all">all (Semua Server)</option>
-								<?php foreach ($serverhot as $srv): ?>
-									<option value="<?=htmlspecialchars($srv['name']);?>"><?=htmlspecialchars($srv['name']);?></option>
+								<?php foreach ($serverhot as $serv): ?>
+									<option value="<?=$serv['name'];?>"><?=$serv['name'];?></option>
 								<?php endforeach; ?>
 							</select>
 						</div>
 
-						<!-- Harga & Markup -->
+						<!-- Harga Beli & Harga Jual -->
 						<div class="col-md-6 form-group">
-							<label class="font-weight-bold">Harga Pokok / HPP (Rp):</label>
+							<label class="font-weight-bold">Harga Modal / Potong Saldo (Rp):</label>
 							<input type="number" name="price" id="field_price" class="form-control" placeholder="2000" required>
 						</div>
 						<div class="col-md-6 form-group">
@@ -245,14 +250,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						</div>
 
 						<!-- Format Kode -->
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
+							<label class="font-weight-bold">Prefix Kode (Awalan):</label>
+							<input type="text" name="prefix" id="field_prefix" class="form-control" placeholder="Contoh: VC-, NET-">
+						</div>
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Tipe Login Voucher:</label>
 							<select name="type" id="field_type" class="form-control">
 								<option value="vc">Voucher Only (User = Pass)</option>
 								<option value="up">Username & Password Beda</option>
 							</select>
 						</div>
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Karakter Kode:</label>
 							<select name="typechar" id="field_typechar" class="form-control">
 								<option value="lower">Huruf Kecil (abc)</option>
@@ -261,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 								<option value="mix">Campuran (aB1)</option>
 							</select>
 						</div>
-						<div class="col-md-4 form-group">
+						<div class="col-md-3 form-group">
 							<label class="font-weight-bold">Panjang Kode (Karakter):</label>
 							<input type="number" name="length" id="field_length" class="form-control" value="4" min="3" max="12" required>
 						</div>
@@ -300,6 +309,7 @@ function openAddVoucherModal() {
 	document.getElementById('field_markup').value = '';
 	document.getElementById('field_Limit').value = '';
 	document.getElementById('field_limit_total').value = '';
+	document.getElementById('field_prefix').value = '';
 	document.getElementById('field_type').value = 'vc';
 	document.getElementById('field_typechar').value = 'lower';
 	document.getElementById('field_length').value = '4';
@@ -318,6 +328,7 @@ function openEditVoucherModal(idx, v) {
 	document.getElementById('field_markup').value = v.markup || '0';
 	document.getElementById('field_Limit').value = v.Limit || '';
 	document.getElementById('field_limit_total').value = v.limit_total || '';
+	document.getElementById('field_prefix').value = v.prefix || '';
 	document.getElementById('field_type').value = v.type || 'vc';
 	document.getElementById('field_typechar').value = v.typechar || 'lower';
 	document.getElementById('field_length').value = v.length || '4';

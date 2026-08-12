@@ -471,6 +471,7 @@ $mkbot->on('callback', function ($command) {
                   $server         = $getdata['server'];
                   $type           = $getdata['type'];
                   $typechar       = $getdata['typechar'];
+                  $prefix         = isset($getdata['prefix']) ? $getdata['prefix'] : '';
                   $Color          = $getdata['Color'];
                   $limituptime    = $getdata['Limit'];
                   $limit_download = toBytes($getdata['limit_download']);
@@ -511,10 +512,10 @@ $mkbot->on('callback', function ($command) {
                             
                             
                             if ($type == 'up') {
-                           $usernamereal = make_string($length, $typechar);
+                           $usernamereal = make_string($length, $typechar, $prefix);
                            $passwordreal = make_string($length, $typechar);
                         } else {
-                           $usernamereal = make_string($length, $typechar);
+                           $usernamereal = make_string($length, $typechar, $prefix);
                            $passwordreal = $usernamereal;
                         }
 

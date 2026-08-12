@@ -604,8 +604,13 @@ function msubstr($str, $start = 0, $length = null, $charset = "utf-8", $suffix =
 	return $slice;
 }
 
-function make_string($len = 4, $type='checkCode'){
+function make_string($len = 4, $type='checkCode', $prefix = ''){
 	$str = '';
+	if ($type === 'lower') $type = 3;
+	elseif ($type === 'upper') $type = 2;
+	elseif ($type === 'num') $type = 1;
+	elseif ($type === 'mix') $type = 5;
+
 	switch ($type) {
 		case 1:
 			$chars = str_repeat('123456789', 3);
@@ -629,7 +634,7 @@ function make_string($len = 4, $type='checkCode'){
 			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
 			break;	
 		default: 
-			$chars = '';
+			$chars = 'abcdefghijklmnopqrstuvwxyz123456789';
 			break;
 	}
 	if ($len > 10) { 
@@ -644,7 +649,7 @@ function make_string($len = 4, $type='checkCode'){
 			$str .= msubstr($chars, floor(mt_rand(0, mb_strlen($chars, 'utf-8') - 1)), 1);
 		} 
 	} 
-	return $str;
+	return $prefix . $str;
 } 
 
 function show_string($type){

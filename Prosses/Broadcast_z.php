@@ -40,14 +40,15 @@ if (!isset($_SESSION["Mikbotamuser"])) {
         $server      = $datajson[$idvoucher]['server'];
         $type        = $datajson[$idvoucher]['type'];
         $typechar    = $datajson[$idvoucher]['typechar'];
+        $prefix      = isset($datajson[$idvoucher]['prefix']) ? $datajson[$idvoucher]['prefix'] : '';
         $Color       = $datajson[$idvoucher]['Color'];
-        $princevoc=$datajson[$idvoucher]['price'];
+        $princevoc   = $datajson[$idvoucher]['price'];
         
     		if ($type == 'up') {
-                                $usernamereal = make_string($length,$typechar);
+                                $usernamereal = make_string($length,$typechar,$prefix);
                                 $passwordreal = make_string($length,$typechar);
                             } else {
-                                $usernamereal  = make_string($length,$typechar);
+                                $usernamereal = make_string($length,$typechar,$prefix);
                                 $passwordreal = $usernamereal;
                             }
 
