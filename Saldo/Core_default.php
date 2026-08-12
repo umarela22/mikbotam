@@ -1487,15 +1487,14 @@
                   if (isset($Success)) {
                      $saldoawal   = lihatsaldo($id);
                      $keterangan  = 'Success';
-                     $markupakhir = minus($princevoc, $markup);
-                     $set         = belivoucher($id, $usernamepelanggan, $markupakhir, $markup, $usernamereal, $passwordreal, $profile, $keterangan);
+                     $set         = belivoucher($id, $usernamepelanggan, $princevoc, $markup, $usernamereal, $passwordreal, $profile, $keterangan);
                      $angka       = lihatsaldo($id);
                      $options     = [
                         'chat_id' => $chatidtele,
                         'reply_markup' => json_encode([
                            'inline_keyboard' => [
                               [
-                                 ['text' => '⏱ History', 'callback_data' => 'VMarkup|' . $princevoc . '|' . $markup . '|' . $markupakhir . '|' . $saldoawal . '|' . $angka . ''],
+                                 ['text' => '⏱ History', 'callback_data' => 'VMarkup|' . $princevoc . '|' . $markup . '|' . $princevoc . '|' . $saldoawal . '|' . $angka . ''],
                                  ['text' => '🔙 Back', 'callback_data' => 'Menu'],
                               ], [
                                  ['text' => '💰 Cek Saldo', 'callback_data' => 'notifsaldo'],
@@ -1747,14 +1746,13 @@
             $text        = "";
 
             if (!empty($princevoc)) {
-               $text .= "<code>Saldo Awal    = </code>" . rupiah($saldoawal) . " \n";
-               $text .= "<code>Voucher Price = </code>" . rupiah($princevoc) . " \n";
-               $text .= "<code>Total Markup  = </code>" . rupiah($markup) . " \n";
-               $text .= "#  Voucher-Markup \n";
-               $text .= "# " . rupiah($princevoc) . " - " . rupiah($markup) . " = " . rupiah($markupakhir) . " \n";
-               $text .= "# Saldoawal-Markup Akhir \n";
-               $text .= "# " . rupiah($saldoawal) . " - " . rupiah($markupakhir) . " = " . rupiah($saldo) . " \n";
-               $text .= "<b>Sisa saldo </b> : " . rupiah($saldo) . " \n";
+               $text .= "<code>Saldo Awal   = </code>" . rupiah($saldoawal) . " \n";
+               $text .= "<code>Harga Pokok  = </code>" . rupiah($princevoc) . " \n";
+               $text .= "<code>Harga Jual   = </code>" . rupiah($markup) . " \n";
+               $text .= "<code>Potong Saldo = </code>" . rupiah($princevoc) . " \n";
+               $text .= "-----------------------------------\n";
+               $text .= "<code>" . rupiah($saldoawal) . " - " . rupiah($princevoc) . " = " . rupiah($saldo) . "</code>\n";
+               $text .= "<b>Sisa Saldo  : </b>" . rupiah($saldo) . " \n";
             } else {
                $text = "Maaf format data salah ";
             }
