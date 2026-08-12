@@ -98,6 +98,36 @@ if (isset($_POST['action_isolir'])) {
 	}
 }
 
+// Handle Adjust Due Date (Tambah / Kurangi Bulan)
+if (isset($_POST['action_adjust_exp'])) {
+	$username_ppp  = isset($_POST['username_ppp']) ? trim($_POST['username_ppp']) : '';
+	$change_months = isset($_POST['change_months']) ? intval($_POST['change_months']) : 0;
+
+	if (!empty($username_ppp) && $change_months != 0) {
+		$cust = $mikbotamdata->get('ppp_customers', ['id', 'exp_date', 'due_date'], ['username_ppp' => $username_ppp]);
+		$settings = get_ppp_isolir_settings();
+		$default_day = intval($settings['due_date']);
+		$day = ($cust && !empty($cust['due_date'])) ? intval($cust['due_date']) : $default_day;
+
+		$cur_exp = ($cust && !empty($cust['exp_date'])) ? $cust['exp_date'] : date('Y-m') . '-' . sprintf('%02d', $day);
+		$sign = ($change_months > 0) ? "+$change_months month" : "$change_months month";
+		$new_exp = date('Y-m-d', strtotime($sign, strtotime($cur_exp)));
+
+		if ($cust) {
+			$mikbotamdata->update('ppp_customers', ['exp_date' => $new_exp], ['id' => $cust['id']]);
+		} else {
+			$mikbotamdata->insert('ppp_customers', [
+				'username_ppp' => $username_ppp,
+				'due_date' => $day,
+				'exp_date' => $new_exp,
+				'app_user_id' => get_current_tenant_id()
+			]);
+		}
+
+		$message = '<div class="alert alert-success mg-b-15">Masa aktif jatuh tempo untuk <strong>' . htmlspecialchars($username_ppp) . '</strong> berhasil diubah menjadi <strong>' . date('d-m-Y', strtotime($new_exp)) . '</strong>!</div>';
+	}
+}
+
 // Fetch invoices
 $invoices = get_ppp_invoices($current_month, $status_filter, $search_query);
 
@@ -255,7 +285,25 @@ foreach ($invoices as $inv) {
 									<td><strong class="tx-inverse"><?=htmlspecialchars($inv['invoice_number']);?></strong></td>
 									<td><strong class="tx-primary"><?=htmlspecialchars($inv['username_ppp']);?></strong></td>
 									<td><?=htmlspecialchars($inv['month_year']);?></td>
-									<td><span class="badge badge-outline-info font-weight-bold"><i class="fa fa-calendar"></i> <?=$exp_disp;?></span></td>
+									<td>
+										<div class="d-flex align-items-center justify-content-between">
+											<span class="badge tx-12 pd-6-10 font-weight-bold" style="background-color: #1d212a; color: #ffffff; border: 1px solid #343a40; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+												<i class="fa fa-calendar text-info mg-r-3"></i> <?=$exp_disp;?>
+											</span>
+											<div class="btn-group mg-l-5" role="group">
+												<form method="POST" action="./?Mikbotam=pppbilling&month=<?=$current_month;?>" style="display:inline;">
+													<input type="hidden" name="username_ppp" value="<?=htmlspecialchars($inv['username_ppp']);?>">
+													<input type="hidden" name="change_months" value="-1">
+													<button type="submit" name="action_adjust_exp" class="btn btn-xs btn-outline-danger" title="Kurangi 1 Bulan Jatuh Tempo (-1 Bln)" style="padding: 1px 6px; font-size: 11px;"><i class="fa fa-minus"></i></button>
+												</form>
+												<form method="POST" action="./?Mikbotam=pppbilling&month=<?=$current_month;?>" style="display:inline;">
+													<input type="hidden" name="username_ppp" value="<?=htmlspecialchars($inv['username_ppp']);?>">
+													<input type="hidden" name="change_months" value="1">
+													<button type="submit" name="action_adjust_exp" class="btn btn-xs btn-outline-success" title="Tambah 1 Bulan Jatuh Tempo (+1 Bln)" style="padding: 1px 6px; font-size: 11px;"><i class="fa fa-plus"></i></button>
+												</form>
+											</div>
+										</div>
+									</td>
 									<td><strong>Rp <?=number_format($inv['amount'], 0, ',', '.');?></strong></td>
 									<td><?=$badge;?></td>
 									<td>
