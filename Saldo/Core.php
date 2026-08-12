@@ -404,18 +404,42 @@
       return Bot::sendMessage($text, ['parse_mode' => 'html']);
    });
 
-   // Admin: /tagihan_ppp - Ringkasan admin
-   $mkbot->cmd('/tagihan_ppp', function () {
+   // Admin & User: /tagihan [username] or /tagihan_ppp
+   $tagihan_handler = function ($user = null) {
       include ('../config/system.conn.php');
       include_once ('../config/system.database.php');
       $info       = bot::message();
       $idtelegram = $info['from']['id'];
 
-      if ($idtelegram != $id_own) {
-         return Bot::sendMessage("Maaf, perintah ini hanya untuk Administrator.");
+      Bot::sendChatAction('typing');
+
+      if (!empty($user)) {
+         $user = trim($user);
+         $invoices = get_ppp_invoices(null, null, $user);
+         if (empty($invoices)) {
+            return Bot::sendMessage("Tagihan untuk username <b>$user</b> tidak ditemukan.", ['parse_mode' => 'html']);
+         }
+         $inv = $invoices[0];
+         $status_icon = ($inv['status'] === 'PAID') ? '🟢 (LUNAS)' : (($inv['status'] === 'ISOLIR') ? '🔴 (TERISOLIR)' : '⚠️ (BELUM DIBAYAR)');
+         $amount_fmt = rupiah($inv['amount']);
+         
+         $text = "📋 <b>DETAIL TAGIHAN PPPoE</b>\n"
+               . "========================\n"
+               . "👤 <b>User PPPoE:</b> <code>{$inv['username_ppp']}</code>\n"
+               . "🧾 <b>No Invoice:</b> <code>{$inv['invoice_number']}</code>\n"
+               . "📅 <b>Periode:</b> {$inv['month_year']}\n"
+               . "💰 <b>Nominal:</b> <b>$amount_fmt</b>\n"
+               . "📌 <b>Status:</b> <b>$status_icon</b>\n"
+               . "========================\n";
+         if ($inv['status'] !== 'PAID' && $idtelegram == $id_own) {
+            $text .= "Ketik <code>/bayar $user</code> untuk memproses pelunasan.";
+         }
+         return Bot::sendMessage($text, ['parse_mode' => 'html']);
       }
 
-      Bot::sendChatAction('typing');
+      if ($idtelegram != $id_own) {
+         return Bot::sendMessage("Maaf, rincian seluruh tagihan hanya dapat diakses Administrator. Gunakan: <code>/tagihan &lt;username_anda&gt;</code>", ['parse_mode' => 'html']);
+      }
 
       $month_year = date('Y-m');
       $invoices   = get_ppp_invoices($month_year);
@@ -442,14 +466,18 @@
       $text .= "Belum Dibayar : Rp " . number_format($total_unpaid, 0, ',', '.') . " ⚠️\n";
       $text .= "Terasolir     : $total_isolir User 🔴\n";
       $text .= "========================\n";
-      $text .= "Gunakan <code>/bayar_ppp &lt;username&gt;</code> untuk tandai lunas.\n";
-      $text .= "Gunakan <code>/isolir_ppp &lt;username&gt;</code> untuk isolir user.";
+      $text .= "• Bayar Tagihan : <code>/bayar &lt;username&gt; [bulan]</code>\n";
+      $text .= "• Isolir User   : <code>/isolir &lt;username&gt;</code>\n";
+      $text .= "• Buka Isolir   : <code>/buka &lt;username&gt;</code>";
 
       return Bot::sendMessage($text, ['parse_mode' => 'html']);
-   });
+   };
 
-   // Admin: /bayar_ppp <user> [jumlah_bulan]
-   $mkbot->cmd('/bayar_ppp', function ($param = null, $arg2 = null) {
+   $mkbot->cmd('/tagihan', $tagihan_handler);
+   $mkbot->cmd('/tagihan_ppp', $tagihan_handler);
+
+   // Admin: /bayar <user> [jumlah_bulan] or /bayar_ppp
+   $bayar_handler = function ($param = null, $arg2 = null) {
       include ('../config/system.conn.php');
       include_once ('../config/system.database.php');
       include_once ('../Api/routeros_api.class.php');
@@ -465,7 +493,7 @@
       $months = (isset($parts[1]) && intval($parts[1]) > 0) ? intval($parts[1]) : ((intval($arg2) > 0) ? intval($arg2) : 1);
 
       if (empty($user)) {
-         return Bot::sendMessage("Format salah. Gunakan: <code>/bayar_ppp &lt;username_pppoe&gt; [jumlah_bulan]</code>\nContoh bayar 3 bulan: <code>/bayar_ppp user_john 3</code>", ['parse_mode' => 'html']);
+         return Bot::sendMessage("Format salah. Gunakan: <code>/bayar &lt;username_pppoe&gt; [jumlah_bulan]</code>\nContoh bayar 3 bulan: <code>/bayar user_john 3</code>", ['parse_mode' => 'html']);
       }
 
       $inv = get_or_create_next_unpaid_invoice($user);
@@ -522,10 +550,13 @@
          'parse_mode' => 'html',
          'reply_markup' => json_encode($keyboard)
       ]);
-   });
+   };
 
-   // Admin: /isolir_ppp <user>
-   $mkbot->cmd('/isolir_ppp', function ($user = null) {
+   $mkbot->cmd('/bayar', $bayar_handler);
+   $mkbot->cmd('/bayar_ppp', $bayar_handler);
+
+   // Admin: /isolir <user> or /isolir_ppp
+   $isolir_handler = function ($user = null) {
       include ('../config/system.conn.php');
       include_once ('../config/system.database.php');
       include_once ('../Api/routeros_api.class.php');
@@ -537,7 +568,7 @@
       }
 
       if (empty($user)) {
-         return Bot::sendMessage("Format salah. Gunakan: <code>/isolir_ppp &lt;username_pppoe&gt;</code>", ['parse_mode' => 'html']);
+         return Bot::sendMessage("Format salah. Gunakan: <code>/isolir &lt;username_pppoe&gt;</code>", ['parse_mode' => 'html']);
       }
 
       $month_year = date('Y-m');
@@ -569,7 +600,50 @@
             . "User PPPoE <b>$user</b> berhasil di-ISOLIR dan koneksi telah diputuskan.";
 
       return Bot::sendMessage($text, ['parse_mode' => 'html']);
-   });
+   };
+
+   $mkbot->cmd('/isolir', $isolir_handler);
+   $mkbot->cmd('/isolir_ppp', $isolir_handler);
+
+   // Admin: /buka or /unisolir <user>
+   $unisolir_handler = function ($user = null) {
+      include ('../config/system.conn.php');
+      include_once ('../config/system.database.php');
+      include_once ('../Api/routeros_api.class.php');
+      $info       = bot::message();
+      $idtelegram = $info['from']['id'];
+
+      if ($idtelegram != $id_own) {
+         return Bot::sendMessage("Maaf, perintah ini hanya untuk Administrator.");
+      }
+
+      if (empty($user)) {
+         return Bot::sendMessage("Format salah. Gunakan: <code>/buka &lt;username_pppoe&gt;</code>", ['parse_mode' => 'html']);
+      }
+
+      $API = new routeros_api();
+      $API->timeout = 3;
+      if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
+         $find_sec = $API->comm("/ppp/secret/print", ["?name" => $user]);
+         if (isset($find_sec[0]['.id'])) {
+            $API->comm("/ppp/secret/enable", [".id" => $find_sec[0]['.id']]);
+            $find_act = $API->comm("/ppp/active/print", ["?name" => $user]);
+            if (isset($find_act[0]['.id'])) {
+               $API->comm("/ppp/active/remove", [".id" => $find_act[0]['.id']]);
+            }
+         }
+         $API->disconnect();
+      }
+
+      $text = "🟢 <b>ISOLIR DIBUKA!</b>\n"
+            . "User PPPoE <b>$user</b> berhasil DIAKTIFKAN KEMBALI di router MikroTik.";
+
+      return Bot::sendMessage($text, ['parse_mode' => 'html']);
+   };
+
+   $mkbot->cmd('/buka', $unisolir_handler);
+   $mkbot->cmd('/unisolir', $unisolir_handler);
+   $mkbot->cmd('/unisolir_ppp', $unisolir_handler);
    //daftar manual khusus Administator
    $mkbot->cmd('/daftarid', function ($id, $name, $notlp, $saldo) {
       include ('../config/system.conn.php');
