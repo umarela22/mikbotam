@@ -44,9 +44,10 @@ if (isset($_POST['action_pay'])) {
 	$inv_id = isset($_POST['invoice_id']) ? intval($_POST['invoice_id']) : 0;
 	$method = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'CASH';
 	$notes  = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+	$months = isset($_POST['months']) ? intval($_POST['months']) : 1;
 
 	if ($inv_id > 0) {
-		pay_ppp_invoice($inv_id, $method, $notes);
+		pay_ppp_invoice($inv_id, $method, $notes, $months);
 
 		// If user was disabled/isolated, automatically re-enable on MikroTik
 		$inv_data = $mikbotamdata->get('ppp_invoices', ['username_ppp'], ['id' => $inv_id]);
@@ -300,6 +301,16 @@ foreach ($invoices as $inv) {
 															<p>No Invoice: <strong><?=htmlspecialchars($inv['invoice_number']);?></strong></p>
 															<p>Total Tagihan: <strong class="tx-success tx-18">Rp <?=number_format($inv['amount'], 0, ',', '.');?></strong></p>
 															<hr>
+															<div class="form-group">
+																<label class="font-weight-bold">Durasi Pembayaran:</label>
+																<select name="months" class="form-control">
+																	<option value="1">1 Bulan (Normal)</option>
+																	<option value="2">2 Bulan sekaligus</option>
+																	<option value="3">3 Bulan sekaligus</option>
+																	<option value="6">6 Bulan sekaligus</option>
+																	<option value="12">12 Bulan (1 Tahun)</option>
+																</select>
+															</div>
 															<div class="form-group">
 																<label class="font-weight-bold">Metode Pembayaran:</label>
 																<select name="payment_method" class="form-control">
