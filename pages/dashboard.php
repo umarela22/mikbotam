@@ -35,7 +35,7 @@
 		}
 		date_default_timezone_set('Asia/Jakarta');
 		$API = new routeros_api();
-		$API->timeout = 3;
+		$API->timeout = 1;
 
 		if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
 			$IDENTITY      = $API->comm('/system/identity/getall');

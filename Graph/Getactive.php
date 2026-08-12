@@ -16,14 +16,17 @@
  *
  */
 
-//=====================================================START SCRIPT====================//
- error_reporting(0);
+error_reporting(0);
 include '../config/system.conn.php';
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
 include '../Api/routeros_api.class.php';
 
 $API = new routeros_api();
+$API->timeout = 1;
 
-if ($API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
+if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
     if (isset($_GET['aponline'])) {
         $items = $API->comm("/ip/neighbor/print");
         echo "AP " . count($items) . " Online";

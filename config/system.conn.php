@@ -50,6 +50,10 @@
 		$active_app_user = get_app_user_by_id($active_user_id);
 	}
 
+	if (session_status() === PHP_SESSION_ACTIVE && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+		@session_write_close();
+	}
+
 	$settings = getsettings();
 	if (!is_array($settings)) {
 		$settings = [];
