@@ -556,8 +556,22 @@ function formatDTM($dtm) {
 //=====================================================START SCRIPT====================//
 
 function toBytes($i) {
-    $bytes = ($i * 1000000);
-    return $bytes;
+    if (empty($i)) {
+        return 0;
+    }
+    if (is_numeric($i)) {
+        return (int)($i * 1000000);
+    }
+    $str = strtoupper(trim((string)$i));
+    $val = (float)$str;
+    if (strpos($str, 'G') !== false) {
+        return (int)($val * 1073741824);
+    } elseif (strpos($str, 'M') !== false) {
+        return (int)($val * 1048576);
+    } elseif (strpos($str, 'K') !== false) {
+        return (int)($val * 1024);
+    }
+    return (int)($val * 1000000);
 }
 function Crusername($length) {
     $chars = "1234567890abcdefghijkmnopqrstuvwxyz";

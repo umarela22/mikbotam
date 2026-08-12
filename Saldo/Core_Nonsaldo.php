@@ -456,10 +456,17 @@ $mkbot->on('callback', function ($command) {
     include ('../config/system.conn.php');
 
     if (has($id)) {
-    	  if (strpos($command, 'Vcrnos') !== false) {
-        	
-            $data  = json_decode($Voucher_nonsaldo, true);
-            $cekid = "Vcrnos" . $data[0]['id'] . ",Vcrnos" . $data[1]['id'] . ",Vcrnos" . $data[2]['id'] . ",Vcrnos" . $data[3]['id'] . ",Vcrnos" . $data[4]['id'] . ",Vcrnos" . $data[5]['id'];
+              if (strpos($command, 'Vcrnos') !== false) {
+             $data  = json_decode($Voucher_nonsaldo, true);
+             $cekid_arr = [];
+             if (is_array($data)) {
+                 foreach ($data as $v_item) {
+                     if (isset($v_item['id'])) {
+                         $cekid_arr[] = 'Vcrnos' . $v_item['id'];
+                     }
+                 }
+             }
+             $cekid = implode(',', $cekid_arr);
 
         if (preg_match('/' . $command . '/i', $cekid)) {
                 $API = new routeros_api();

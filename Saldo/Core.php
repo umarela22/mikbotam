@@ -1258,7 +1258,15 @@
       	
          if (strpos($command, 'Vcr') !== false) {
             $data  = json_decode($voucher_1, true);
-            $cekid = "Vcr" . $data[0]['id'] . ",Vcr" . $data[1]['id'] . ",Vcr" . $data[2]['id'] . ",Vcr" . $data[3]['id'] . ",Vcr" . $data[4]['id'] . ",Vcr" . $data[5]['id'];
+            $cekid_arr = [];
+            if (is_array($data)) {
+                foreach ($data as $v_item) {
+                    if (isset($v_item['id'])) {
+                        $cekid_arr[] = 'Vcr' . $v_item['id'];
+                    }
+                }
+            }
+            $cekid = implode(',', $cekid_arr);
 
             if (preg_match('/' . $command . '/i', $cekid)) {
                $API = new routeros_api();
