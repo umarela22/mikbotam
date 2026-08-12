@@ -469,33 +469,49 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
          return Bot::sendMessage("Tagihan untuk username <b>$user</b> periode $month_year tidak ditemukan.", ['parse_mode' => 'html']);
       }
 
-      $inv_id = $invoices[0]['id'];
-      $next_exp = pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin');
+      $inv = $invoices[0];
+      $inv_id = $inv['id'];
+      $inv_no = isset($inv['invoice_number']) ? $inv['invoice_number'] : "INV-$inv_id";
+      $amount_fmt = isset($inv['amount']) ? rupiah($inv['amount']) : 'Rp 0';
+      $status = isset($inv['status']) ? $inv['status'] : 'UNPAID';
 
-      // Re-enable on MikroTik
-      $API = new routeros_api();
-      $API->timeout = 3;
-      if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
-         $find_sec = $API->comm("/ppp/secret/print", ["?name" => $user]);
-         if (isset($find_sec[0]['.id'])) {
-            $API->comm("/ppp/secret/enable", [".id" => $find_sec[0]['.id']]);
-            $find_act = $API->comm("/ppp/active/print", ["?name" => $user]);
-            if (isset($find_act[0]['.id'])) {
-               $API->comm("/ppp/active/remove", [".id" => $find_act[0]['.id']]);
-            }
-         }
-         $API->disconnect();
+      if ($status === 'PAID') {
+         return Bot::sendMessage("Tagihan untuk username <b>$user</b> periode $month_year sudah <b>LUNAS</b>.", ['parse_mode' => 'html']);
       }
 
-      $tgl_jt = !empty($next_exp) ? date('d-m-Y', strtotime($next_exp)) : '-';
+      global $mikbotamdata;
+      $cust = $mikbotamdata->get('ppp_customers', ['exp_date', 'due_date'], ['username_ppp' => $user]);
+      $settings = get_ppp_isolir_settings();
+      $default_day = intval($settings['due_date']);
+      $day = ($cust && !empty($cust['due_date'])) ? intval($cust['due_date']) : $default_day;
 
-      $text = "✅ <b>PEMBAYARAN SUCCESS!</b>\n\n"
+      if ($cust && !empty($cust['exp_date'])) {
+          $next_exp_preview = date('d-m-Y', strtotime('+1 month', strtotime($cust['exp_date'])));
+      } else {
+          $next_exp_preview = date('d-m-Y', strtotime(date('Y-m', strtotime('+1 month')) . '-' . sprintf('%02d', $day)));
+      }
+
+      $text = "⚠️ <b>KONFIRMASI PEMBAYARAN PPPoE</b>\n\n"
             . "👤 <b>User PPPoE:</b> <code>$user</code>\n"
-            . "💵 <b>Status:</b> <b>LUNAS</b>\n"
-            . "📅 <b>Jatuh Tempo Selanjutnya:</b> <b>$tgl_jt</b>\n\n"
-            . "Koneksi user telah diaktifkan kembali.";
+            . "🧾 <b>No Invoice:</b> <code>$inv_no</code>\n"
+            . "📋 <b>Periode:</b> $month_year\n"
+            . "💰 <b>Total Tagihan:</b> <b>$amount_fmt</b>\n"
+            . "📅 <b>Jatuh Tempo Baru:</b> <b>$next_exp_preview</b>\n\n"
+            . "Apakah Anda yakin ingin memproses pelunasan tagihan ini?";
 
-      return Bot::sendMessage($text, ['parse_mode' => 'html']);
+      $keyboard = [
+         'inline_keyboard' => [
+            [
+               ['text' => '✅ BAYAR SEKARANG', 'callback_data' => 'pay_ppp_yes_' . $inv_id],
+               ['text' => '❌ BATAL', 'callback_data' => 'pay_ppp_no_' . $inv_id]
+            ]
+         ]
+      ];
+
+      return Bot::sendMessage($text, [
+         'parse_mode' => 'html',
+         'reply_markup' => json_encode($keyboard)
+      ]);
    });
 
    // Admin: /isolir_ppp <user>
@@ -1283,15 +1299,70 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
 
    $mkbot->on('callback', function ($command) {
 
-    $message           = Bot::message();
-    $enkod             = json_encode($message);
-    $id                = $message['from']['id'];
-    $usernamepelanggan = $message['from']['username'];
-    $namatele          = $message['from']['first_name'];
-    $chatidtele        = $message["message"]['chat']['id'];
-    $message_idtele    = $message["message"]["message_id"];
+      $message           = Bot::message();
+      $id                = $message['from']['id'];
+      $usernamepelanggan = $message['from']['username'];
+      $namatele          = $message['from']['first_name'];
+      $chatidtele        = $message["message"]['chat']['id'];
+      $message_idtele    = $message["message"]["message_id"];
 
-    include ('../config/system.conn.php');
+      include ('../config/system.conn.php');
+
+      if (strpos($command, 'pay_ppp_yes_') === 0) {
+         include_once ('../config/system.conn.php');
+         include_once ('../config/system.database.php');
+         include_once ('../Api/routeros_api.class.php');
+
+         $inv_id = intval(str_replace('pay_ppp_yes_', '', $command));
+         $invs = get_ppp_invoices(null, null, null);
+         $target_inv = null;
+         foreach ($invs as $i_item) {
+             if (intval($i_item['id']) === $inv_id) {
+                 $target_inv = $i_item;
+                 break;
+             }
+         }
+
+         if (!$target_inv) {
+             return Bot::sendMessage("Tagihan tidak ditemukan atau sudah diproses.");
+         }
+
+         $user = $target_inv['username_ppp'];
+         $amount_fmt = rupiah($target_inv['amount']);
+         $next_exp = pay_ppp_invoice($inv_id, 'TELEGRAM_BOT', 'Pelunasan via Bot Telegram Admin');
+
+         // Re-enable on MikroTik
+         $API = new routeros_api();
+         $API->timeout = 3;
+         if (!empty($mikrotik_ip) && $API->connect($mikrotik_ip, $mikrotik_username, $mikrotik_password, $mikrotik_port)) {
+            $find_sec = $API->comm("/ppp/secret/print", ["?name" => $user]);
+            if (isset($find_sec[0]['.id'])) {
+               $API->comm("/ppp/secret/enable", [".id" => $find_sec[0]['.id']]);
+               $find_act = $API->comm("/ppp/active/print", ["?name" => $user]);
+               if (isset($find_act[0]['.id'])) {
+                  $API->comm("/ppp/active/remove", [".id" => $find_act[0]['.id']]);
+               }
+            }
+            $API->disconnect();
+         }
+
+         $tgl_jt = !empty($next_exp) ? date('d-m-Y', strtotime($next_exp)) : '-';
+
+         $text = "✅ <b>PEMBAYARAN SUCCESS!</b>\n\n"
+               . "👤 <b>User PPPoE:</b> <code>$user</code>\n"
+               . "💵 <b>Status:</b> <b>LUNAS</b>\n"
+               . "💰 <b>Nominal:</b> <b>$amount_fmt</b>\n"
+               . "📅 <b>Jatuh Tempo Selanjutnya:</b> <b>$tgl_jt</b>\n\n"
+               . "Koneksi user telah diaktifkan kembali.";
+
+         return Bot::sendMessage($text, ['parse_mode' => 'html']);
+      }
+
+      if (strpos($command, 'pay_ppp_no_') === 0) {
+         $text = "❌ <b>PEMBAYARAN DIBATALKAN.</b>\n"
+               . "Tagihan PPPoE belum diproses.";
+         return Bot::sendMessage($text, ['parse_mode' => 'html']);
+      }
 
     if (has($id)) {
     	

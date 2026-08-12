@@ -253,3 +253,4 @@ Stack trace:
 #3 {main}
   thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 143
 [12-Aug-2026 18:35:25 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[12-Aug-2026 18:39:54 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
