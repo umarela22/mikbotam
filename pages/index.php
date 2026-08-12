@@ -30,129 +30,109 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 	exit();
 } else {
 
+	include_once __DIR__ . '/../config/system.conn.php';
+	include_once __DIR__ . '/../config/system.database.php';
 	include '../include/header.php';
 	include '../include/Home.php';
 
 	echo '<div class="sl-mainpanel">';
 
-	if ($_GET["Mikbotam"] == "Record") {
-		include "recordcounter.php";
-	} else
+	$page = isset($_GET["Mikbotam"]) ? $_GET["Mikbotam"] : '';
 
-	if ($_GET["Mikbotam"] == "sendVoc") {
-		include "sendvoc.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "Settings") {
-		include "settings.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "addprofile") {
-		include "../hotspot/add_profile.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "Hotspotuserlist") {
-		include "../hotspot/user.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "comingsoon") {
-		include "comingson.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "sendMessage") {
-		include "sendmess.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "SettingsVoc") {
-		include "settingsvoc.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "SettingsVocnonsaldo") {
-		include "settingsvocnonsaldo.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "setwebhook") {
-		include "../tools/setwebhook.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "NewUser") {
-		include "nusercounter.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "topupsaldo") {
-		include "topup.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "topdownsaldo") {
-		include "topdown.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "monitortraffic") {
-		include "graphmikbotam.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "logout") {
-		session_destroy();
-		echo "<script>sessionStorage.clear();</script>";
-		echo "<script>window.location='../index.php'</script>";
-	} else
-
-	if ($_GET["Mikbotam"] == "userlist") {
-		include "userlist.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "useractive") {
-		include "../hotspot/user_active.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "about") {
-		include "../about/about.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "boteditor") {
-		include "boteditor.php";
-		//ppp
-	} else
-
-	if ($_GET["Mikbotam"] == "pppuser") {
-		include "../ppp/ppp_user.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "pppactive") {
-		include "../ppp/ppp_active.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "pppprofile") {
-		include "../ppp/ppp_profile.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "pppbilling") {
-		include "../ppp/ppp_billing.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "ppppackages") {
-		include "../ppp/ppp_packages.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "pppisolir") {
-		include "../ppp/ppp_isolir_settings.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "manageusers") {
-		include "manage_users.php";
-	} else
-
-	if ($_GET["Mikbotam"] == "Settingstext") {
-		include "settingstext.php";
-	} else {
-		$user_role = isset($_SESSION['app_user_role']) ? $_SESSION['app_user_role'] : 'user';
-		$is_impersonating = isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0;
-
-		if ($user_role === 'superadmin' && !$is_impersonating) {
+	switch ($page) {
+		case "Record":
+			include "recordcounter.php";
+			break;
+		case "sendVoc":
+			include "sendvoc.php";
+			break;
+		case "Settings":
+			include "settings.php";
+			break;
+		case "addprofile":
+			include "../hotspot/add_profile.php";
+			break;
+		case "Hotspotuserlist":
+			include "../hotspot/user.php";
+			break;
+		case "comingsoon":
+			include "comingson.php";
+			break;
+		case "sendMessage":
+			include "sendmess.php";
+			break;
+		case "SettingsVoc":
+			include "settingsvoc.php";
+			break;
+		case "SettingsVocnonsaldo":
+			include "settingsvocnonsaldo.php";
+			break;
+		case "setwebhook":
+			include "../tools/setwebhook.php";
+			break;
+		case "NewUser":
+			include "nusercounter.php";
+			break;
+		case "topupsaldo":
+			include "topup.php";
+			break;
+		case "topdownsaldo":
+			include "topdown.php";
+			break;
+		case "monitortraffic":
+			include "graphmikbotam.php";
+			break;
+		case "logout":
+			session_destroy();
+			echo "<script>sessionStorage.clear();</script>";
+			echo "<script>window.location='../index.php'</script>";
+			break;
+		case "userlist":
+			include "userlist.php";
+			break;
+		case "useractive":
+			include "../hotspot/user_active.php";
+			break;
+		case "about":
+			include "../about/about.php";
+			break;
+		case "boteditor":
+			include "boteditor.php";
+			break;
+		case "pppuser":
+			include "../ppp/ppp_user.php";
+			break;
+		case "pppactive":
+			include "../ppp/ppp_active.php";
+			break;
+		case "pppprofile":
+			include "../ppp/ppp_profile.php";
+			break;
+		case "pppbilling":
+			include "../ppp/ppp_billing.php";
+			break;
+		case "ppppackages":
+			include "../ppp/ppp_packages.php";
+			break;
+		case "pppisolir":
+			include "../ppp/ppp_isolir_settings.php";
+			break;
+		case "manageusers":
 			include "manage_users.php";
-		} else {
-			include "dashboard.php";
-		}
+			break;
+		case "Settingstext":
+			include "settingstext.php";
+			break;
+		default:
+			$user_role = isset($_SESSION['app_user_role']) ? $_SESSION['app_user_role'] : 'user';
+			$is_impersonating = isset($_SESSION['impersonate_user_id']) && intval($_SESSION['impersonate_user_id']) > 0;
+
+			if ($user_role === 'superadmin' && !$is_impersonating) {
+				include "manage_users.php";
+			} else {
+				include "dashboard.php";
+			}
+			break;
 	}
 
 	include '../include/footer.php';
