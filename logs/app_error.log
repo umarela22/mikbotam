@@ -263,3 +263,15 @@ Stack trace:
 #4 C:\xampp\htdocs\mikbotam\scratch\test_advance_generation.php(2): include_once('C:\\xampp\\htdocs...')
 #5 {main}
   thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 130
+[20-Aug-2026 05:52:35 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[20-Aug-2026 05:52:35 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000]: General error: 1 no such table: st_mikbotam in C:\xampp\htdocs\mikbotam\config\system.medoo.php:130
+Stack trace:
+#0 C:\xampp\htdocs\mikbotam\config\system.medoo.php(130): PDO->query('SELECT "_id","T...')
+#1 C:\xampp\htdocs\mikbotam\config\system.medoo.php(666): medoo->query('SELECT "_id","T...')
+#2 C:\xampp\htdocs\mikbotam\config\system.database.php(1298): medoo->get('st_mikbotam', Array)
+#3 C:\xampp\htdocs\mikbotam\config\system.conn.php(57): getsettings()
+#4 C:\xampp\htdocs\mikbotam\scratch\test_login_step.php(5): include('C:\\xampp\\htdocs...')
+#5 {main}
+  thrown in C:\xampp\htdocs\mikbotam\config\system.medoo.php on line 130
+[20-Aug-2026 05:54:11 Asia/Jakarta] PHP Warning:  Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\mikbotam\config\system.conn.php on line 53
+[20-Aug-2026 05:54:11 Asia/Jakarta] PHP Fatal error:  Cannot redeclare get_current_tenant_id() (previously declared in C:\xampp\htdocs\mikbotam\config\system.database.php:26) in C:\xampp\htdocs\mikbotam\config\system.database.php on line 46

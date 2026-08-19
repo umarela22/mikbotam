@@ -1,3 +1,4 @@
 scratch/*
 logs/*
 config/mibotam.db
+.htaccess

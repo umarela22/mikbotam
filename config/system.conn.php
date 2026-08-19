@@ -50,7 +50,7 @@
 		$active_app_user = get_app_user_by_id($active_user_id);
 	}
 
-	if (session_status() === PHP_SESSION_ACTIVE && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+	if (session_status() === PHP_SESSION_ACTIVE && (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'POST')) {
 		@session_write_close();
 	}
 

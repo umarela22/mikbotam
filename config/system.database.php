@@ -1186,11 +1186,25 @@ function makesession($user) {
 		'u_pass',
 	], [
 		'u_user' => $user
-
 	]);
 
-	$hasil = isset($data['u_id']) ? $data['u_id'] : null;
-	return $hasil;
+	if ($data && isset($data['u_id']) && !empty($data['u_id'])) {
+		return $data['u_id'];
+	}
+
+	$app_user = $mikbotamdata->get('app_users', ['id'], [
+		'OR' => [
+			'username' => $user,
+			'email' => $user
+		]
+	]);
+
+	if ($app_user && isset($app_user['id'])) {
+		return strval($app_user['id']);
+	}
+
+	$default_id = $mikbotamdata->get('mikhbotam_id', 'u_id');
+	return $default_id ? $default_id : '12102';
 }
 function updatesession($user, $pass,$id) {
 	global $mikbotamdata;
@@ -1677,6 +1691,90 @@ function init_ppp_billing_tables() {
     if (!$mikbotamdata) return;
     try {
         $pdo = $mikbotamdata->pdo;
+
+        // Core base tables
+        $pdo->exec("CREATE TABLE IF NOT EXISTS mikhbotam_id (
+            u_id TEXT PRIMARY KEY,
+            u_user TEXT,
+            u_pass TEXT,
+            lastlogin TEXT,
+            ip TEXT,
+            user TEXT,
+            status TEXT
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS st_mikbotam (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nama_router TEXT,
+            IP_router TEXT,
+            Username_router TEXT,
+            Pass_router TEXT,
+            Port TEXT DEFAULT '8728',
+            dnsname TEXT,
+            Owner TEXT,
+            Id_owner TEXT,
+            Token_bot TEXT,
+            Username_bot TEXT,
+            Voucher_1 TEXT,
+            Voucher_nonsaldo TEXT,
+            Tanggal_diubah TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS voc_mikbotam (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Voucher TEXT,
+            u_id TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS re_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user TEXT,
+            nama_seller TEXT,
+            nomer_tlp TEXT,
+            saldo INTEGER DEFAULT 0,
+            Waktu TEXT,
+            Tanggal TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS re_operating (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user TEXT,
+            operat TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS st_reportdata (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user TEXT,
+            username_voucher TEXT,
+            password_voucher TEXT,
+            profile TEXT,
+            price INTEGER DEFAULT 0,
+            date TEXT,
+            time TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS st_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user TEXT,
+            nominal INTEGER DEFAULT 0,
+            type TEXT,
+            date TEXT,
+            time TEXT,
+            app_user_id INTEGER
+        )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS st_monitoring (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            status TEXT,
+            app_user_id INTEGER
+        )");
+
         $pdo->exec("CREATE TABLE IF NOT EXISTS ppp_packages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             profile_name TEXT NOT NULL,
@@ -1829,6 +1927,53 @@ function init_ppp_billing_tables() {
             $pdo->exec("UPDATE st_monitoring SET app_user_id = 1 WHERE app_user_id IS NULL");
         } catch (Exception $ex) {}
 
+        // Seed default legacy mikhbotam_id if empty
+        $count_mikh = $mikbotamdata->count('mikhbotam_id');
+        if ($count_mikh == 0) {
+            $mikbotamdata->insert('mikhbotam_id', [
+                'u_id' => '12102',
+                'u_user' => 'admin',
+                'u_pass' => password_hash('admin', PASSWORD_BCRYPT),
+                'lastlogin' => date('Y-m-d'),
+                'ip' => '127.0.0.1',
+                'user' => 'admin',
+                'status' => 'Success'
+            ]);
+        }
+
+        // Seed default st_mikbotam if empty
+        $count_st = $mikbotamdata->count('st_mikbotam');
+        if ($count_st == 0) {
+            $mikbotamdata->insert('st_mikbotam', [
+                '_id' => 1,
+                'Nama_router' => 'MikroTik',
+                'IP_router' => '',
+                'Username_router' => 'admin',
+                'Pass_router' => '',
+                'Port' => '8728',
+                'dnsname' => '',
+                'Owner' => 'Administrator',
+                'Id_owner' => '',
+                'Token_bot' => '',
+                'Username_bot' => '',
+                'Voucher_1' => '[]',
+                'Voucher_nonsaldo' => '[]',
+                'Tanggal_diubah' => date('Y-m-d'),
+                'app_user_id' => 1
+            ]);
+        }
+
+        // Seed default voc_mikbotam if empty
+        $count_voc = $mikbotamdata->count('voc_mikbotam');
+        if ($count_voc == 0) {
+            $mikbotamdata->insert('voc_mikbotam', [
+                '_id' => 1,
+                'u_id' => '12102',
+                'Voucher' => '[]',
+                'app_user_id' => 1
+            ]);
+        }
+
         // Auto-migrate existing admin as Superadmin if app_users is empty
         $count = $mikbotamdata->count('app_users');
         if ($count == 0) {
@@ -1850,6 +1995,7 @@ function init_ppp_billing_tables() {
                 'full_name' => 'Super Admin',
                 'role' => 'superadmin',
                 'status' => 'active',
+                'email' => 'admin@mikbotam.local',
                 'mikrotik_ip' => $mk_ip,
                 'mikrotik_username' => $mk_user,
                 'mikrotik_password' => $mk_pass,
