@@ -110,6 +110,15 @@ if ($is_paid_status) {
         if (!empty($token)) {
             FrameBot::init(['token' => $token]);
 
+            // Hapus pesan kode QRIS jika message_id tersimpan
+            if (!empty($trx['telegram_message_id'])) {
+                $target_chat = !empty($trx['telegram_chat_id']) ? $trx['telegram_chat_id'] : $user_id;
+                Bot::send('deleteMessage', [
+                    'chat_id'    => $target_chat,
+                    'message_id' => (int)$trx['telegram_message_id']
+                ]);
+            }
+
             // Notification to User
             $user_text = "✅ <b>PEMBAYARAN QRIS DITERIMA!</b>\n";
             $user_text .= "━━━━━━━━━━━━━━━━━━━━━\n";

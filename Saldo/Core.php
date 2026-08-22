@@ -1891,7 +1891,14 @@
                      'parse_mode'   => 'html',
                      'reply_markup' => json_encode($qris_markup)
                   ];
-                  Bot::send('sendPhoto', $photo_opt);
+                  $sent_qris = Bot::send('sendPhoto', $photo_opt);
+                  if ($sent_qris && isset($sent_qris['result']['message_id'])) {
+                     $sent_msg_id = $sent_qris['result']['message_id'];
+                     $mikbotamdata->update('app_qris_transactions', [
+                        'telegram_message_id' => $sent_msg_id,
+                        'telegram_chat_id'    => (string)$chatidtele
+                     ], ['order_id' => $order_id]);
+                  }
                } else {
                   $err_text = "⚠️ <b>Gagal Membuat QRIS</b>\n\n" . htmlspecialchars($qris_res['message']) . "\n\nSilakan pilih metode Transfer Manual atau hubungi Administrator.";
                   $options = [
@@ -1922,8 +1929,42 @@
                   Bot::send('answerCallbackQuery', [
                      'callback_query_id' => $message['id'],
                      'text' => '✅ Pembayaran LUNAS! Saldo Anda telah berhasil ditambahkan.',
-                     'show_alert' => true
+                     'show_alert' => false
                   ]);
+
+                  // Hapus pesan kode QRIS
+                  Bot::send('deleteMessage', [
+                     'chat_id'    => $chatidtele,
+                     'message_id' => (int) $message['message']['message_id']
+                  ]);
+
+                  $amount       = isset($check_res['amount']) ? $check_res['amount'] : (isset($check_res['trx']['amount']) ? $check_res['trx']['amount'] : 0);
+                  $total_amount = isset($check_res['total_amount']) ? $check_res['total_amount'] : (isset($check_res['trx']['total_amount']) ? $check_res['trx']['total_amount'] : 0);
+                  $paid_at      = isset($check_res['paid_at']) ? $check_res['paid_at'] : date('d-m-Y H:i:s');
+
+                  // Kirim pesan info saldo berhasil ditambahkan
+                  $user_text = "✅ <b>PEMBAYARAN QRIS BERHASIL!</b>\n";
+                  $user_text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                  $user_text .= "🆔 <b>Order ID:</b> <code>" . htmlspecialchars($order_id) . "</code>\n";
+                  $user_text .= "💰 <b>Nominal Saldo:</b> " . rupiah($amount) . "\n";
+                  $user_text .= "💵 <b>Total Dibayar:</b> " . rupiah($total_amount) . "\n";
+                  $user_text .= "⏰ <b>Waktu Lunas:</b> " . htmlspecialchars($paid_at) . "\n";
+                  $user_text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                  $user_text .= "🎉 Saldo Anda berhasil ditambahkan sebesar <b>" . rupiah($amount) . "</b>. Terima kasih!\n\n";
+
+                  $user_opt = [
+                     'chat_id' => $chatidtele,
+                     'reply_markup' => json_encode([
+                        'inline_keyboard' => [
+                           [
+                              ['text' => '🔎 Beli Voucher', 'callback_data' => 'Menu'],
+                              ['text' => '💰 Cek Saldo', 'callback_data' => 'ceksaldo']
+                           ]
+                        ]
+                     ]),
+                     'parse_mode' => 'html'
+                  ];
+                  Bot::sendMessage($user_text, $user_opt);
                } elseif ($check_res['status'] === 'EXPIRED') {
                   Bot::send('answerCallbackQuery', [
                      'callback_query_id' => $message['id'],

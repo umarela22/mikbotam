@@ -1953,9 +1953,13 @@ function init_ppp_billing_tables() {
             expired_at DATETIME,
             paid_at DATETIME,
             signature TEXT,
+            telegram_message_id INTEGER,
+            telegram_chat_id TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );");
+        try { $pdo->exec("ALTER TABLE app_qris_transactions ADD COLUMN telegram_message_id INTEGER"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE app_qris_transactions ADD COLUMN telegram_chat_id TEXT"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
