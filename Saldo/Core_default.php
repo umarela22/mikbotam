@@ -76,8 +76,7 @@
          } else {
             if (preg_match('/^[0-9]+$/', $jumlah)) {
                if (strlen($jumlah) < 7) {
-                  //jika user belum terdaftar
-                  $text .= "@$usernamepelanggan Permintaan deposit  sebesar " . rupiah($cek) . " sudah kami terima, \nSilahkan kirimkan foto bukti pembayaran  disertai dengan Caption #konfirmasi deposit $cek\n\nKonfirmasi selambatnya 2 jam setelah permintaan deposit";
+                  $text .= "@$nametelegram Permintaan deposit  sebesar " . rupiah($jumlah) . " sudah kami terima, \nSilahkan kirimkan foto bukti pembayaran  disertai dengan Caption #konfirmasi deposit $jumlah\n\nKonfirmasi selambatnya 2 jam setelah permintaan deposit";
                   $textsend = "";
                   $textsend .= "<code>User :  </code>@$nametelegram \n";
                   $textsend .= "<code>ID   : </code> <code>$idtelegram </code>\n";
