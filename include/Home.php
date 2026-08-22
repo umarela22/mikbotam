@@ -107,6 +107,9 @@
 	} elseif ($page == "Settingstext") {
 		$sshow        = "show-sub";
 		$Settingstext   = "active";
+	} elseif ($page == "klikqris_settings" || $page == "payment_gateway") {
+		$sshow        = "show-sub";
+		$klikqris_menu = "active";
 	}
 
 ?>
@@ -220,7 +223,7 @@
           </div>
         </a>
 
-        <a href="#" class="sl-menu-link <?=$Settings .$Settingstext. $SettingsVoc . " " . $sshow;?> ">
+        <a href="#" class="sl-menu-link <?=$Settings .$Settingstext. $SettingsVoc . " " . $klikqris_menu . " " . $sshow;?> ">
           <div class="sl-menu-item">
             <i class="menu-item-icon fa fa-cogs tx-16"></i>
             <span class="menu-item-label"> Settings</span>
@@ -232,6 +235,7 @@
           <li class="nav-item"><a class="nav-link <?=$SettingsVoc;?>" href="./?Mikbotam=SettingsVoc"><i class="fa fa-ticket "></i> Settings Voucher</a></li>
           <li class="nav-item"><a class="nav-link <?=$SettingsVocnonsaldos;?>" href="./?Mikbotam=SettingsVocnonsaldo"><i class="fa fa-ticket "></i> Settings Voucher Non saldo</a></li>
           <li class="nav-item"><a class="nav-link " href="./?Mikbotam=Settingstext"><i class="fa fa-pencil-square-o "></i> Text Settings</a></li>
+          <li class="nav-item"><a class="nav-link <?=$klikqris_menu;?>" href="./?Mikbotam=klikqris_settings"><i class="fa fa-qrcode "></i> Payment Gateway (KlikQRIS)</a></li>
         </ul>
 
         <a href="#" class="sl-menu-link <?=$toolsshow;?> ">

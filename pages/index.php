@@ -70,6 +70,10 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 		case "smtpsettings":
 			include "smtp_settings.php";
 			break;
+		case "klikqris_settings":
+		case "payment_gateway":
+			include "klikqris_settings.php";
+			break;
 		case "setwebhook":
 			include "../tools/setwebhook.php";
 			break;

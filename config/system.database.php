@@ -1906,6 +1906,20 @@ function init_ppp_billing_tables() {
             from_name TEXT DEFAULT 'Mikbotam Admin',
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS app_payment_settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            gateway_name TEXT NOT NULL DEFAULT 'klikqris',
+            api_key TEXT,
+            merchant_id TEXT,
+            mode TEXT NOT NULL DEFAULT 'sandbox',
+            sandbox_url TEXT NOT NULL DEFAULT 'https://klikqris.com/api/sandbox',
+            production_url TEXT NOT NULL DEFAULT 'https://klikqris.com/api',
+            is_active INTEGER NOT NULL DEFAULT 1,
+            app_user_id INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );");
         try { $pdo->exec("ALTER TABLE re_settings ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
         try { $pdo->exec("ALTER TABLE st_reportdata ADD COLUMN app_user_id INTEGER"); } catch (Exception $ex) {}
@@ -2855,4 +2869,107 @@ function update_app_user_profile($user_id, $full_name, $username, $email, $new_p
     $_SESSION['Mikbotamuser']  = $username;
 
     return ['success' => true, 'message' => 'Profil akun berhasil diperbarui!'];
+}
+
+function get_klikqris_settings($tenant_id = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if ($tenant_id === null) {
+        $tenant_id = get_current_tenant_id();
+    }
+    $tenant_id = intval($tenant_id);
+
+    $defaults = [
+        'api_key'        => '',
+        'merchant_id'    => '',
+        'mode'           => 'sandbox',
+        'sandbox_url'    => 'https://klikqris.com/api/sandbox',
+        'production_url' => 'https://klikqris.com/api',
+        'active_url'     => 'https://klikqris.com/api/sandbox',
+        'is_active'      => 1
+    ];
+
+    if (!$mikbotamdata) return $defaults;
+
+    $row = $mikbotamdata->get('app_payment_settings', '*', [
+        'AND' => [
+            'gateway_name' => 'klikqris',
+            'app_user_id'  => $tenant_id
+        ]
+    ]);
+
+    if (!$row && $tenant_id !== 1 && $tenant_id !== 0) {
+        $row = $mikbotamdata->get('app_payment_settings', '*', [
+            'AND' => [
+                'gateway_name' => 'klikqris',
+                'app_user_id'  => 1
+            ]
+        ]);
+    }
+
+    if ($row) {
+        $mode = (!empty($row['mode']) && in_array($row['mode'], ['sandbox', 'production'])) ? $row['mode'] : 'sandbox';
+        $sandbox_url = !empty($row['sandbox_url']) ? $row['sandbox_url'] : 'https://klikqris.com/api/sandbox';
+        $production_url = !empty($row['production_url']) ? $row['production_url'] : 'https://klikqris.com/api';
+        $active_url = ($mode === 'production') ? $production_url : $sandbox_url;
+
+        return [
+            'id'             => $row['id'],
+            'api_key'        => !empty($row['api_key']) ? decrypturl($row['api_key']) : '',
+            'merchant_id'    => isset($row['merchant_id']) ? $row['merchant_id'] : '',
+            'mode'           => $mode,
+            'sandbox_url'    => $sandbox_url,
+            'production_url' => $production_url,
+            'active_url'     => $active_url,
+            'is_active'      => isset($row['is_active']) ? intval($row['is_active']) : 1
+        ];
+    }
+
+    return $defaults;
+}
+
+function save_klikqris_settings($data, $tenant_id = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if ($tenant_id === null) {
+        $tenant_id = get_current_tenant_id();
+    }
+    $tenant_id = intval($tenant_id);
+
+    $api_key        = isset($data['api_key']) ? trim($data['api_key']) : '';
+    $merchant_id    = isset($data['merchant_id']) ? trim($data['merchant_id']) : '';
+    $mode           = (isset($data['mode']) && in_array($data['mode'], ['sandbox', 'production'])) ? $data['mode'] : 'sandbox';
+    $sandbox_url    = !empty($data['sandbox_url']) ? trim($data['sandbox_url']) : 'https://klikqris.com/api/sandbox';
+    $production_url = !empty($data['production_url']) ? trim($data['production_url']) : 'https://klikqris.com/api';
+    $is_active      = isset($data['is_active']) ? intval($data['is_active']) : 1;
+
+    $encrypted_key = !empty($api_key) ? encrypturl($api_key) : '';
+
+    $exists = $mikbotamdata->get('app_payment_settings', 'id', [
+        'AND' => [
+            'gateway_name' => 'klikqris',
+            'app_user_id'  => $tenant_id
+        ]
+    ]);
+
+    $payload = [
+        'gateway_name'   => 'klikqris',
+        'api_key'        => $encrypted_key,
+        'merchant_id'    => $merchant_id,
+        'mode'           => $mode,
+        'sandbox_url'    => $sandbox_url,
+        'production_url' => $production_url,
+        'is_active'      => $is_active,
+        'app_user_id'    => $tenant_id,
+        'updated_at'     => date('Y-m-d H:i:s')
+    ];
+
+    if ($exists) {
+        $mikbotamdata->update('app_payment_settings', $payload, ['id' => $exists]);
+    } else {
+        $payload['created_at'] = date('Y-m-d H:i:s');
+        $mikbotamdata->insert('app_payment_settings', $payload);
+    }
+
+    return ['success' => true, 'message' => 'Pengaturan Payment Gateway KlikQRIS berhasil disimpan!'];
 }
