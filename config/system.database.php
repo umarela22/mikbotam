@@ -3148,3 +3148,122 @@ function update_qris_transaction_status($order_id, $status = 'PAID', $paid_at = 
     }
     return $mikbotamdata->update('app_qris_transactions', $upd, ['order_id' => $order_id]);
 }
+
+function check_klikqris_status($order_id, $tenant_id = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if (!$mikbotamdata) {
+        return ['success' => false, 'message' => 'Database connection unavailable'];
+    }
+
+    $trx = get_qris_transaction_by_order_id($order_id);
+    if (!$trx) {
+        return ['success' => false, 'message' => 'Transaksi tidak ditemukan'];
+    }
+
+    if (empty($tenant_id)) {
+        $tenant_id = isset($trx['app_user_id']) ? intval($trx['app_user_id']) : get_current_tenant_id();
+    }
+
+    $settings = get_klikqris_settings($tenant_id);
+    if (empty($settings['api_key']) || empty($settings['merchant_id'])) {
+        return [
+            'success' => true,
+            'status'  => $trx['status'],
+            'message' => 'Status transaksi: ' . $trx['status'],
+            'trx'     => $trx
+        ];
+    }
+
+    $base_url = rtrim($settings['active_url'], '/');
+    $endpoint = $base_url . '/qris/status/' . rawurlencode($order_id);
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL            => $endpoint,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST  => 'GET',
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'x-api-key: ' . $settings['api_key'],
+            'id_merchant: ' . $settings['merchant_id']
+        ]
+    ]);
+
+    $response   = curl_exec($ch);
+    $http_code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
+
+    if ($curl_error || empty($response)) {
+        return [
+            'success' => true,
+            'status'  => $trx['status'],
+            'message' => 'Status saat ini: ' . $trx['status'],
+            'trx'     => $trx
+        ];
+    }
+
+    $json = json_decode($response, true);
+    if (!$json || !isset($json['status']) || $json['status'] !== true) {
+        return [
+            'success' => true,
+            'status'  => $trx['status'],
+            'message' => isset($json['message']) ? $json['message'] : 'Status transaksi: ' . $trx['status'],
+            'trx'     => $trx
+        ];
+    }
+
+    $data = isset($json['data']) ? $json['data'] : [];
+    $remote_status = isset($data['status']) ? strtoupper(trim((string)$data['status'])) : $trx['status'];
+    $paid_at = isset($data['paid_at']) && !empty($data['paid_at']) ? $data['paid_at'] : date('Y-m-d H:i:s');
+
+    if (in_array($remote_status, ['SUCCESS', 'PAID', 'SETTLED', '1', 'TRUE'])) {
+        if ($trx['status'] !== 'PAID') {
+            $settings_bot = getsettings();
+            $id_own       = isset($settings_bot['Id_owner']) ? $settings_bot['Id_owner'] : '';
+
+            $user_id      = $trx['telegram_id'];
+            $user_name    = $trx['telegram_username'];
+            $amount       = intval($trx['amount']);
+
+            topupresseller($user_id, $user_name, $amount, $id_own);
+            update_qris_transaction_status($order_id, 'PAID', $paid_at);
+        }
+
+        return [
+            'success'       => true,
+            'status'        => 'PAID',
+            'remote_status' => $remote_status,
+            'message'       => 'Pembayaran LUNAS',
+            'paid_at'       => $paid_at,
+            'amount'        => $trx['amount'],
+            'total_amount'  => $trx['total_amount'],
+            'trx'           => get_qris_transaction_by_order_id($order_id),
+            'data'          => $data
+        ];
+    } elseif ($remote_status === 'EXPIRED') {
+        if ($trx['status'] === 'PENDING') {
+            update_qris_transaction_status($order_id, 'EXPIRED');
+        }
+        return [
+            'success'       => true,
+            'status'        => 'EXPIRED',
+            'remote_status' => $remote_status,
+            'message'       => 'Transaksi Kedaluwarsa',
+            'trx'           => get_qris_transaction_by_order_id($order_id),
+            'data'          => $data
+        ];
+    } else {
+        return [
+            'success'       => true,
+            'status'        => 'PENDING',
+            'remote_status' => $remote_status,
+            'message'       => 'Menunggu Pembayaran',
+            'trx'           => $trx,
+            'data'          => $data
+        ];
+    }
+}

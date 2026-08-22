@@ -1916,25 +1916,32 @@
          } elseif (strpos($command, 'cekqris') !== false) {
             $cekdata = explode('|', $command);
             $order_id = isset($cekdata[1]) ? trim($cekdata[1]) : '';
-            $trx = get_qris_transaction_by_order_id($order_id);
-            if ($trx) {
-               if ($trx['status'] === 'PAID') {
+            $check_res = check_klikqris_status($order_id);
+            if ($check_res && isset($check_res['success']) && $check_res['success']) {
+               if ($check_res['status'] === 'PAID') {
                   Bot::send('answerCallbackQuery', [
                      'callback_query_id' => $message['id'],
-                     'text' => '✅ Pembayaran LUNAS! Saldo telah ditambahkan ke akun Anda.',
+                     'text' => '✅ Pembayaran LUNAS! Saldo Anda telah berhasil ditambahkan.',
+                     'show_alert' => true
+                  ]);
+               } elseif ($check_res['status'] === 'EXPIRED') {
+                  Bot::send('answerCallbackQuery', [
+                     'callback_query_id' => $message['id'],
+                     'text' => '❌ Transaksi QRIS ini telah kedaluwarsa. Silakan lakukan request /deposit baru.',
                      'show_alert' => true
                   ]);
                } else {
+                  $tot = isset($check_res['trx']['total_amount']) ? rupiah($check_res['trx']['total_amount']) : '';
                   Bot::send('answerCallbackQuery', [
                      'callback_query_id' => $message['id'],
-                     'text' => '⏳ Menunggu Pembayaran. Silakan transfer sesuai TOTAL HARUS DIBAYAR (' . rupiah($trx['total_amount']) . ').',
+                     'text' => '⏳ Pembayaran belum terdeteksi. Silakan transfer tepat ' . $tot . ' sebelum batas waktu berakhir.',
                      'show_alert' => true
                   ]);
                }
             } else {
                Bot::send('answerCallbackQuery', [
                   'callback_query_id' => $message['id'],
-                  'text' => 'Transaksi tidak ditemukan.',
+                  'text' => 'Transaksi tidak ditemukan atau gagal dicek.',
                   'show_alert' => true
                ]);
             }
