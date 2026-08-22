@@ -150,6 +150,8 @@ if (!isset($_SESSION["Mikbotamuser"])) {
 			break;
 	}
 
+	include_once __DIR__ . '/../include/klikqris_promo_modal.php';
+
 	include '../include/footer.php';
 }
 

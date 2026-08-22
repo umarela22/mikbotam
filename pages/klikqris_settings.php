@@ -64,6 +64,36 @@ $callback_url = $protocol . $domain_host . '/tools/klikqris_callback.php?uid=' .
 
     <?= $message; ?>
 
+    <!-- Banner Info / Promo Aktivasi KlikQRIS -->
+    <div class="card bd-0 bg-gradient-primary text-white shadow-sm mg-b-20" style="background: linear-gradient(135deg, #10b759 0%, #008080 100%); border-radius: 8px;">
+        <div class="card-body pd-20">
+            <div class="row align-items-center">
+                <div class="col-md-8 mg-b-15 mg-md-b-0">
+                    <div class="d-flex align-items-center">
+                        <div class="mg-r-15 d-none d-sm-block">
+                            <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-white text-success" style="width: 54px; height: 54px; font-size: 26px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                                <i class="fa fa-qrcode"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h5 class="tx-white font-weight-bold mg-b-5">
+                                <i class="fa fa-bullhorn mg-r-5 text-warning"></i> Belum Memiliki Akun Merchant KlikQRIS?
+                            </h5>
+                            <p class="tx-white tx-13 mg-b-0" style="opacity: 0.95;">
+                                Nikmati kemudahan terima pembayaran QRIS otomatis 24 Jam untuk top up saldo reseller dan tagihan PPP. Daftar dan lakukan aktivasi akun merchant melalui tautan resmi di bawah ini:
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    <a href="https://klikqris.com/r/178014423787" target="_blank" class="btn btn-warning btn-block btn-lg font-weight-bold tx-uppercase tx-12 shadow" style="color: #212529; border-radius: 6px; padding: 12px 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <i class="fa fa-external-link mg-r-5"></i> Daftar & Aktivasi KlikQRIS
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row row-sm justify-content-center">
         <!-- Form Pengaturan KlikQRIS -->
         <div class="col-lg-8 mg-b-20">
