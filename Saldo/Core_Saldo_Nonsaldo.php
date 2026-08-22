@@ -66,68 +66,45 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
       
       $text         = "";
 
-      if (!empty($jumlah)) {
-         if (has($idtelegram) == false) {
-            //jika user belum terdaftar
-            $text = 'Anda tidak terdaftar Silahkan daftar terlebih dahulu ke admin atau /daftar sebelum request top up saldo';
-         } else {
-            if (preg_match('/^[0-9]+$/', $jumlah)) {
-               if (strlen($jumlah) < 7) {
-                  $text .= "@$nametelegram Permintaan deposit  sebesar " . rupiah($jumlah) . " sudah kami terima, \nSilahkan kirimkan foto bukti pembayaran  disertai dengan Caption #konfirmasi deposit $jumlah\n\nKonfirmasi selambatnya 2 jam setelah permintaan deposit";
-                  $textsend = "";
-                  $textsend .= "<code>User :  </code>@$nametelegram \n";
-                  $textsend .= "<code>ID   : </code> <code>$idtelegram </code>\n";
-                  $textsend .= "<code>Request pengisian saldo </code>\n";
-                  $textsend .= "<code>Nominal :" . rupiah($jumlah) . "</code>\n";
-                  $textsend .= "<code>Silahkan tindak lanjut \nAtau Hubungi user </code> @$nametelegram \n\n";
-                  $textsend .= "Dengan Menekan tombol dibawah ini saldo user otomatis terisi  ";
+       if (!empty($jumlah)) {
+          if (has($idtelegram) == false) {
+             //jika user belum terdaftar
+             $text = 'Anda tidak terdaftar Silahkan daftar terlebih dahulu ke admin atau /daftar sebelum request top up saldo';
+          } else {
+             if (preg_match('/^[0-9]+$/', $jumlah)) {
+                if (strlen($jumlah) < 7) {
+                   $text .= "<b>💰 Konfirmasi Permintaan Deposit</b>\n";
+                   $text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                   $text .= "👤 <b>User:</b> @" . htmlspecialchars($nametelegram) . " (<code>$idtelegram</code>)\n";
+                   $text .= "💵 <b>Nominal:</b> <b>" . rupiah($jumlah) . "</b>\n";
+                   $text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                   $text .= "Silakan pilih metode pembayaran yang Anda inginkan:\n";
 
-                  //-===================rubah texnya saja ya
-                  $kirimpelangan = [
-                     'chat_id' => $id_own,
-                     'reply_markup' => json_encode([
-                        'inline_keyboard' => [
-                           [
-                              ['text' => 'QUICK TOP UP', 'callback_data' => '12'],
-                           ],
-                           [
-                              ['text' => '' . rupiah($jumlah) . '', 'callback_data' => 'tp|' . $jumlah . '|' . $idtelegram . '|' . $nametelegram . ''],
-                           ],
-                           [
-                              ['text' => 'OR COSTUM', 'callback_data' => '12'],
-                           ],
-                           [
-                              ['text' => '10000', 'callback_data' => 'tp|10000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '15000', 'callback_data' => 'tp|15000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '20000', 'callback_data' => 'tp|20000|' . $idtelegram . '|' . $nametelegram . ''],
-                           ],
-                           [
-
-                              ['text' => '25000', 'callback_data' => 'tp|25000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '30000', 'callback_data' => 'tp|30000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '50000', 'callback_data' => 'tp|50000|' . $idtelegram . '|' . $nametelegram . ''],
-                           ],
-                           [
-
-                              ['text' => '100000', 'callback_data' => 'tp|100000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '150000', 'callback_data' => 'tp|150000|' . $idtelegram . '|' . $nametelegram . ''],
-                              ['text' => '200000', 'callback_data' => 'tp|200000|' . $idtelegram . '|' . $nametelegram . ''],
-                           ],
-
-                        ]]),
-                     'parse_mode' => 'html'
-
-                  ];
-
-                  Bot::sendMessage($textsend, $kirimpelangan);
-               } else {
-                  $text = 'Maaf Maksimal deposit Top Up Rp 1.000.000.00';
-               }
-            } else {
-               $text = 'Maaf input Nominal saldo hanya berupa angka saja';
-            }
-         }
-      } else {
+                   $options = [
+                      'reply_markup' => json_encode([
+                         'inline_keyboard' => [
+                            [
+                               ['text' => '📱 Bayar via QRIS (Otomatis 24 Jam)', 'callback_data' => 'payqris|' . $jumlah],
+                            ],
+                            [
+                               ['text' => '🏦 Transfer Manual (Kirim Bukti)', 'callback_data' => 'paymanual|' . $jumlah],
+                            ],
+                            [
+                               ['text' => '❌ Batalkan', 'callback_data' => 'paycancel'],
+                            ]
+                         ]
+                      ]),
+                      'parse_mode' => 'html'
+                   ];
+                   return Bot::sendMessage($text, $options);
+                } else {
+                   $text = 'Maaf Maksimal deposit Top Up Rp 1.000.000.00';
+                }
+             } else {
+                $text = 'Maaf input Nominal saldo hanya berupa angka saja';
+             }
+          }
+       } else {
          $text .= "Perintah ini di gunakan untuk Request Deposit Saldo kepada Adminstator \n";
          $text .= "Anda dapat  Custom Request Deposit dengan cara \n";
          $text .= "/deposit (nominal)\n";
@@ -1878,22 +1855,53 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
         } elseif (strpos($command, 'tps') !== false) {
             if (preg_match('/^tps/', $command)) {
                $cekdata  = explode('|', $command);
-               $cek      = $cekdata[1];
-               $text .= "@$usernamepelanggan Permintaan deposit  sebesar " . rupiah($cek) . " sudah kami terima, \nSilahkan kirimkan foto bukti pembayaran  disertai dengan Caption #konfirmasi deposit $cek\n\nKonfirmasi selambatnya 2 jam setelah permintaan deposit";
+               $cek      = isset($cekdata[1]) ? intval($cekdata[1]) : 0;
+               
+               $text = "<b>💰 Konfirmasi Permintaan Deposit</b>\n";
+               $text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+               $text .= "👤 <b>User:</b> @" . htmlspecialchars($usernamepelanggan) . " (<code>$id</code>)\n";
+               $text .= "💵 <b>Nominal:</b> <b>" . rupiah($cek) . "</b>\n";
+               $text .= "━━━━━━━━━━━━━━━━━━━━━\n";
+               $text .= "Silakan pilih metode pembayaran yang Anda inginkan:\n";
+
+               $options = [
+                  'chat_id' => $chatidtele,
+                  'message_id' => (int) $message['message']['message_id'],
+                  'text' => $text,
+                  'reply_markup' => json_encode([
+                     'inline_keyboard' => [
+                        [
+                           ['text' => '📱 Bayar via QRIS (Otomatis 24 Jam)', 'callback_data' => 'payqris|' . $cek],
+                        ],
+                        [
+                           ['text' => '🏦 Transfer Manual (Kirim Bukti)', 'callback_data' => 'paymanual|' . $cek],
+                        ],
+                        [
+                           ['text' => '❌ Batalkan', 'callback_data' => 'paycancel'],
+                        ]
+                     ]
+                  ]),
+                  'parse_mode' => 'html'
+               ];
+               Bot::editMessageText($options);
+            }
+         } elseif (strpos($command, 'paymanual') !== false) {
+            $cekdata  = explode('|', $command);
+            $cek      = isset($cekdata[1]) ? intval($cekdata[1]) : 0;
+            if ($cek > 0) {
+               $text = "@$usernamepelanggan Permintaan deposit  sebesar " . rupiah($cek) . " sudah kami terima, \nSilahkan kirimkan foto bukti pembayaran  disertai dengan Caption #konfirmasi deposit $cek\n\nKonfirmasi selambatnya 2 jam setelah permintaan deposit";
                $options = [
                   'chat_id' => $chatidtele,
                   'message_id' => (int) $message['message']['message_id'],
                   'text' => $text,
                   'parse_mode' => 'html'
-
                ];
-
                Bot::editMessageText($options);
 
                $textsend = "";
                $textsend .= "<code>User :  </code>@$usernamepelanggan \n";
                $textsend .= "<code>ID   : </code> <code>$id </code>\n";
-               $textsend .= "<code>Request pengisian saldo </code>\n";
+               $textsend .= "<code>Request pengisian saldo (Manual)</code>\n";
                $textsend .= "<code>Nominal :" . rupiah($cek) . "</code>\n";
                $textsend .= "<code>Silahkan tindak lanjut \nAtau Hubungi user </code> @$usernamepelanggan \n\n";
                $textsend .= "Dengan Menekan tombol dibawah ini saldo user otomatis terisi  ";
@@ -1917,30 +1925,145 @@ $mkbot->cmd('*', 'Maaf commands tidak tersedia');
                            ['text' => '20000', 'callback_data' => 'tp|20000|' . $id . '|' . $usernamepelanggan . ''],
                         ],
                         [
-
                            ['text' => '25000', 'callback_data' => 'tp|25000|' . $id . '|' . $usernamepelanggan . ''],
                            ['text' => '30000', 'callback_data' => 'tp|30000|' . $id . '|' . $usernamepelanggan . ''],
                            ['text' => '50000', 'callback_data' => 'tp|50000|' . $id . '|' . $usernamepelanggan . ''],
                         ],
                         [
-
                            ['text' => '100000', 'callback_data' => 'tp|100000|' . $id . '|' . $usernamepelanggan . ''],
                            ['text' => '150000', 'callback_data' => 'tp|150000|' . $id . '|' . $usernamepelanggan . ''],
                            ['text' => '200000', 'callback_data' => 'tp|200000|' . $id . '|' . $usernamepelanggan . ''],
                         ],
                         [
-
                            ['text' => 'Reject Request', 'callback_data' => 'tp|reject|' . $id . '|reject']
                         ],
-
                      ]]),
                   'parse_mode' => 'html'
-
                ];
-
                Bot::sendMessage($textsend, $kirimpelangan);
             }
-        } elseif (strpos($command, 'tp') !== false) {
+         } elseif (strpos($command, 'payqris') !== false) {
+            $cekdata  = explode('|', $command);
+            $cek      = isset($cekdata[1]) ? intval($cekdata[1]) : 0;
+            if ($cek > 0) {
+               $tenant_id = get_current_tenant_id();
+               $qris_res = create_klikqris_transaction($cek, $id, $usernamepelanggan, "Deposit Saldo @$usernamepelanggan", $tenant_id);
+               if ($qris_res['success']) {
+                  $order_id     = $qris_res['order_id'];
+                  $total_amount = $qris_res['total_amount'];
+                  $amount_uniq  = $qris_res['amount_uniq'];
+                  $qris_url     = $qris_res['qris_url'];
+                  $expired_at   = $qris_res['expired_at'];
+                  $exp_menit    = $qris_res['expired_menit'];
+
+                  $caption = "💳 <b>PEMBAYARAN DEPOSIT QRIS OTOMATIS</b>\n";
+                  $caption .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                  $caption .= "👤 <b>User:</b> @" . htmlspecialchars($usernamepelanggan) . " (<code>$id</code>)\n";
+                  $caption .= "🆔 <b>Order ID:</b> <code>$order_id</code>\n";
+                  $caption .= "💰 <b>Nominal Deposit:</b> " . rupiah($cek) . "\n";
+                  if ($amount_uniq > 0) {
+                     $caption .= "🔢 <b>Kode Unik:</b> " . rupiah($amount_uniq) . "\n";
+                  }
+                  $caption .= "💵 <b>TOTAL HARUS DIBAYAR:</b> <b><u>" . rupiah($total_amount) . "</u></b>\n";
+                  $caption .= "⏰ <b>Batas Waktu:</b> $expired_at ($exp_menit Menit)\n";
+                  $caption .= "━━━━━━━━━━━━━━━━━━━━━\n";
+                  $caption .= "⚠️ <b>PENTING:</b>\n";
+                  $caption .= "• Scan QR Code di atas menggunakan BCA, GoPay, OVO, DANA, ShopeePay, atau Mobile Banking.\n";
+                  $caption .= "• Pastikan transfer <b>PERSIS " . rupiah($total_amount) . "</b> agar saldo <b>OTOMATIS</b> terisi 24 Jam!\n";
+
+                  $qris_markup = [
+                     'inline_keyboard' => [
+                        [
+                           ['text' => '🔄 Cek Status Pembayaran', 'callback_data' => 'cekqris|' . $order_id],
+                        ],
+                        [
+                           ['text' => '❌ Batalkan', 'callback_data' => 'cancelqris|' . $order_id]
+                        ]
+                     ]
+                  ];
+
+                  $del_opt = [
+                     'chat_id' => $chatidtele,
+                     'message_id' => (int) $message['message']['message_id']
+                  ];
+                  Bot::send('deleteMessage', $del_opt);
+
+                  $photo_opt = [
+                     'chat_id'      => $chatidtele,
+                     'photo'        => $qris_url,
+                     'caption'      => $caption,
+                     'parse_mode'   => 'html',
+                     'reply_markup' => json_encode($qris_markup)
+                  ];
+                  Bot::send('sendPhoto', $photo_opt);
+               } else {
+                  $err_text = "⚠️ <b>Gagal Membuat QRIS</b>\n\n" . htmlspecialchars($qris_res['message']) . "\n\nSilakan pilih metode Transfer Manual atau hubungi Administrator.";
+                  $options = [
+                     'chat_id' => $chatidtele,
+                     'message_id' => (int) $message['message']['message_id'],
+                     'text' => $err_text,
+                     'reply_markup' => json_encode([
+                        'inline_keyboard' => [
+                           [
+                              ['text' => '🏦 Gunakan Transfer Manual', 'callback_data' => 'paymanual|' . $cek],
+                           ],
+                           [
+                              ['text' => '❌ Batal', 'callback_data' => 'paycancel']
+                           ]
+                        ]
+                     ]),
+                     'parse_mode' => 'html'
+                  ];
+                  Bot::editMessageText($options);
+               }
+            }
+         } elseif (strpos($command, 'cekqris') !== false) {
+            $cekdata = explode('|', $command);
+            $order_id = isset($cekdata[1]) ? trim($cekdata[1]) : '';
+            $trx = get_qris_transaction_by_order_id($order_id);
+            if ($trx) {
+               if ($trx['status'] === 'PAID') {
+                  Bot::send('answerCallbackQuery', [
+                     'callback_query_id' => $message['id'],
+                     'text' => '✅ Pembayaran LUNAS! Saldo telah ditambahkan ke akun Anda.',
+                     'show_alert' => true
+                  ]);
+               } else {
+                  Bot::send('answerCallbackQuery', [
+                     'callback_query_id' => $message['id'],
+                     'text' => '⏳ Menunggu Pembayaran. Silakan transfer sesuai TOTAL HARUS DIBAYAR (' . rupiah($trx['total_amount']) . ').',
+                     'show_alert' => true
+                  ]);
+               }
+            } else {
+               Bot::send('answerCallbackQuery', [
+                  'callback_query_id' => $message['id'],
+                  'text' => 'Transaksi tidak ditemukan.',
+                  'show_alert' => true
+               ]);
+            }
+         } elseif (strpos($command, 'cancelqris') !== false) {
+            $cekdata = explode('|', $command);
+            $order_id = isset($cekdata[1]) ? trim($cekdata[1]) : '';
+            if ($order_id) {
+               update_qris_transaction_status($order_id, 'CANCELLED');
+            }
+            $options = [
+               'chat_id' => $chatidtele,
+               'message_id' => (int) $message['message']['message_id'],
+               'text' => '❌ Permintaan pembayaran QRIS telah dibatalkan.',
+               'parse_mode' => 'html'
+            ];
+            Bot::editMessageText($options);
+         } elseif ($command === 'paycancel') {
+            $options = [
+               'chat_id' => $chatidtele,
+               'message_id' => (int) $message['message']['message_id'],
+               'text' => '❌ Permintaan deposit telah dibatalkan.',
+               'parse_mode' => 'html'
+            ];
+            Bot::editMessageText($options);
+         } elseif (strpos($command, 'tp') !== false) {
 
             if (preg_match('/^tp/', $command)) {
                $cekdata     = explode('|', $command);

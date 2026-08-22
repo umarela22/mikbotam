@@ -1742,9 +1742,25 @@ function init_ppp_billing_tables() {
         $pdo->exec("CREATE TABLE IF NOT EXISTS re_operating (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             id_user TEXT,
+            nama_seller TEXT,
+            saldo_awal INTEGER DEFAULT 0,
+            saldo_akhir INTEGER DEFAULT 0,
+            top_up INTEGER DEFAULT 0,
+            top_up_fromid TEXT,
+            keterangan TEXT,
+            Waktu TEXT,
+            Tanggal TEXT,
             operat TEXT,
             app_user_id INTEGER
         )");
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN nama_seller TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN saldo_awal INTEGER DEFAULT 0"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN saldo_akhir INTEGER DEFAULT 0"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN top_up INTEGER DEFAULT 0"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN top_up_fromid TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN keterangan TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN Waktu TEXT"); } catch (Exception $ex) {}
+        try { $pdo->exec("ALTER TABLE re_operating ADD COLUMN Tanggal TEXT"); } catch (Exception $ex) {}
 
         $pdo->exec("CREATE TABLE IF NOT EXISTS st_reportdata (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1917,6 +1933,26 @@ function init_ppp_billing_tables() {
             production_url TEXT NOT NULL DEFAULT 'https://klikqris.com/api',
             is_active INTEGER NOT NULL DEFAULT 1,
             app_user_id INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );");
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS app_qris_transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id TEXT NOT NULL UNIQUE,
+            merchant_id TEXT,
+            telegram_id TEXT,
+            telegram_username TEXT,
+            app_user_id INTEGER,
+            amount INTEGER NOT NULL,
+            amount_uniq INTEGER DEFAULT 0,
+            total_amount INTEGER NOT NULL,
+            qris_url TEXT,
+            status TEXT NOT NULL DEFAULT 'PENDING',
+            keterangan TEXT,
+            expired_at DATETIME,
+            paid_at DATETIME,
+            signature TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );");
@@ -2972,4 +3008,143 @@ function save_klikqris_settings($data, $tenant_id = null) {
     }
 
     return ['success' => true, 'message' => 'Pengaturan Payment Gateway KlikQRIS berhasil disimpan!'];
+}
+
+function create_klikqris_transaction($amount, $telegram_id, $telegram_username = '', $keterangan = 'Top Up Saldo', $tenant_id = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if ($tenant_id === null) {
+        $tenant_id = get_current_tenant_id();
+    }
+    $tenant_id = intval($tenant_id);
+    $settings = get_klikqris_settings($tenant_id);
+
+    if (empty($settings['is_active']) || empty($settings['api_key']) || empty($settings['merchant_id'])) {
+        return [
+            'success' => false,
+            'message' => 'Layanan QRIS saat ini belum aktif atau belum dikonfigurasi oleh Administrator.'
+        ];
+    }
+
+    $amount = intval($amount);
+    if ($amount < 1000) {
+        return [
+            'success' => false,
+            'message' => 'Minimal transaksi QRIS adalah Rp 1.000.'
+        ];
+    }
+
+    // Generate unique order_id
+    $order_id = 'DEP-' . $telegram_id . '-' . date('ymdHis') . rand(10, 99);
+    $base_url = rtrim($settings['active_url'], '/');
+    $endpoint = $base_url . '/qris/create';
+
+    $payload = [
+        'order_id'    => $order_id,
+        'id_merchant' => $settings['merchant_id'],
+        'amount'      => $amount,
+        'keterangan'  => !empty($keterangan) ? $keterangan : ('Deposit Saldo #' . $telegram_id)
+    ];
+
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL            => $endpoint,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_POSTFIELDS     => json_encode($payload),
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'x-api-key: ' . $settings['api_key'],
+            'id_merchant: ' . $settings['merchant_id']
+        ]
+    ]);
+
+    $response = curl_exec($curl);
+    $curl_error = curl_error($curl);
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($curl_error) {
+        return [
+            'success' => false,
+            'message' => 'Koneksi ke server KlikQRIS gagal: ' . $curl_error
+        ];
+    }
+
+    $json = json_decode($response, true);
+    if (!$json || !isset($json['status']) || $json['status'] !== true) {
+        $err_msg = isset($json['message']) ? $json['message'] : 'Gagal membuat QRIS (HTTP ' . $http_code . ')';
+        return [
+            'success' => false,
+            'message' => $err_msg,
+            'raw'     => $response
+        ];
+    }
+
+    $data = isset($json['data']) ? $json['data'] : [];
+    $total_amount = isset($data['total_amount']) ? intval(round(floatval($data['total_amount']))) : $amount;
+    $amount_uniq  = isset($data['amount_uniq']) ? intval(round(floatval($data['amount_uniq']))) : ($total_amount - $amount);
+    $qris_url     = isset($data['qris_url']) ? $data['qris_url'] : '';
+    $qris_image   = isset($data['qris_image']) ? $data['qris_image'] : '';
+    $expired_at   = isset($data['expired_at']) ? $data['expired_at'] : date('Y-m-d H:i:s', strtotime('+60 minutes'));
+    $expired_menit = isset($data['expired_menit']) ? $data['expired_menit'] : '60';
+    $signature    = isset($data['signature']) ? $data['signature'] : '';
+
+    // Save transaction record in database
+    $mikbotamdata->insert('app_qris_transactions', [
+        'order_id'          => $order_id,
+        'merchant_id'       => $settings['merchant_id'],
+        'telegram_id'       => (string)$telegram_id,
+        'telegram_username' => (string)$telegram_username,
+        'app_user_id'       => $tenant_id,
+        'amount'            => $amount,
+        'amount_uniq'       => $amount_uniq,
+        'total_amount'      => $total_amount,
+        'qris_url'          => $qris_url,
+        'status'            => 'PENDING',
+        'keterangan'        => $payload['keterangan'],
+        'expired_at'        => $expired_at,
+        'signature'         => $signature,
+        'created_at'        => date('Y-m-d H:i:s'),
+        'updated_at'        => date('Y-m-d H:i:s')
+    ]);
+
+    return [
+        'success'       => true,
+        'order_id'      => $order_id,
+        'amount'        => $amount,
+        'amount_uniq'   => $amount_uniq,
+        'total_amount'  => $total_amount,
+        'qris_url'      => $qris_url,
+        'qris_image'    => $qris_image,
+        'expired_at'    => $expired_at,
+        'expired_menit' => $expired_menit,
+        'data'          => $data
+    ];
+}
+
+function get_qris_transaction_by_order_id($order_id) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if (!$mikbotamdata) return null;
+    return $mikbotamdata->get('app_qris_transactions', '*', ['order_id' => $order_id]);
+}
+
+function update_qris_transaction_status($order_id, $status = 'PAID', $paid_at = null) {
+    global $mikbotamdata;
+    init_ppp_billing_tables();
+    if (!$mikbotamdata) return false;
+    $upd = [
+        'status'     => $status,
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+    if ($paid_at) {
+        $upd['paid_at'] = $paid_at;
+    } elseif ($status === 'PAID') {
+        $upd['paid_at'] = date('Y-m-d H:i:s');
+    }
+    return $mikbotamdata->update('app_qris_transactions', $upd, ['order_id' => $order_id]);
 }
